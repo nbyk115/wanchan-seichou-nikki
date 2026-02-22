@@ -29,7 +29,7 @@
 [data-font="kosugi"]{--fh:"Kosugi Maru",sans-serif;--ff:"Kosugi Maru",sans-serif;}
 
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;overflow:hidden;}
+html,body{height:100dvh;height:100vh;overflow:hidden;}
 body{font-family:var(--ff);background:var(--bg);color:var(--tx);-webkit-font-smoothing:antialiased;font-size:14px;}
 
 /* ── ANIMATIONS ── */
@@ -50,9 +50,9 @@ body{font-family:var(--ff);background:var(--bg);color:var(--tx);-webkit-font-smo
 .sp-dot:nth-child(2){animation-delay:.2s;}.sp-dot:nth-child(3){animation-delay:.4s;}
 
 /* ── SHELL ── */
-#app{display:none;height:100%;flex-direction:column;padding-top:52px;}
+#app{display:none;height:100dvh;height:100vh;flex-direction:column;}
 .screens{flex:1;position:relative;overflow:hidden;}
-.screen{position:absolute;inset:0;display:none;flex-direction:column;overflow-y:auto;background:var(--bg);z-index:1;padding-bottom:calc(56px + env(safe-area-inset-bottom,0));}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;overflow-y:auto;background:var(--bg);}
 .screen::-webkit-scrollbar{display:none;}
 .screen.active{display:flex;animation:riseIn .2s ease;}
 
@@ -64,14 +64,13 @@ body{font-family:var(--ff);background:var(--bg);color:var(--tx);-webkit-font-smo
   padding:0 16px;height:52px;
   display:flex;align-items:center;gap:12px;
   flex-shrink:0;z-index:60;
-  position:fixed;top:0;left:0;right:0;
 }
 .tb-ava{width:32px;height:32px;border-radius:50%;background:var(--sf2);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;font-size:17px;flex-shrink:0;}
 .tb-name{font-family:var(--fh);font-size:17px;color:var(--tx);flex:1;font-weight:700;letter-spacing:.01em;}
 .tb-btn{width:32px;height:32px;border:none;background:transparent;font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--mid);flex-shrink:0;}
 
 /* ── HERO ── */
-.hero{position:relative;overflow:hidden;flex-shrink:0;padding:32px 20px 20px;background:var(--hero-bg);}
+.hero{position:relative;overflow:hidden;flex-shrink:0;padding:60px 20px 64px;background:var(--hero-bg);}
 .hero-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.4;}
 .hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.05),rgba(0,0,0,.38));}
 .hero-grain{position:absolute;inset:0;opacity:.035;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
@@ -89,25 +88,21 @@ body{font-family:var(--ff);background:var(--bg);color:var(--tx);-webkit-font-smo
   background:rgba(255,255,255,.18);
   border:1.5px solid rgba(255,255,255,.3);
   border-radius:22px;
-  padding:6px 10px;
-  display:flex;align-items:center;gap:4px;
+  padding:7px 15px;
+  display:flex;align-items:center;gap:5px;
   font-family:var(--fn);
-  font-size:11px;
+  font-size:13px;
   font-weight:700;
   color:#fff;
   line-height:1;
   white-space:nowrap;
-  flex:1 1 0;
-  min-width:0;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  max-width:48%;
+  letter-spacing:.01em;
 }
 .h-pill-icon{font-size:14px;line-height:1;}
 
 /* ── FLOAT CARD ── */
 .fc{
-  margin:8px 12px 0;
+  margin:-28px 12px 0;
   background:var(--sf);
   border-radius:var(--r-xl);
   box-shadow:0 8px 28px rgba(0,0,0,.1),0 2px 6px rgba(0,0,0,.06);
@@ -157,7 +152,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--tx);-webkit-font-smo
 .wk-txt{font-size:13px;font-weight:700;color:var(--tx);line-height:1.8;}
 
 /* ── HIGHLIGHTS ROW ── */
-.hl-row{display:flex;gap:12px;padding:6px 16px 90px;overflow-x:auto;scrollbar-width:none;}
+.hl-row{display:flex;gap:12px;padding:6px 16px 12px;overflow-x:auto;scrollbar-width:none;}
 .hl-row::-webkit-scrollbar{display:none;}
 .hl-circle-item{flex-shrink:0;width:72px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;}
 .hl-circle-item:active{opacity:.7;}
@@ -359,7 +354,6 @@ canvas#weightChart{width:100%;height:110px;}
   border-top:1px solid rgba(0,0,0,.06);
   display:flex;align-items:center;flex-shrink:0;
   height:56px;padding-bottom:env(safe-area-inset-bottom,0);
-  position:fixed;bottom:0;left:0;right:0;z-index:100;
 }
 .ntab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;height:100%;position:relative;min-width:0;border:none;background:transparent;padding:0;-webkit-appearance:none;appearance:none;}
 .ntab:active{opacity:.5;}
@@ -502,14 +496,9 @@ button,[onclick]{touch-action:manipulation;}
           </div>
           <span class="post-arr">›</span>
         </div>
-        <div class="sec-card" onclick="alert('プレミアムプラン\n\n近日公開予定です！🎉')" style="background:linear-gradient(135deg,#4C1D95,#7C3AED);cursor:pointer;">
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <div style="display:flex;align-items:center;gap:10px;">
-              <div style="font-size:22px">👑</div>
-              <div><div style="font-size:13px;font-weight:800;color:#fff;">プレミアムプランを試す</div><div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:2px;">健康管理・AI強化・無制限保存</div></div>
-            </div>
-            <div style="font-size:12px;font-weight:800;color:#fff;background:rgba(255,255,255,.2);padding:5px 10px;border-radius:20px;">月額480円 ›</div>
-          </div>
+        <div onclick="alert('プレミアムプラン\n\n近日公開予定です！🎉')" style="margin:8px 12px 0;padding:14px 16px;border-radius:16px;background:linear-gradient(135deg,#4C1D95,#7C3AED);display:flex;align-items:center;justify-content:space-between;cursor:pointer;touch-action:manipulation;">
+          <div style="display:flex;align-items:center;gap:10px;"><div style="font-size:20px">👑</div><div><div style="font-size:13px;font-weight:800;color:#fff;">プレミアムプランを試す</div><div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:2px;">健康管理・AI強化・クラウド同期</div></div></div>
+          <div style="font-size:12px;font-weight:800;color:#fff;background:rgba(255,255,255,.2);padding:5px 10px;border-radius:20px;white-space:nowrap;">月額480円 ›</div>
         </div>
         <div class="fc-stats">
           <div class="fcs"><div class="fcs-n" id="statDiary">0</div><div class="fcs-l">日記</div></div>
@@ -526,6 +515,10 @@ button,[onclick]{touch-action:manipulation;}
       <div class="sec-card" style="padding-bottom:10px">
         <div class="sec-hd"><div class="sec-t">ハイライト</div><div class="sec-more" onclick="showScreen('highlights')">全部みる ›</div></div>
         <div class="hl-row" id="hlRow">
+          <div class="hl-circle-item" onclick="openMemorySheet()"><div class="hl-ring add-ring"><div class="add-ring-ico">＋</div></div><div class="hl-lbl">追加</div></div>
+          <div class="hl-circle-item" onclick="showScreen('highlights')"><div class="hl-ring"><div class="hl-inner">🎂</div></div><div class="hl-lbl">誕生日</div></div>
+          <div class="hl-circle-item" onclick="showScreen('highlights')"><div class="hl-ring"><div class="hl-inner">❄️</div></div><div class="hl-lbl">冬のおもいで</div></div>
+          <div class="hl-circle-item" onclick="showScreen('highlights')"><div class="hl-ring"><div class="hl-inner">🏖️</div></div><div class="hl-lbl">おでかけ</div></div>
           <div class="hl-circle-item" onclick="openMemorySheet()"><div class="hl-ring add-ring"><div class="add-ring-ico">＋</div></div><div class="hl-lbl">追加</div></div>
         </div>
       </div>
@@ -569,20 +562,12 @@ button,[onclick]{touch-action:manipulation;}
     <!-- HIGHLIGHTS -->
     <div class="screen" id="highlightsScreen">
       <div class="hl-topbar"><div class="hl-title">ハイライト</div><button class="hl-add-btn" onclick="openMemorySheet()">＋ 新しいグループ</button></div>
-      <divclass="hl-list">
+      <div class="hl-list">
         <div id="hlGroupList">
-          <div class="hl-group" id="hlg-first">
-            <div class="hl-g-head"><div class="hl-g-ico">🌸</div><div class="hl-g-name">はじめての〇〇</div><button onclick="if(confirm('このグループを削除しますか？')){document.getElementById('hlg-first').remove();}" style="margin-left:auto;background:none;border:none;font-size:18px;cursor:pointer;color:var(--soft);padding:4px;touch-action:manipulation;">×</button></div>
-            <div class="hl-photos"><div class="hl-photo-add" onclick="alert('写真追加機能は近日公開予定！')">＋</div></div>
-          </div>
-          <div class="hl-group" id="hlg-second">
-            <div class="hl-g-head"><div class="hl-g-ico">🎂</div><div class="hl-g-name">誕生日</div><button onclick="if(confirm('このグループを削除しますか？')){document.getElementById('hlg-second').remove();}" style="margin-left:auto;background:none;border:none;font-size:18px;cursor:pointer;color:var(--soft);padding:4px;touch-action:manipulation;">×</button></div>
-            <div class="hl-photos"><div class="hl-photo-add" onclick="alert('写真追加機能は近日公開予定！')">＋</div></div>
-          </div>
+          <div class="hl-group" id="hlg-1"><div class="hl-g-head" style="display:flex;align-items:center;padding:12px 14px;"><div class="hl-g-ico">🌸</div><div class="hl-g-name" style="margin-left:8px;font-weight:700;">はじめての〇〇</div><button onclick="if(confirm('削除しますか？')){this.closest('.hl-group').remove()}" style="margin-left:auto;background:none;border:none;font-size:18px;color:var(--soft);cursor:pointer;touch-action:manipulation;padding:4px;">×</button></div><div class="hl-photos"><div class="hl-photo-add" onclick="alert('写真追加は近日公開！')">＋</div></div></div>
+          <div class="hl-group" id="hlg-2"><div class="hl-g-head" style="display:flex;align-items:center;padding:12px 14px;"><div class="hl-g-ico">🎂</div><div class="hl-g-name" style="margin-left:8px;font-weight:700;">誕生日</div><button onclick="if(confirm('削除しますか？')){this.closest('.hl-group').remove()}" style="margin-left:auto;background:none;border:none;font-size:18px;color:var(--soft);cursor:pointer;touch-action:manipulation;padding:4px;">×</button></div><div class="hl-photos"><div class="hl-photo-add" onclick="alert('写真追加は近日公開！')">＋</div></div></div>
         </div>
-        <div class="hl-group" style="cursor:pointer;border:2px dashed var(--bd);background:transparent;box-shadow:none;display:flex;align-items:center;justify-content:center;min-height:64px;" onclick="openMemorySheet()">
-          <span style="font-size:13px;color:var(--soft);font-weight:600">＋ 新しいグループを作る</span>
-        </div>
+        <div class="hl-group" style="cursor:pointer;border:2px dashed var(--bd);background:transparent;box-shadow:none;display:flex;align-items:center;justify-content:center;min-height:64px;" onclick="openMemorySheet()"><span style="font-size:13px;color:var(--soft);font-weight:600">＋ 新しいグループを作る</span></div>
         <div class="hl-group"><div class="hl-group-head"><div class="hl-group-emoji">🎂</div><div class="hl-group-info"><div class="hl-group-name">誕生日</div><div class="hl-group-count">2枚</div></div></div>
           <div class="hl-photos"><div class="hl-photo-cell" style="background:linear-gradient(135deg,#ECE8D8,#D0C090)" onclick="openPhoto('🎂','linear-gradient(135deg,#ECE8D8,#D0C090)','3歳のお誕生日')">🎂</div><div class="hl-photo-add" onclick="document.getElementById('hlMediaInput').click()"><div class="hl-photo-add-ico">＋</div><div class="hl-photo-add-txt">追加</div></div></div>
         </div>
@@ -638,10 +623,10 @@ button,[onclick]{touch-action:manipulation;}
             <div><div style="font-family:var(--fh);font-size:16px;font-weight:800;color:#fff;">プレミアムプラン</div><div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:2px;">健康管理・無制限保存・AIコメント強化</div></div>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
-            <div style="background:rgba(255,255,255,.12);border-radius:10px;padding:10px;"><div style="font-size:16px;margin-bottom:3px">⚖️</div><div style="font-size:11px;color:#fff;font-weight:600">体重・健康管理</div></div>
             <div style="background:rgba(255,255,255,.12);border-radius:10px;padding:10px;"><div style="font-size:16px;margin-bottom:3px">💉</div><div style="font-size:11px;color:#fff;font-weight:600">ワクチン記録</div></div>
             <div style="background:rgba(255,255,255,.12);border-radius:10px;padding:10px;"><div style="font-size:16px;margin-bottom:3px">🖼️</div><div style="font-size:11px;color:#fff;font-weight:600">無制限写真保存</div></div>
             <div style="background:rgba(255,255,255,.12);border-radius:10px;padding:10px;"><div style="font-size:16px;margin-bottom:3px">🐾</div><div style="font-size:11px;color:#fff;font-weight:600">AIコメント強化版</div></div>
+            <div style="background:rgba(255,255,255,.12);border-radius:10px;padding:10px;"><div style="font-size:16px;margin-bottom:3px">☁️</div><div style="font-size:11px;color:#fff;font-weight:600">クラウド同期</div></div>
           </div>
           <button onclick="alert('プレミアムプラン\n\n近日公開予定です！🎉')" style="width:100%;padding:13px;border:none;border-radius:12px;background:#fff;font-family:var(--ff);font-size:14px;font-weight:800;color:#7C3AED;cursor:pointer;touch-action:manipulation;">✨ 月額480円で始める</button>
         </div>
@@ -727,7 +712,7 @@ button,[onclick]{touch-action:manipulation;}
     <button class="ntab"    id="nt-post"       onclick="showScreen('post')"><div class="ni" style="width:46px;height:32px;border-radius:10px;background:linear-gradient(135deg,#F472B6,#A855F7,#6366F1);display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;box-shadow:0 3px 12px rgba(168,85,247,.42)">＋</div></button>
     <button class="ntab"    id="nt-photos"     onclick="showScreen('photos')"><div class="ni">📷</div></button>
     <button class="ntab"    id="nt-health"     onclick="showScreen('health')"><div class="ni">❤️</div></button>
-  </nav>
+</nav>
 </div>
 
 <!-- MODALS -->
@@ -1546,28 +1531,17 @@ function esc(s){if(s==null)return'';return String(s).replace(/&/g,'&amp;').repla
 function createMemory(){
   const n=document.getElementById('memoryName').value.trim();
   if(!n){document.getElementById('memoryName').focus();return;}
-  const emoji=document.querySelector('.mp.on')?document.querySelector('.mp.on').textContent:'📸';
-  const id='hl'+Date.now();
-  // ハイライト画面に追加（削除ボタン付き）
+  const em=document.querySelector('.mp.on')?document.querySelector('.mp.on').textContent:'📸';
+  const id='hlg'+Date.now();
   const gl=document.getElementById('hlGroupList');
-  if(gl){
-    const d=document.createElement('div');
-    d.className='hl-group';d.id=id;
-    d.innerHTML=`<div class="hl-g-head"><div class="hl-g-ico">${emoji}</div><div class="hl-g-name">${esc(n)}</div><button onclick="if(confirm('このグループを削除しますか？')){document.getElementById('${id}').remove();const r=document.getElementById('hlRow');if(r){const ci=r.querySelector('#hlc-${id}');if(ci)ci.remove();}}" style="margin-left:auto;background:none;border:none;font-size:18px;cursor:pointer;color:var(--soft);padding:4px;">×</button></div><div class="hl-photos"><div class="hl-photo-add" onclick="alert('写真追加機能は近日公開予定！')">＋</div></div>`;
-    gl.appendChild(d);
-  }
-  // ホームのhl-rowにも追加
+  if(gl){const d=document.createElement('div');d.className='hl-group';d.id=id;
+    d.innerHTML='<div class="hl-g-head" style="display:flex;align-items:center;padding:12px 14px;"><div class="hl-g-ico">'+em+'</div><div class="hl-g-name" style="margin-left:8px;font-weight:700;">'+esc(n)+'</div><button onclick="if(confirm(\'削除しますか？\')){this.closest(\'.hl-group\').remove()}" style="margin-left:auto;background:none;border:none;font-size:18px;color:var(--soft);cursor:pointer;touch-action:manipulation;padding:4px;">×</button></div><div class="hl-photos"><div class="hl-photo-add" onclick="alert(\'写真追加は近日公開！\')">＋</div></div>';
+    gl.appendChild(d);}
   const row=document.getElementById('hlRow');
-  if(row){
-    const ci=document.createElement('div');
-    ci.className='hl-circle-item';ci.id='hlc-'+id;
-    ci.innerHTML=`<div class="hl-ring"><div class="hl-inner">${emoji}</div></div><div class="hl-lbl">${esc(n).slice(0,5)}</div>`;
-    ci.onclick=()=>showScreen('highlights');
-    row.insertBefore(ci,row.lastElementChild);
-  }
-  closePicker('ovMemory');
-  document.getElementById('memoryName').value='';
-  showScreen('highlights');
+  if(row){const ci=document.createElement('div');ci.className='hl-circle-item';
+    ci.innerHTML='<div class="hl-ring"><div class="hl-inner">'+em+'</div></div><div class="hl-lbl">'+esc(n).slice(0,5)+'</div>';
+    ci.onclick=()=>showScreen('highlights');row.insertBefore(ci,row.lastElementChild);}
+  closePicker('ovMemory');document.getElementById('memoryName').value='';showScreen('highlights');
 }
 function pickMonth(el){document.querySelectorAll('.mp').forEach(p=>p.classList.remove('on'));el.classList.add('on');}
 function closePicker(id){document.getElementById(id).classList.remove('on');}
@@ -1583,27 +1557,23 @@ initDates();
 renderDiaryList();
 window.addEventListener('load',()=>{setTimeout(()=>{document.getElementById('splash').classList.add('out');document.getElementById('app').style.display='flex';},1400);});
 window.addEventListener('resize',drawChart);
-
 // スワイプで戻る
 (function(){
-  const history=[];
+  const hist=[];
   const _orig=window.showScreen;
   window.showScreen=function(id){
     const cur=document.querySelector('.screen.active');
-    if(cur && cur.id!==id+'Screen') history.push(cur.id.replace('Screen',''));
-    if(_orig) _orig(id);
+    if(cur){const cid=cur.id.replace('Screen','');if(cid!==id)hist.push(cid);}
+    _orig(id);
   };
   let sx=0,sy=0;
   document.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
   document.addEventListener('touchend',e=>{
     const dx=e.changedTouches[0].clientX-sx;
     const dy=Math.abs(e.changedTouches[0].clientY-sy);
-    if(dx>60&&dy<40&&history.length){
-      window.showScreen(history.pop());
-    }
+    if(dx>60&&dy<50&&hist.length){window.showScreen(hist.pop());}
   },{passive:true});
 })();
-
 </script>
 </body>
 </html>
