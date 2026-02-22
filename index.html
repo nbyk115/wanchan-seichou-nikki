@@ -1596,7 +1596,7 @@ function showScreen(name){SCREENS.forEach(s=>{const e=document.getElementById(s+
 // INIT
 initDates();
 renderDiaryList();
-window.addEventListener('load',()=>{setTimeout(()=>{if(!window._fbLoggedIn)document.getElementById('splash').classList.add('out');},2200);});
+window.addEventListener('load',()=>{setTimeout(()=>{document.getElementById('splash').classList.add('out');},1800);});
 
 function esc(s){if(s==null)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 window.syncDogName=function(name){const n=name.trim()||'わんちゃん';['hName','pName'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=n;});const tb=document.getElementById('tbUserName');if(tb)tb.textContent=n+'の成長日記';};
@@ -1609,7 +1609,7 @@ document.addEventListener('touchstart',function(){},{passive:true});
 window.addEventListener('resize',drawChart);
 </script>
 
-<div id="loginOverlay" style="display:none;position:fixed;inset:0;z-index:1000;background:linear-gradient(160deg,#4C1D95,#7C3AED,#DB2777);flex-direction:column;align-items:center;justify-content:center;gap:0;">
+<div id="loginOverlay" style="display:flex;position:fixed;inset:0;z-index:1000;background:linear-gradient(160deg,#4C1D95,#7C3AED,#DB2777);flex-direction:column;align-items:center;justify-content:center;gap:0;">
   <div style="font-size:72px;line-height:1;padding-bottom:4px;animation:bob 2s ease-in-out infinite">🐾</div>
   <div style="font-family:'Hachi Maru Pop',sans-serif;font-size:22px;color:#fff;margin-top:18px;letter-spacing:.05em;">わんちゃんの成長日記</div>
   <div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:8px;letter-spacing:.1em;">大切な毎日を、ずっとそばに。</div>
