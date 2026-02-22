@@ -1,12 +1,9 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-	<meta name="apple-mobile-web-app-capable" content="yes">
-
-	<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>おすしの成長日記</title>
+<title>わんちゃんの成長日記</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Yomogi&family=Zen+Maru+Gothic:wght@400;500;700&family=Nunito:wght@700;800;900&family=M+PLUS+Rounded+1c:wght@400;700&family=Kosugi+Maru&family=Hachi+Maru+Pop&display=swap" rel="stylesheet">
 <style>
@@ -45,7 +42,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--tx);-webkit-font-smo
 /* ── SPLASH ── */
 #splash{position:fixed;inset:0;background:linear-gradient(160deg,#4C1D95,#7C3AED,#DB2777);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;transition:opacity .6s,visibility .6s;}
 #splash.out{opacity:0;visibility:hidden;pointer-events:none;}
-.sp-ava{width:88px;height:88px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(0,0,0,.25);animation:bob 2.2s ease-in-out infinite;font-size:46px;}
+.sp-ava{width:88px;height:88px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(0,0,0,.25);animation:bob 2.2s ease-in-out infinite;font-size:44px;line-height:1;padding-bottom:4px;}
 .sp-title{font-family:var(--fh);font-size:22px;color:#fff;margin-top:18px;letter-spacing:.05em;animation:riseIn .5s .3s both;}
 .sp-sub{font-size:11px;color:rgba(255,255,255,.45);margin-top:6px;letter-spacing:.18em;animation:riseIn .5s .5s both;}
 .sp-dots{display:flex;gap:8px;margin-top:26px;animation:riseIn .5s .7s both;}
@@ -86,20 +83,19 @@ body{font-family:var(--ff);background:var(--bg);color:var(--tx);-webkit-font-smo
 .h-name{font-family:var(--fh);font-size:28px;color:#fff;text-shadow:0 1px 10px rgba(0,0,0,.2);letter-spacing:.02em;}
 .h-breed{font-size:11px;font-weight:600;color:rgba(255,255,255,.62);margin-top:3px;letter-spacing:.1em;text-transform:uppercase;}
 /* ── PILLS: same size, crisp text, centered in hero ── */
-.h-meta{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:18px;flex-wrap:nowrap;}
+.h-meta{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:16px;flex-wrap:wrap;padding:0 8px;}
 .h-pill{
   background:rgba(255,255,255,.18);
   border:1.5px solid rgba(255,255,255,.3);
-  border-radius:22px;
-  padding:7px 15px;
-  display:flex;align-items:center;gap:5px;
+  border-radius:20px;
+  padding:6px 12px;
+  display:flex;align-items:center;gap:4px;
   font-family:var(--fn);
-  font-size:13px;
+  font-size:12px;
   font-weight:700;
   color:#fff;
   line-height:1;
   white-space:nowrap;
-  letter-spacing:.01em;
 }
 .h-pill-icon{font-size:14px;line-height:1;}
 
@@ -452,7 +448,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 <!-- SPLASH -->
 <div id="splash">
   <div class="sp-ava" id="spAva">🐾</div>
-  <div class="sp-title">おすしの成長日記</div>
+  <div class="sp-title">わんちゃんの成長日記</div>
   <div class="sp-sub">大切な毎日を、ずっとそばに。</div>
   <div class="sp-dots"><div class="sp-dot"></div><div class="sp-dot"></div><div class="sp-dot"></div></div>
 </div>
@@ -478,7 +474,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
             <div class="hero-ava" id="heroAva" onclick="document.getElementById('avatarUpload').click()">🐩</div>
             <button class="hero-ava-edit" onclick="document.getElementById('avatarUpload').click()">📷</button>
           </div>
-          <div class="h-name">おすし</div>
+          <div class="h-name">わんちゃん</div>
           <div class="h-breed" id="hBreed">マルチーズ</div>
           <div class="h-meta">
             <div class="h-pill"><span class="h-pill-icon">🎂</span><span id="hAge">…</span></div>
@@ -491,7 +487,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
         <div class="post-row" onclick="showScreen('post')">
           <div class="post-ico">📷</div>
           <div>
-            <div class="post-main">今日のおすしを記録する</div>
+            <div class="post-main">今日のわんちゃんを記録する</div>
             <div class="post-sub">写真・動画を撮って気持ちを残そう</div>
           </div>
           <span class="post-arr">›</span>
@@ -659,7 +655,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
             <div class="p-ava" id="profAva" onclick="document.getElementById('avatarUpload').click()">🐩</div>
             <button class="p-ava-edit" onclick="document.getElementById('avatarUpload').click()">📷</button>
           </div>
-          <div class="p-name">おすし</div>
+          <div class="p-name">わんちゃん</div>
           <div class="p-breed" id="pBreed">マルチーズ</div>
           <div class="p-pills"><div class="pp" id="ppAge">…</div><div class="pp" id="ppDays">…</div></div>
         </div>
@@ -810,7 +806,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, serverTimestamp }
+import { getFirestore, collection, addDoc, getDocs, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -831,15 +827,17 @@ const provider = new GoogleAuthProvider();
 let currentUser = null;
 onAuthStateChanged(auth, user => {
   currentUser = user;
+  document.getElementById('splash').classList.add('out');
   if (user) {
-    // ログイン済み
     document.getElementById('loginOverlay').style.display = 'none';
-    document.getElementById('app').style.display = 'flex';
-    document.getElementById('tbUserName').textContent = user.displayName || 'わんちゃん';
+    const appEl = document.getElementById('app');
+    appEl.style.display = 'flex';
+    const nameEl = document.getElementById('tbUserName');
+    if(nameEl) nameEl.textContent = user.displayName ? user.displayName.split(' ')[0] + 'さん' : 'わんちゃん';
+    if(window.initDates) window.initDates();
+    if(window.renderDiaryList) window.renderDiaryList();
     loadDiaries();
   } else {
-    // 未ログイン
-    document.getElementById('splash').classList.add('out');
     document.getElementById('loginOverlay').style.display = 'flex';
     document.getElementById('app').style.display = 'none';
   }
@@ -875,15 +873,10 @@ window.saveDiaryToFirestore = async function(entry) {
 window.loadDiaries = async function() {
   if (!currentUser) return;
   try {
-    const q = query(
-      collection(db, 'users', currentUser.uid, 'diaries'),
-      orderBy('createdAt', 'desc'),
-      limit(20)
-    );
-    const snap = await getDocs(q);
+    const snap = await getDocs(collection(db, 'users', currentUser.uid, 'diaries'));
     const remote = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     if (remote.length > 0) {
-      diaries = remote;
+      diaries = remote.sort((a,b) => (b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
       renderDiaryList();
     }
   } catch(e) {
@@ -1472,7 +1465,7 @@ const BDAY=new Date('2022-03-12');
 let WELCOME=new Date('2022-04-20');
 function getAge(d){const n=new Date();let y=n.getFullYear()-d.getFullYear(),m=n.getMonth()-d.getMonth();if(m<0){y--;m+=12;}return `${y}歳${m}ヶ月`;}
 function getDays(d){return Math.floor((new Date()-d)/86400000);}
-function initDates(){
+window.initDates = function initDates(){
   const age=getAge(BDAY),days=getDays(WELCOME);
   const bd=`${BDAY.getFullYear()}.${String(BDAY.getMonth()+1).padStart(2,'0')}.${String(BDAY.getDate()).padStart(2,'0')}`;
   document.getElementById('hAge').textContent=`${age}（${bd}）`;
@@ -1509,7 +1502,7 @@ let diaries=[
   {id:'d2',date:'2025.02.13',title:'雨の日',emoji:'☁️',bg:'linear-gradient(135deg,#DCE8EC,#B0C8D4)',mood:'☁️ のんびり',txt:'雨の日。一日中ゴロゴロしてた。おすしもわたしのそばで丸まってた。',wanko:AI_MSGS['default'][3]},
 ];
 let mediaFiles=[];
-function renderDiaryList(){
+window.renderDiaryList = function renderDiaryList(){
   const list=document.getElementById('diaryList');list.innerHTML='';
   diaries.slice(0,2).forEach(e=>{
     const div=document.createElement('div');div.className='dc';div.onclick=()=>openDiary(e.id);
@@ -1613,13 +1606,13 @@ function showScreen(name){SCREENS.forEach(s=>{const e=document.getElementById(s+
 // INIT
 initDates();
 renderDiaryList();
-window.addEventListener('load',()=>{setTimeout(()=>{document.getElementById('splash').classList.add('out');},1400);});
+window.addEventListener('load',()=>{setTimeout(()=>{if(!currentUser){document.getElementById('splash').classList.add('out');}},2000);});
 window.addEventListener('resize',drawChart);
 </script>
 
 <!-- LOGIN OVERLAY -->
 <div id="loginOverlay" style="display:none;position:fixed;inset:0;z-index:1000;background:linear-gradient(160deg,#4C1D95,#7C3AED,#DB2777);flex-direction:column;align-items:center;justify-content:center;gap:0;">
-  <div style="font-size:72px;animation:bob 2s ease-in-out infinite">🐾</div>
+  <div style="font-size:72px;line-height:1;display:flex;align-items:center;justify-content:center;animation:bob 2s ease-in-out infinite">🐾</div>
   <div style="font-family:'Hachi Maru Pop',sans-serif;font-size:22px;color:#fff;margin-top:18px;letter-spacing:.05em;">わんちゃん成長日記</div>
   <div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:8px;letter-spacing:.1em;">大切な毎日を、ずっとそばに。</div>
   <button onclick="doGoogleLogin()" style="margin-top:36px;display:flex;align-items:center;gap:10px;background:#fff;border:none;border-radius:28px;padding:14px 28px;font-size:15px;font-weight:700;color:#333;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.2);">
