@@ -42,7 +42,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--tx);-webkit-font-smo
 /* ── SPLASH ── */
 #splash{position:fixed;inset:0;background:linear-gradient(160deg,#4C1D95,#7C3AED,#DB2777);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;transition:opacity .6s,visibility .6s;}
 #splash.out{opacity:0;visibility:hidden;pointer-events:none;}
-.sp-ava{width:88px;height:88px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(0,0,0,.25);animation:bob 2.2s ease-in-out infinite;font-size:44px;line-height:1;padding-bottom:4px;}
+.sp-ava{width:88px;height:88px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(0,0,0,.25);animation:bob 2.2s ease-in-out infinite;font-size:46px;}
 .sp-title{font-family:var(--fh);font-size:22px;color:#fff;margin-top:18px;letter-spacing:.05em;animation:riseIn .5s .3s both;}
 .sp-sub{font-size:11px;color:rgba(255,255,255,.45);margin-top:6px;letter-spacing:.18em;animation:riseIn .5s .5s both;}
 .sp-dots{display:flex;gap:8px;margin-top:26px;animation:riseIn .5s .7s both;}
@@ -70,7 +70,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--tx);-webkit-font-smo
 .tb-btn{width:32px;height:32px;border:none;background:transparent;font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--mid);flex-shrink:0;}
 
 /* ── HERO ── */
-.hero{position:relative;overflow:hidden;flex-shrink:0;padding:32px 20px 24px;background:var(--hero-bg);}
+.hero{position:relative;overflow:hidden;flex-shrink:0;padding:38px 20px 64px;background:var(--hero-bg);}
 .hero-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.4;}
 .hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.05),rgba(0,0,0,.38));}
 .hero-grain{position:absolute;inset:0;opacity:.035;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
@@ -83,21 +83,26 @@ body{font-family:var(--ff);background:var(--bg);color:var(--tx);-webkit-font-smo
 .h-name{font-family:var(--fh);font-size:28px;color:#fff;text-shadow:0 1px 10px rgba(0,0,0,.2);letter-spacing:.02em;}
 .h-breed{font-size:11px;font-weight:600;color:rgba(255,255,255,.62);margin-top:3px;letter-spacing:.1em;text-transform:uppercase;}
 /* ── PILLS: same size, crisp text, centered in hero ── */
-.h-meta{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:16px;flex-wrap:wrap;padding:0 8px;}
+.h-meta{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:18px;flex-wrap:nowrap;}
 .h-pill{
   background:rgba(255,255,255,.18);
   border:1.5px solid rgba(255,255,255,.3);
-  border-radius:20px;
-  padding:6px 12px;
-  display:flex;align-items:center;gap:4px;
-  font-family:var(--fn);font-size:12px;font-weight:700;
-  color:#fff;line-height:1;white-space:nowrap;
+  border-radius:22px;
+  padding:7px 15px;
+  display:flex;align-items:center;gap:5px;
+  font-family:var(--fn);
+  font-size:13px;
+  font-weight:700;
+  color:#fff;
+  line-height:1;
+  white-space:nowrap;
+  letter-spacing:.01em;
 }
 .h-pill-icon{font-size:14px;line-height:1;}
 
 /* ── FLOAT CARD ── */
 .fc{
-  margin:12px 12px 0;
+  margin:-28px 12px 0;
   background:var(--sf);
   border-radius:var(--r-xl);
   box-shadow:0 8px 28px rgba(0,0,0,.1),0 2px 6px rgba(0,0,0,.06);
@@ -114,7 +119,9 @@ body{font-family:var(--ff);background:var(--bg);color:var(--tx);-webkit-font-smo
 .fcs{flex:1;padding:14px 8px;text-align:center;border-right:1px solid rgba(0,0,0,.05);}
 .fcs:last-child{border:none;}
 .fcs-n{
-  font-family:var(--fn);font-size:21px;font-weight:900;color:var(--ac2);
+  font-family:var(--fn);font-size:21px;font-weight:900;
+  background:linear-gradient(135deg,var(--ac),var(--ac2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
 .fcs-l{font-size:10px;color:var(--soft);margin-top:2px;letter-spacing:.03em;}
 
@@ -123,7 +130,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--tx);-webkit-font-smo
   background:var(--sf);
   margin:12px 12px 0;
   border-radius:var(--r-xl);
-  padding:16px 14px 14px;
+  padding:18px 16px 14px;
   box-shadow:0 2px 10px rgba(0,0,0,.06);
 }
 .sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
@@ -131,14 +138,13 @@ body{font-family:var(--ff);background:var(--bg);color:var(--tx);-webkit-font-smo
 .sec-more{font-size:12px;color:var(--ac2);cursor:pointer;font-weight:700;}
 
 /* ── DIARY CARDS ── */
-.dc{background:var(--sf2);border-radius:14px;overflow:hidden;margin-bottom:8px;cursor:pointer;transition:transform .15s;border:1px solid rgba(0,0,0,.04);}
-.dc:last-child{margin-bottom:0;}
+.dc{background:var(--sf2);border-radius:var(--r-lg);overflow:hidden;margin-bottom:12px;cursor:pointer;transition:transform .15s;border:1px solid rgba(0,0,0,.04);}
 .dc:active{transform:scale(.986);}
-.dc-media{width:100%;height:180px;position:relative;overflow:hidden;background:var(--sf2);}
+.dc-media{width:100%;height:210px;position:relative;overflow:hidden;background:var(--sf2);}
 .dc-media img,.dc-media video{width:100%;height:100%;object-fit:cover;display:block;}
 .dc-media-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:72px;}
 .dc-date-tag{position:absolute;bottom:10px;left:12px;background:rgba(0,0,0,.38);border-radius:6px;padding:3px 9px;font-size:10px;font-weight:600;color:rgba(255,255,255,.94);}
-.dc-body{padding:12px 14px 14px;}
+.dc-body{padding:14px 15px 16px;}
 .dc-title{font-family:var(--fh);font-size:16px;font-weight:800;color:var(--tx);margin-bottom:5px;}
 .dc-txt{font-size:13px;color:var(--mid);line-height:1.8;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 .wanko{margin-top:11px;background:linear-gradient(130deg,var(--ac3),rgba(255,255,255,.6));border-left:3px solid var(--ac);border-radius:0 10px 10px 0;padding:10px 13px;}
@@ -146,12 +152,12 @@ body{font-family:var(--ff);background:var(--bg);color:var(--tx);-webkit-font-smo
 .wk-txt{font-size:13px;font-weight:700;color:var(--tx);line-height:1.8;}
 
 /* ── HIGHLIGHTS ROW ── */
-.hl-row{display:flex;gap:14px;padding:2px 0 4px;overflow-x:auto;scrollbar-width:none;}
+.hl-row{display:flex;gap:12px;padding:6px 16px 90px;overflow-x:auto;scrollbar-width:none;}
 .hl-row::-webkit-scrollbar{display:none;}
-.hl-circle-item{flex-shrink:0;width:58px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;}
+.hl-circle-item{flex-shrink:0;width:72px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;}
 .hl-circle-item:active{opacity:.7;}
 .hl-ring{
-  width:52px;height:52px;min-width:52px;min-height:52px;
+  width:64px;height:64px;min-width:64px;min-height:64px;
   border-radius:50%;
   padding:2.5px;
   background:linear-gradient(135deg,var(--ac),var(--ac2),#F472B6);
@@ -161,7 +167,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--tx);-webkit-font-smo
 }
 .hl-ring.add-ring{background:var(--sf2);border:2px dashed var(--bd);}
 .hl-inner{
-  width:44px;height:44px;min-width:44px;min-height:44px;
+  width:55px;height:55px;min-width:55px;min-height:55px;
   border-radius:50%;
   background:var(--sf);
   border:2px solid var(--sf);
@@ -170,7 +176,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--tx);-webkit-font-smo
   overflow:hidden;flex-shrink:0;
 }
 .hl-inner img,.hl-inner video{width:100%;height:100%;object-fit:cover;}
-.hl-lbl{font-size:9px;font-weight:600;color:var(--mid);text-align:center;width:58px;line-height:1.3;}
+.hl-lbl{font-size:10px;font-weight:600;color:var(--mid);text-align:center;width:72px;line-height:1.3;}
 .add-ring-ico{font-size:22px;color:var(--soft);}
 
 /* ── HIGHLIGHTS SCREEN ── */
@@ -349,7 +355,7 @@ canvas#weightChart{width:100%;height:110px;}
   display:flex;align-items:center;flex-shrink:0;
   height:56px;padding-bottom:env(safe-area-inset-bottom,0);
 }
-.ntab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;height:100%;position:relative;min-width:0;border:none;background:transparent;padding:0;font-family:var(--ff);-webkit-appearance:none;appearance:none;}
+.ntab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;height:100%;position:relative;min-width:0;border:none;background:transparent;padding:0;-webkit-appearance:none;appearance:none;}
 .ntab:active{opacity:.5;}
 .ni{font-size:22px;line-height:1;transition:transform .14s;}
 .ntab.on .ni{transform:scale(1.08);}
@@ -438,23 +444,22 @@ input[type=file]{display:none;}
 input[type=number]{-moz-appearance:textfield;}
 input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 
-/* ── iOS TOUCH ── */
+/* iOS touch */
 *{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;}
 input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text;}
-button,[onclick]{touch-action:manipulation;cursor:pointer;}
+button,[onclick]{touch-action:manipulation;}
 html,body{touch-action:manipulation;}
 </style>
 </head>
 <body>
-<div id="loginOverlay" style="display:flex;position:fixed;inset:0;z-index:1000;background:linear-gradient(160deg,#4C1D95,#7C3AED,#DB2777);flex-direction:column;align-items:center;justify-content:center;gap:0;">
-  <div style="font-size:72px;line-height:1;padding-bottom:4px;animation:bob 2s ease-in-out infinite">🐾</div>
+<div id="loginOverlay" style="display:none;position:fixed;inset:0;z-index:9999;background:linear-gradient(160deg,#4C1D95,#7C3AED,#DB2777);flex-direction:column;align-items:center;justify-content:center;gap:0;">
+  <div style="font-size:72px;line-height:1;padding-bottom:4px">🐾</div>
   <div style="font-family:'Hachi Maru Pop',sans-serif;font-size:22px;color:#fff;margin-top:18px;letter-spacing:.05em;">わんちゃんの成長日記</div>
-  <div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:8px;letter-spacing:.1em;">大切な毎日を、ずっとそばに。</div>
-  <button onclick="doGoogleLogin()" style="margin-top:36px;display:flex;align-items:center;gap:10px;background:#fff;border:none;border-radius:28px;padding:14px 28px;font-size:15px;font-weight:700;color:#333;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.2);touch-action:manipulation;">
+  <div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:8px;">大切な毎日を、ずっとそばに。</div>
+  <button id="googleLoginBtn" style="margin-top:36px;display:flex;align-items:center;gap:10px;background:#fff;border:none;border-radius:28px;padding:14px 28px;font-size:15px;font-weight:700;color:#333;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.2);touch-action:manipulation;">
     <img src="https://www.google.com/favicon.ico" style="width:18px;height:18px"> Googleでログイン
   </button>
 </div>
-
 
 <!-- SPLASH -->
 <div id="splash">
@@ -518,7 +523,6 @@ html,body{touch-action:manipulation;}
       <div class="sec-card" style="padding-bottom:10px">
         <div class="sec-hd"><div class="sec-t">ハイライト</div><div class="sec-more" onclick="showScreen('highlights')">全部みる ›</div></div>
         <div class="hl-row" id="hlRow">
-          <div style="font-size:11px;color:var(--soft);align-self:center;white-space:nowrap;padding-left:4px;">思い出を追加しよう</div>
           <div class="hl-circle-item" onclick="openMemorySheet()"><div class="hl-ring add-ring"><div class="add-ring-ico">＋</div></div><div class="hl-lbl">追加</div></div>
         </div>
       </div>
@@ -609,7 +613,7 @@ html,body{touch-action:manipulation;}
     <div class="screen" id="settingsScreen">
       <div class="scr-topbar"><button class="back-btn" onclick="showScreen('home')">‹</button><div class="scr-title">設定</div></div>
       <div class="s-wrap">
-        <div class="s-block" style="background:linear-gradient(135deg,#4C1D95,#7C3AED);border-radius:var(--r-lg);padding:20px;box-shadow:0 4px 20px rgba(124,58,237,.3);">
+                <div class="s-block" style="background:linear-gradient(135deg,#4C1D95,#7C3AED);border-radius:var(--r-lg);padding:20px;box-shadow:0 4px 20px rgba(124,58,237,.3);">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
             <div style="font-size:24px">👑</div>
             <div><div style="font-family:var(--fh);font-size:16px;font-weight:800;color:#fff;">プレミアムプラン</div><div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:2px;">健康管理・無制限保存・AIコメント強化</div></div>
@@ -622,7 +626,7 @@ html,body{touch-action:manipulation;}
           </div>
           <button onclick="openPremiumSheet()" style="width:100%;padding:13px;border:none;border-radius:12px;background:#fff;font-family:var(--ff);font-size:14px;font-weight:800;color:#7C3AED;cursor:pointer;touch-action:manipulation;">✨ 月額480円で始める</button>
         </div>
-        <div class="s-block"><div class="s-block-t">👤 アカウント</div>
+<div class="s-block"><div class="s-block-t">👤 アカウント</div>
           <div class="info-card">
             <div class="irow" onclick="doLogout()"><div class="irow-ico">🚪</div><div><div class="irow-lbl">ログアウト</div><div class="irow-val">サインアウト</div></div><span class="irow-arr">›</span></div>
           </div>
@@ -648,7 +652,6 @@ html,body{touch-action:manipulation;}
         <div class="s-block"><div class="s-block-t">🐾 アバター</div><div class="ava-grid" id="avaGrid"></div></div>
         <div class="s-block"><div class="s-block-t">📋 プロフィール</div>
           <div class="info-card">
-            <div class="irow"><div class="irow-ico">🐾</div><div style="flex:1"><div class="irow-lbl">わんちゃんの名前</div><div class="irow-val"><input class="irow-input" id="dogNameInput" type="text" placeholder="わんちゃん" value="わんちゃん" oninput="syncDogName(this.value)" style="width:120px"></div></div></div>
             <div class="irow" onclick="openBreedPicker()"><div class="irow-ico">🐕</div><div><div class="irow-lbl">犬種</div><div class="irow-val" id="breedVal">マルチーズ</div></div><span class="irow-arr">›</span></div>
             <div class="irow" onclick="openBdayPicker()"><div class="irow-ico">🎂</div><div><div class="irow-lbl">誕生日</div><div class="irow-val" id="bdayVal">2022年3月12日</div></div><span class="irow-arr">›</span></div>
             <div class="irow" onclick="openFamilyDayInput()"><div class="irow-ico">🏠</div><div><div class="irow-lbl">家族になった日</div><div class="irow-val" id="familyVal">2022年4月20日</div></div><span class="irow-arr">›</span></div>
@@ -704,6 +707,8 @@ html,body{touch-action:manipulation;}
 
   </div>
 
+</div>
+
   <nav class="bnav">
     <button class="ntab on" id="nt-home"       onclick="showScreen('home')"><div class="ni">🏠</div></button>
     <button class="ntab"    id="nt-highlights" onclick="showScreen('highlights')"><div class="ni">✨</div></button>
@@ -711,7 +716,6 @@ html,body{touch-action:manipulation;}
     <button class="ntab"    id="nt-photos"     onclick="showScreen('photos')"><div class="ni">📷</div></button>
     <button class="ntab"    id="nt-health"     onclick="showScreen('health')"><div class="ni">❤️</div></button>
   </nav>
-</div>
 
 <!-- MODALS -->
 <div class="overlay" id="ovSuccess">
@@ -835,21 +839,34 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
+const db  = getFirestore(app);
 const provider = new GoogleAuthProvider();
-window._fbAuth = auth;
 
-window.doGoogleLogin = async () => {
-  try { 
-    await signInWithPopup(auth, provider); 
-  } catch(e) { 
-    console.error('Popup failed, trying redirect:', e);
-    try { await signInWithRedirect(auth, provider); } catch(e2) { console.error(e2); }
-  }
-};
+// ログインボタンにイベントを設定
+document.addEventListener('DOMContentLoaded', async () => {
+  // リダイレクト結果を確認
+  try {
+    const result = await getRedirectResult(auth);
+    if(result) console.log('Redirect OK:', result.user.displayName);
+  } catch(e){ console.error(e); }
+
+  const btn = document.getElementById('googleLoginBtn');
+  if(btn) btn.addEventListener('click', async () => {
+    try {
+      await signInWithPopup(auth, provider);
+    } catch(e) {
+      console.error('Popup failed:', e.code);
+      if(e.code === 'auth/popup-blocked' || e.code === 'auth/popup-closed-by-user'){
+        await signInWithRedirect(auth, provider);
+      }
+    }
+  });
+});
+
 window.doLogout = async () => {
-  try { await signOut(auth); } catch(e) { console.error(e); }
+  try { await signOut(auth); } catch(e){ console.error(e); }
 };
+
 window.saveDiaryToFirestore = async (entry) => {
   const user = auth.currentUser;
   if (!user) return;
@@ -857,26 +874,22 @@ window.saveDiaryToFirestore = async (entry) => {
     const data = {uid:user.uid, createdAt:serverTimestamp()};
     ['date','title','emoji','mood','txt','wanko','bg'].forEach(k=>{if(entry[k]!=null)data[k]=entry[k];});
     await addDoc(collection(db,'users',user.uid,'diaries'), data);
-  } catch(e) { console.error('Save:',e); }
+  } catch(e){ console.error('Save:',e); }
 };
 
-// Check redirect result first
-try {
-  const result = await getRedirectResult(auth);
-  if (result) console.log('Redirect login success:', result.user.displayName);
-} catch(e) { console.error('Redirect result error:', e); }
-
 onAuthStateChanged(auth, async (user) => {
-  window._fbLoggedIn = !!user;
-  document.getElementById('splash').classList.add('out');
+  window._fbReady = true;
+  const overlay = document.getElementById('loginOverlay');
+  const appEl = document.getElementById('app');
   if (user) {
-    document.getElementById('loginOverlay').style.display = 'none';
-    document.getElementById('app').style.display = 'flex';
-    const el = document.getElementById('tbUserName');
-    if(el) el.textContent = (user.displayName||'').split(' ')[0] + 'さんの日記';
-    await new Promise(r=>setTimeout(r,150));
+    overlay.style.display = 'none';
+    appEl.style.display = 'flex';
+    const tb = document.getElementById('tbUserName');
+    if(tb) tb.textContent = (user.displayName||'').split(' ')[0] + 'さんの日記';
+    await new Promise(r=>setTimeout(r,100));
     if(window.initDates) window.initDates();
     if(window.renderDiaryList) window.renderDiaryList();
+    // Firestore読み込み
     try {
       const snap = await getDocs(collection(db,'users',user.uid,'diaries'));
       if(!snap.empty){
@@ -886,8 +899,8 @@ onAuthStateChanged(auth, async (user) => {
       }
     } catch(e){ console.error('Load:',e); }
   } else {
-    document.getElementById('loginOverlay').style.display = 'flex';
-    document.getElementById('app').style.display = 'none';
+    overlay.style.display = 'flex';
+    appEl.style.display = 'none';
   }
 });
 </script>
@@ -1473,7 +1486,7 @@ const BDAY=new Date('2022-03-12');
 let WELCOME=new Date('2022-04-20');
 function getAge(d){const n=new Date();let y=n.getFullYear()-d.getFullYear(),m=n.getMonth()-d.getMonth();if(m<0){y--;m+=12;}return `${y}歳${m}ヶ月`;}
 function getDays(d){return Math.floor((new Date()-d)/86400000);}
-window.initDates=function initDates(){
+window.initDates=function(){
   const age=getAge(BDAY),days=getDays(WELCOME);
   const bd=`${BDAY.getFullYear()}.${String(BDAY.getMonth()+1).padStart(2,'0')}.${String(BDAY.getDate()).padStart(2,'0')}`;
   document.getElementById('hAge').textContent=`${age}（${bd}）`;
@@ -1506,17 +1519,18 @@ function handleAvatarUpload(e){const f=e.target.files[0];if(!f)return;const r=ne
 
 // DIARY DATA
 let diaries=[
-  {id:'d1',date:'2025.02.15',title:'お散歩日和',emoji:'🌸',bg:'linear-gradient(135deg,#EDE0F0,#D4B8E0)',mood:'🌸 うれしい',txt:'今日はお散歩で桜の木の下を通った。わんちゃんがくんくんして気持ちよさそうにしてた。こういう何気ない一日が好きだな。',wanko:AI_MSGS['のんびり'][0]},
-  {id:'d2',date:'2025.02.13',title:'雨の日',emoji:'☁️',bg:'linear-gradient(135deg,#DCE8EC,#B0C8D4)',mood:'☁️ のんびり',txt:'雨の日。一日中ゴロゴロしてた。わんちゃんもわたしのそばで丸まってた。',wanko:AI_MSGS['default'][3]},
+  {id:'d1',date:'2025.02.15',title:'お散歩日和',emoji:'🌸',bg:'linear-gradient(135deg,#EDE0F0,#D4B8E0)',mood:'🌸 うれしい',txt:'今日はお散歩で桜の木の下を通った。おすしがくんくんして気持ちよさそうにしてた。こういう何気ない一日が好きだな。',wanko:AI_MSGS['のんびり'][0]},
+  {id:'d2',date:'2025.02.13',title:'雨の日',emoji:'☁️',bg:'linear-gradient(135deg,#DCE8EC,#B0C8D4)',mood:'☁️ のんびり',txt:'雨の日。一日中ゴロゴロしてた。おすしもわたしのそばで丸まってた。',wanko:AI_MSGS['default'][3]},
 ];
 let mediaFiles=[];
-window.renderDiaryList=function renderDiaryList(){
+window.renderDiaryList=function(){
+  const list=document.getElementById('diaryList');if(!list)return;list.innerHTML='';
+  if(!diaries.length){list.innerHTML='<div style="text-align:center;padding:24px 16px;color:var(--soft)"><div style="font-size:32px;margin-bottom:8px">📖</div><div style="font-size:13px;font-weight:600">まだ日記がありません</div></div>';return;}
   const list=document.getElementById('diaryList');list.innerHTML='';
-  if(!diaries.length){list.innerHTML='<div style="text-align:center;padding:24px 16px;color:var(--soft)"><div style="font-size:32px;margin-bottom:8px">📖</div><div style="font-size:13px;font-weight:600">まだ日記がありません</div><div style="font-size:11px;margin-top:4px">最初の日記を書いてみよう！</div></div>';return;}
-  diaries.slice(0,2).forEach(e=>{
+  diaries.slice(0,3).forEach(e=>{
     const div=document.createElement('div');div.className='dc';div.onclick=()=>openDiary(e.id);
     const mediaHtml=e.mediaSrc?(e.mediaType==='video'?`<video src="${e.mediaSrc}" muted playsinline style="width:100%;height:100%;object-fit:cover"></video>`:`<img src="${e.mediaSrc}" alt="">`):`<div class="dc-media-ph" style="background:${e.bg}">${e.emoji}</div>`;
-    div.innerHTML=`<div class="dc-media">${mediaHtml}<div class="dc-date-tag">${e.date}</div></div><div class="dc-body">${e.title?`<div class="dc-title">${e.title}</div>`:''}<div class="dc-txt">${e.txt}</div><div class="wanko"><span class="wk-lbl">🐾 わんちゃんからのひとこと</span><span class="wk-txt">${esc(e.wanko)}</span></div></div>`;
+    div.innerHTML=`<div class="dc-media">${mediaHtml}<div class="dc-date-tag">${e.date}</div></div><div class="dc-body">${e.title?`<div class="dc-title">${e.title}</div>`:''}<div class="dc-txt">${e.txt}</div><div class="wanko"><span class="wk-lbl">🐾 わんちゃんからのひとこと</span><span class="wk-txt">${e.wanko}</span></div></div>`;
     list.appendChild(div);
   });
   document.getElementById('statDiary').textContent=diaries.length;
@@ -1539,11 +1553,8 @@ function onEditorInput(){tryAI();}
 // POST
 let aiOn=false,selMood='';
 function pickMood(el){document.querySelectorAll('.mc').forEach(c=>c.classList.remove('on'));el.classList.add('on');selMood=el.textContent.trim();tryAI();}
-function tryAI(){const el=document.getElementById('dta'),txt=el?el.textContent:'';if(aiOn)document.getElementById('aiMsg').textContent=getAIMsg(selMood);}
-function doSubmit(){
-  const sbtn=document.querySelector('.sub-btn');if(sbtn&&sbtn.disabled)return;if(sbtn){sbtn.disabled=true;setTimeout(()=>{sbtn.disabled=false;},3000);}const el=document.getElementById('dta'),txt=el?el.textContent.trim():'';if(!txt&&!mediaFiles.length){if(el)el.focus();return;}const title=document.getElementById('diaryTitle').value.trim();const now=new Date();const ds=`${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;const w=getAIMsg(selMood);const newEntry={id:'d'+Date.now(),date:ds,title,emoji:'✏️',bg:'linear-gradient(135deg,#EDE7FF,#D1C4E9)',mood:selMood,txt,wanko:w,mediaSrc:mediaFiles.length?mediaFiles[0].src:null,mediaType:mediaFiles.length?mediaFiles[0].type:null};
-diaries.unshift(newEntry);
-if(window.saveDiaryToFirestore)window.saveDiaryToFirestore(newEntry);document.getElementById('mMsg').textContent=w;document.getElementById('ovSuccess').classList.add('on');}
+function tryAI(){const el=document.getElementById('dta'),txt=el?el.textContent:'';if((txt.length>4||mediaFiles.length>0)&&!aiOn){aiOn=true;document.getElementById('aiBub').classList.add('on');}if(aiOn)document.getElementById('aiMsg').textContent=getAIMsg(selMood);}
+function doSubmit(){const el=document.getElementById('dta'),txt=el?el.textContent.trim():'';if(!txt&&!mediaFiles.length){if(el)el.focus();return;}const title=document.getElementById('diaryTitle').value.trim();const now=new Date();const ds=`${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;const w=getAIMsg(selMood);const _e={id:'d'+Date.now(),date:ds,title,emoji:'✏️',bg:'linear-gradient(135deg,#EDE7FF,#D1C4E9)',mood:selMood,txt,wanko:w,mediaSrc:mediaFiles.length?mediaFiles[0].src:null,mediaType:mediaFiles.length?mediaFiles[0].type:null};diaries.unshift(_e);if(window.saveDiaryToFirestore)window.saveDiaryToFirestore(_e);document.getElementById('mMsg').textContent=w;document.getElementById('ovSuccess').classList.add('on');}
 function closeSuccess(){document.getElementById('ovSuccess').classList.remove('on');const d=document.getElementById('dta');if(d)d.innerHTML='';const t=document.getElementById('diaryTitle');if(t)t.value='';mediaFiles=[];refreshMediaStrip();document.getElementById('aiBub').classList.remove('on');document.querySelectorAll('.mc').forEach(c=>c.classList.remove('on'));aiOn=false;selMood='';renderDiaryList();showScreen('home');}
 
 // DIARY DETAIL
@@ -1617,29 +1628,23 @@ function showScreen(name){SCREENS.forEach(s=>{const e=document.getElementById(s+
 initDates();
 renderDiaryList();
 window.addEventListener('load',()=>{
-  setTimeout(()=>{document.getElementById('splash').classList.add('out');},1800);
-  // Fallback: if Firebase doesn't respond, show login after 3s
   setTimeout(()=>{
-    if(!window._fbLoggedIn){
-      const lo=document.getElementById('loginOverlay');
-      const app=document.getElementById('app');
-      if(app.style.display==='none'){
-        lo.style.display='flex';
+    document.getElementById('splash').classList.add('out');
+    // Firebase未認証の場合loginOverlayを表示
+    setTimeout(()=>{
+      if(!window._fbReady){
+        document.getElementById('loginOverlay').style.display='flex';
       }
-    }
-  },3000);
+    },400);
+  },1800);
 });
 
-function esc(s){if(s==null)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-window.syncDogName=function(name){const n=name.trim()||'わんちゃん';['hName','pName'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=n;});const tb=document.getElementById('tbUserName');if(tb)tb.textContent=n+'の成長日記';};
-window.openPremiumSheet=function(){alert('プレミアムプラン\n\n近日公開予定です！\nリリースをお楽しみに🎉');};
-window._setDiaries=function(remote){diaries=remote;renderDiaryList();};
-window.doLogout=function(){if(window._fbAuth)window._fbAuth.signOut();};
-window.doGoogleLogin=function(){};
+window._setDiaries = function(remote){ diaries=remote; if(window.renderDiaryList) window.renderDiaryList(); };
+window.doGoogleLogin = function(){ document.getElementById('googleLoginBtn').click(); };
+function esc(s){if(s==null)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 document.addEventListener('touchstart',function(){},{passive:true});
-
+function openPremiumSheet(){alert('プレミアムプラン\n\n近日公開予定です！\nリリースをお楽しみに🎉');}
 window.addEventListener('resize',drawChart);
 </script>
-
 </body>
 </html>
