@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wanchan-v2';
+const CACHE_NAME = 'wanchan-v3';
 const ASSETS = [
   '/wanchan-seichou-nikki/',
   '/wanchan-seichou-nikki/index.html',
