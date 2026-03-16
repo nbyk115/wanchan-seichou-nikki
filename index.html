@@ -50,8 +50,9 @@ img{max-width:100%;height:auto;}
 *:focus-visible{outline:2.5px solid #3B82F6 !important;outline-offset:2px !important;border-radius:4px;}
 [role="button"]:focus-visible,[tabindex]:focus-visible{outline:2.5px solid #3B82F6 !important;outline-offset:2px !important;}
 
-/* Touch Target Enhancement */
-#root [style*="cursor: pointer"],#root [style*="cursor:pointer"]{min-height:44px;min-width:44px;}
+/* Touch Target Enhancement - only for block-level interactive elements */
+#root div[style*="cursor: pointer"],#root div[style*="cursor:pointer"],
+#root button{min-height:44px;}
 
 /* Smooth Scroll & iOS Momentum */
 html{scroll-behavior:smooth;}
@@ -97,9 +98,9 @@ html{scroll-behavior:smooth;}
 @keyframes ux-btn-press{0%{transform:scale(1);}50%{transform:scale(.96);}100%{transform:scale(1);}}
 .ux-haptic{animation:ux-btn-press .15s ease;}
 
-/* Image lazy load fade-in */
-img[loading="lazy"]{opacity:0;transition:opacity .3s ease;}
-img[loading="lazy"].ux-loaded,img[loading="lazy"][complete]{opacity:1;}
+/* Image lazy load fade-in - only for images not yet loaded */
+img.ux-lazy-pending{opacity:0;transition:opacity .3s ease;}
+img.ux-lazy-pending.ux-loaded{opacity:1;}
 
 /* Improved color contrast for dim text */
 [style*="color: rgb(187, 187, 187)"], [style*="color:#bbb"]{color:#888 !important;}
@@ -150,7 +151,13 @@ Error generating stack: `+n.message+`
     var icons = {success:'✅', error:'❌', info:'💡', warning:'⚠️'};
     var t = document.createElement('div');
     t.className = 'ux-toast ux-toast-' + type;
-    t.innerHTML = '<span class="ux-toast-icon">' + (icons[type]||'💡') + '</span><span>' + msg + '</span>';
+    var iconSpan = document.createElement('span');
+    iconSpan.className = 'ux-toast-icon';
+    iconSpan.textContent = icons[type] || '💡';
+    var msgSpan = document.createElement('span');
+    msgSpan.textContent = msg;
+    t.appendChild(iconSpan);
+    t.appendChild(msgSpan);
     toastContainer.appendChild(t);
     setTimeout(function(){ t.classList.add('ux-toast-out'); }, 2500);
     setTimeout(function(){ t.remove(); }, 2800);
@@ -176,16 +183,8 @@ Error generating stack: `+n.message+`
   /* ==============================
      2. ENHANCED DELETE CONFIRMATION
      ============================== */
-  // MutationObserver to intercept confirm-style dialogs
-  // The app uses a custom `.ask()` pattern - we enhance the confirm dialog
-  var _origConfirm = window.confirm;
-  window.confirm = function(msg) {
-    // For delete operations, show enhanced dialog
-    if (typeof msg === 'string' && (msg.indexOf('削除') !== -1 || msg.indexOf('解除') !== -1 || msg.indexOf('全データ') !== -1)) {
-      return new Promise(function(){});  // Don't use this path
-    }
-    return _origConfirm.call(window, msg);
-  };
+  // The app uses a custom `.ask()` pattern for deletions.
+  // We don't override window.confirm to avoid breaking synchronous return values.
 
   /* ==============================
      3. ACCESSIBILITY ENHANCEMENTS
@@ -290,22 +289,25 @@ Error generating stack: `+n.message+`
      6. IMAGE LAZY LOADING
      ============================== */
   function enableLazyLoading() {
-    document.querySelectorAll('#root img:not([loading])').forEach(function(img) {
+    document.querySelectorAll('#root img:not([data-ux-lazy])').forEach(function(img) {
+      img.setAttribute('data-ux-lazy', '1');
       // Don't lazy-load small icons/avatars (under 60px)
       var w = img.getAttribute('width') || img.style.width;
       if (w && parseInt(w) < 60) return;
       if (img.closest('[style*="position: fixed"]') || img.closest('[style*="position:fixed"]')) return;
 
       img.setAttribute('loading', 'lazy');
-      if (img.complete) {
-        img.classList.add('ux-loaded');
-      } else {
-        img.addEventListener('load', function() {
-          img.classList.add('ux-loaded');
-        }, {once: true});
-        // Fallback: show after 3s anyway
-        setTimeout(function(){ img.classList.add('ux-loaded'); }, 3000);
+      // Only apply fade-in for images not yet loaded
+      if (img.complete && img.naturalWidth > 0) {
+        // Already loaded, don't hide it
+        return;
       }
+      img.classList.add('ux-lazy-pending');
+      img.addEventListener('load', function() {
+        img.classList.add('ux-loaded');
+      }, {once: true});
+      // Fallback: show after 3s to prevent permanently hidden images
+      setTimeout(function(){ img.classList.add('ux-loaded'); }, 3000);
     });
   }
 
@@ -319,15 +321,18 @@ Error generating stack: `+n.message+`
       ta._uxAutoSave = true;
       var key = 'ux_draft_' + (ta.placeholder || 'default');
 
-      // Restore draft
+      // Restore draft - set value via native setter to trigger React's internal handler
       var draft = localStorage.getItem(key);
       if (draft && !ta.value) {
-        ta.value = draft;
-        // Trigger React's onChange
-        var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
-        nativeInputValueSetter.call(ta, draft);
-        ta.dispatchEvent(new Event('input', { bubbles: true }));
-        showToast('下書きを復元しました', 'info');
+        try {
+          var nativeSet = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
+          nativeSet.call(ta, draft);
+          ta.dispatchEvent(new Event('input', { bubbles: true }));
+          showToast('下書きを復元しました', 'info');
+        } catch(e) {
+          // Fallback: just set the DOM value (won't sync to React state)
+          ta.value = draft;
+        }
       }
 
       ta.addEventListener('input', function() {
@@ -345,8 +350,16 @@ Error generating stack: `+n.message+`
 
   // Clear draft after form submission
   document.addEventListener('click', function(e) {
-    var btn = e.target;
-    if (btn && (btn.textContent === '保存' || btn.textContent === '記録する' || btn.textContent === '送信')) {
+    var btn = e.target.closest('[style*="cursor"]') || e.target;
+    if (!btn) return;
+    // Check the direct text of the clicked element (not deep textContent)
+    var directText = '';
+    for (var i = 0; i < btn.childNodes.length; i++) {
+      if (btn.childNodes[i].nodeType === 3) directText += btn.childNodes[i].textContent;
+    }
+    directText = directText.trim();
+    if (!directText) directText = btn.textContent.trim();
+    if (directText === '保存' || directText === '記録する' || directText === '送信') {
       setTimeout(function() {
         Object.keys(localStorage).forEach(function(k) {
           if (k.startsWith('ux_draft_')) localStorage.removeItem(k);
