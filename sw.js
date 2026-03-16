@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wanchan-v2';
+const CACHE_NAME = 'wanchan-v3';
 const ASSETS = [
   '/wanchan-seichou-nikki/',
   '/wanchan-seichou-nikki/index.html',
@@ -29,7 +29,7 @@ button:active{transform:scale(.97)}
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)).catch(() => {})
   );
   self.skipWaiting();
 });
