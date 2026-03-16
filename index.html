@@ -497,5 +497,1353 @@ Error generating stack: `+n.message+`
 
 })();
 </script>
+<script>
+/* ========================================================================
+   Feature Enhancement Pack - カレンダー・散歩・食事/うんち・リマインダー・
+   家族共有・データエクスポート・人間年齢換算
+   ======================================================================== */
+(function(){
+'use strict';
+
+// === Data Layer ===
+var STORE_KEY = 'wc2';
+var EXT_KEY = 'wc2_ext'; // extended features data
+
+function getAppData() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch(e) { return {}; }
+}
+
+function getExtData() {
+  try { return JSON.parse(localStorage.getItem(EXT_KEY)) || { walks: [], meals: [], poops: [], reminders: [], sharedCode: null }; } catch(e) { return { walks: [], meals: [], poops: [], reminders: [], sharedCode: null }; }
+}
+
+function saveExtData(d) {
+  try { localStorage.setItem(EXT_KEY, JSON.stringify(d)); } catch(e) {}
+}
+
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+function todayStr() {
+  var d = new Date();
+  return d.getFullYear() + '.' + String(d.getMonth()+1).padStart(2,'0') + '.' + String(d.getDate()).padStart(2,'0');
+}
+
+function fmtTime(h,m) { return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0'); }
+
+function toast(msg, type) {
+  if (window.__uxToast) window.__uxToast(msg, type || 'success');
+}
+
+// === Theme Detection ===
+function getTheme() {
+  var app = getAppData();
+  var themes = {
+    pink:{bg:"#FFF8F5",c:"#fff",s:"#FFF0EB",tx:"#3D2C2C",h1:"#E8796B",ac:"#FF7B9C",a2:"#FFF0F3",bd:"#F0D9D1",dm:"#BFA6A0",g1:"#F5A6B8",g2:"#FF7B9C"},
+    blue:{bg:"#F0F8FF",c:"#fff",s:"#E8F4FD",tx:"#2C3E50",h1:"#2980B9",ac:"#3498DB",a2:"#EBF5FB",bd:"#BDD7EE",dm:"#7FB3D3",g1:"#5DADE2",g2:"#3498DB"},
+    green:{bg:"#F5FAF0",c:"#fff",s:"#EAF5E0",tx:"#2D3B2D",h1:"#4CAF50",ac:"#43A047",a2:"#E8F5E9",bd:"#C8E6C9",dm:"#8DB98E",g1:"#81C784",g2:"#43A047"},
+    purple:{bg:"#F8F5FF",c:"#fff",s:"#F0EAFF",tx:"#352D4A",h1:"#7C4DFF",ac:"#651FFF",a2:"#EDE7F6",bd:"#D1C4E9",dm:"#9E8DC1",g1:"#B388FF",g2:"#651FFF"}
+  };
+  var t = themes[app.theme] || themes.pink;
+  if (app.dark) {
+    t = Object.assign({}, t, {bg:"#121212",c:"#1E1E1E",s:"#252525",tx:"#E8E8E8",bd:"#333",dm:"#999",a2:"#2a2030"});
+  }
+  return t;
+}
+
+function getDogName() { var d = getAppData(); return d.name || 'わんちゃん'; }
+
+// === Overlay System ===
+var overlayEl = null;
+
+function createOverlay(title, contentFn) {
+  if (overlayEl) overlayEl.remove();
+  var t = getTheme();
+  overlayEl = document.createElement('div');
+  overlayEl.id = 'wc-ext-overlay';
+  overlayEl.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:9998;background:' + t.bg + ';overflow-y:auto;-webkit-overflow-scrolling:touch;animation:ux-page-in .25s ease-out;';
+
+  // Header
+  var header = document.createElement('div');
+  header.style.cssText = 'position:sticky;top:0;z-index:1;padding:env(safe-area-inset-top,12px) 16px 12px;background:' + t.bg + ';border-bottom:1px solid ' + t.bd + ';display:flex;align-items:center;gap:12px;';
+  var backBtn = document.createElement('div');
+  backBtn.textContent = '←';
+  backBtn.style.cssText = 'font-size:22px;cursor:pointer;padding:8px;border-radius:50%;color:' + t.tx + ';min-width:40px;min-height:40px;display:flex;align-items:center;justify-content:center;';
+  backBtn.onclick = function() { overlayEl.remove(); overlayEl = null; };
+  var titleEl = document.createElement('h2');
+  titleEl.textContent = title;
+  titleEl.style.cssText = 'font-size:18px;font-weight:900;color:' + t.h1 + ';margin:0;flex:1;';
+  header.appendChild(backBtn);
+  header.appendChild(titleEl);
+  overlayEl.appendChild(header);
+
+  // Content
+  var content = document.createElement('div');
+  content.style.cssText = 'padding:16px 16px 100px;max-width:430px;margin:0 auto;';
+  contentFn(content, t);
+  overlayEl.appendChild(content);
+
+  document.body.appendChild(overlayEl);
+}
+
+// === Shared UI Components ===
+function makeCard(t, opts) {
+  var card = document.createElement('div');
+  card.style.cssText = 'background:' + t.c + ';border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);border:1px solid ' + t.bd + ';' + (opts||'');
+  return card;
+}
+
+function makeBtn(label, t, primary, onclick) {
+  var btn = document.createElement('button');
+  btn.textContent = label;
+  btn.onclick = onclick;
+  btn.style.cssText = 'padding:12px 20px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;border:none;font-family:inherit;' +
+    (primary ? 'background:linear-gradient(135deg,' + t.g1 + ',' + t.g2 + ');color:#fff;' : 'background:' + t.s + ';color:' + t.tx + ';border:1px solid ' + t.bd + ';');
+  return btn;
+}
+
+function makeInput(t, placeholder, type) {
+  var inp = document.createElement('input');
+  inp.type = type || 'text';
+  inp.placeholder = placeholder;
+  inp.style.cssText = 'width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid ' + t.bd + ';background:' + t.s + ';color:' + t.tx + ';font-size:15px;font-family:inherit;box-sizing:border-box;outline:none;';
+  inp.onfocus = function() { inp.style.borderColor = t.ac; };
+  inp.onblur = function() { inp.style.borderColor = t.bd; };
+  return inp;
+}
+
+function makeSelect(t, options) {
+  var sel = document.createElement('select');
+  sel.style.cssText = 'padding:12px 14px;border-radius:12px;border:1.5px solid ' + t.bd + ';background:' + t.s + ';color:' + t.tx + ';font-size:15px;font-family:inherit;outline:none;-webkit-appearance:none;';
+  options.forEach(function(o) {
+    var opt = document.createElement('option');
+    opt.value = o.v; opt.textContent = o.l;
+    sel.appendChild(opt);
+  });
+  return sel;
+}
+
+// ================================================
+// 1. CALENDAR VIEW
+// ================================================
+function openCalendar() {
+  createOverlay('📅 カレンダー', function(content, t) {
+    var now = new Date();
+    var viewYear = now.getFullYear();
+    var viewMonth = now.getMonth();
+
+    function render() {
+      content.innerHTML = '';
+      var app = getAppData();
+      var ext = getExtData();
+
+      // Month nav
+      var nav = document.createElement('div');
+      nav.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;';
+      var prev = makeBtn('◀', t, false, function() { viewMonth--; if(viewMonth<0){viewMonth=11;viewYear--;} render(); });
+      prev.style.minWidth = '44px';
+      var next = makeBtn('▶', t, false, function() { viewMonth++; if(viewMonth>11){viewMonth=0;viewYear++;} render(); });
+      next.style.minWidth = '44px';
+      var label = document.createElement('span');
+      label.textContent = viewYear + '年 ' + (viewMonth+1) + '月';
+      label.style.cssText = 'font-size:17px;font-weight:900;color:' + t.h1 + ';';
+      nav.appendChild(prev); nav.appendChild(label); nav.appendChild(next);
+      content.appendChild(nav);
+
+      // Day labels
+      var dayLabels = document.createElement('div');
+      dayLabels.style.cssText = 'display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:4px;';
+      ['日','月','火','水','木','金','土'].forEach(function(d,i) {
+        var dl = document.createElement('div');
+        dl.textContent = d;
+        dl.style.cssText = 'font-size:12px;font-weight:700;color:' + (i===0?'#EF4444':i===6?'#3B82F6':t.dm) + ';padding:4px;';
+        dayLabels.appendChild(dl);
+      });
+      content.appendChild(dayLabels);
+
+      // Build events map
+      var events = {};
+      function addEvent(dateStr, emoji) {
+        // dateStr = "2024.03.16"
+        var parts = dateStr.split('.');
+        var key = parseInt(parts[1]) + '-' + parseInt(parts[2]);
+        if (!events[key]) events[key] = [];
+        if (events[key].indexOf(emoji) === -1) events[key].push(emoji);
+      }
+
+      (app.diaries||[]).forEach(function(d) { if(d.date) addEvent(d.date, '📝'); });
+      (app.weights||[]).forEach(function(w) { if(w.d) addEvent(w.d, '⚖️'); });
+      (ext.walks||[]).forEach(function(w) { if(w.date) addEvent(w.date, '🐾'); });
+      (ext.meals||[]).forEach(function(m) { if(m.date) addEvent(m.date, '🍖'); });
+      (ext.poops||[]).forEach(function(p) { if(p.date) addEvent(p.date, '💩'); });
+
+      // Calendar grid
+      var grid = document.createElement('div');
+      grid.style.cssText = 'display:grid;grid-template-columns:repeat(7,1fr);gap:2px;';
+
+      var firstDay = new Date(viewYear, viewMonth, 1).getDay();
+      var daysInMonth = new Date(viewYear, viewMonth+1, 0).getDate();
+      var todayD = now.getDate(), todayM = now.getMonth(), todayY = now.getFullYear();
+
+      for (var i = 0; i < firstDay; i++) {
+        var empty = document.createElement('div');
+        grid.appendChild(empty);
+      }
+
+      for (var d = 1; d <= daysInMonth; d++) {
+        var cell = document.createElement('div');
+        var isToday = (d === todayD && viewMonth === todayM && viewYear === todayY);
+        cell.style.cssText = 'min-height:52px;padding:4px;border-radius:10px;text-align:center;' +
+          (isToday ? 'background:' + t.ac + '20;border:2px solid ' + t.ac + ';' : 'background:' + t.c + ';border:1px solid ' + t.bd + '40;');
+
+        var dayNum = document.createElement('div');
+        dayNum.textContent = d;
+        var dayOfWeek = new Date(viewYear, viewMonth, d).getDay();
+        dayNum.style.cssText = 'font-size:13px;font-weight:' + (isToday?'900':'600') + ';color:' + (isToday?t.ac:dayOfWeek===0?'#EF4444':dayOfWeek===6?'#3B82F6':t.tx) + ';';
+        cell.appendChild(dayNum);
+
+        var key = (viewMonth+1) + '-' + d;
+        if (events[key]) {
+          var dots = document.createElement('div');
+          dots.textContent = events[key].slice(0,3).join('');
+          dots.style.cssText = 'font-size:10px;line-height:1.2;margin-top:2px;';
+          cell.appendChild(dots);
+        }
+
+        grid.appendChild(cell);
+      }
+      content.appendChild(grid);
+
+      // Legend
+      var legend = makeCard(t);
+      legend.style.marginTop = '16px';
+      legend.innerHTML = '<div style="font-size:13px;font-weight:700;color:'+t.h1+';margin-bottom:8px">アイコンの意味</div>' +
+        '<div style="display:flex;flex-wrap:wrap;gap:12px;font-size:13px;color:'+t.tx+'">' +
+        '<span>📝 日記</span><span>⚖️ 体重</span><span>🐾 散歩</span><span>🍖 食事</span><span>💩 うんち</span></div>';
+      content.appendChild(legend);
+    }
+
+    render();
+  });
+}
+
+// ================================================
+// 2. WALK TRACKING
+// ================================================
+function openWalkLog() {
+  createOverlay('🐾 お散歩記録', function(content, t) {
+    var ext = getExtData();
+
+    // Quick add form
+    var form = makeCard(t);
+    form.innerHTML = '<div style="font-size:15px;font-weight:900;color:'+t.h1+';margin-bottom:12px">今日のお散歩を記録</div>';
+
+    var row1 = document.createElement('div');
+    row1.style.cssText = 'display:flex;gap:8px;margin-bottom:10px;';
+    var durInput = makeInput(t, '時間(分)', 'number');
+    durInput.style.flex = '1';
+    durInput.min = '1'; durInput.max = '300';
+    var distInput = makeInput(t, '距離(km)', 'number');
+    distInput.style.flex = '1';
+    distInput.step = '0.1'; distInput.min = '0';
+    row1.appendChild(durInput); row1.appendChild(distInput);
+    form.appendChild(row1);
+
+    var memoInput = makeInput(t, 'メモ（例：公園で遊んだ）');
+    memoInput.style.marginBottom = '12px';
+    form.appendChild(memoInput);
+
+    // Weather picker
+    var weatherRow = document.createElement('div');
+    weatherRow.style.cssText = 'display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;';
+    var selectedWeather = '☀️';
+    ['☀️','⛅','☁️','🌧','❄️'].forEach(function(w) {
+      var wb = document.createElement('div');
+      wb.textContent = w;
+      wb.style.cssText = 'width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;cursor:pointer;font-size:20px;border:2px solid ' + (w===selectedWeather?t.ac:'transparent') + ';background:' + t.s + ';';
+      wb.onclick = function() {
+        selectedWeather = w;
+        weatherRow.querySelectorAll('div').forEach(function(el) { el.style.borderColor = 'transparent'; });
+        wb.style.borderColor = t.ac;
+      };
+      weatherRow.appendChild(wb);
+    });
+    form.appendChild(weatherRow);
+
+    form.appendChild(makeBtn('🐾 記録する', t, true, function() {
+      var dur = parseInt(durInput.value);
+      if (!dur || dur <= 0) { toast('時間を入力してね', 'warning'); return; }
+      ext.walks.push({
+        id: genId(), date: todayStr(), duration: dur,
+        distance: parseFloat(distInput.value) || 0,
+        memo: memoInput.value.trim(), weather: selectedWeather,
+        time: fmtTime(new Date().getHours(), new Date().getMinutes())
+      });
+      saveExtData(ext);
+      toast('お散歩を記録しました！');
+      openWalkLog(); // refresh
+    }));
+    content.appendChild(form);
+
+    // History
+    var walks = (ext.walks||[]).slice().reverse();
+    if (walks.length > 0) {
+      var histTitle = document.createElement('div');
+      histTitle.textContent = '散歩の記録';
+      histTitle.style.cssText = 'font-size:15px;font-weight:900;color:'+t.h1+';margin:16px 0 8px;';
+      content.appendChild(histTitle);
+
+      // Stats
+      var thisMonth = todayStr().substring(0,7);
+      var monthWalks = walks.filter(function(w) { return w.date && w.date.substring(0,7) === thisMonth; });
+      var totalMin = monthWalks.reduce(function(s,w){return s+(w.duration||0);},0);
+      var totalKm = monthWalks.reduce(function(s,w){return s+(w.distance||0);},0);
+
+      var stats = makeCard(t);
+      stats.innerHTML = '<div style="font-size:13px;color:'+t.dm+';margin-bottom:6px">今月のまとめ</div>' +
+        '<div style="display:flex;gap:16px;text-align:center;">' +
+        '<div style="flex:1"><div style="font-size:22px;font-weight:900;color:'+t.ac+'">'+monthWalks.length+'</div><div style="font-size:11px;color:'+t.dm+'">回</div></div>' +
+        '<div style="flex:1"><div style="font-size:22px;font-weight:900;color:'+t.ac+'">'+totalMin+'</div><div style="font-size:11px;color:'+t.dm+'">分</div></div>' +
+        '<div style="flex:1"><div style="font-size:22px;font-weight:900;color:'+t.ac+'">'+totalKm.toFixed(1)+'</div><div style="font-size:11px;color:'+t.dm+'">km</div></div></div>';
+      content.appendChild(stats);
+
+      walks.slice(0,30).forEach(function(w) {
+        var card = makeCard(t);
+        card.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+          '<div><span style="font-size:15px">' + (w.weather||'🐾') + '</span> <strong style="color:'+t.tx+'">' + (w.duration||0) + '分</strong>' +
+          (w.distance ? ' / ' + w.distance + 'km' : '') + '</div>' +
+          '<div style="font-size:12px;color:'+t.dm+'">' + (w.date||'') + ' ' + (w.time||'') + '</div></div>' +
+          (w.memo ? '<div style="font-size:13px;color:'+t.dm+';margin-top:6px">' + escHtml(w.memo) + '</div>' : '') +
+          '<div style="text-align:right;margin-top:4px"><span style="font-size:12px;color:#EF4444;cursor:pointer" data-del="1">削除</span></div>';
+        card.querySelector('[data-del]').onclick = function() {
+          ext.walks = ext.walks.filter(function(x){return x.id!==w.id;});
+          saveExtData(ext);
+          toast('削除しました');
+          openWalkLog();
+        };
+        content.appendChild(card);
+      });
+    } else {
+      var empty = makeCard(t);
+      empty.style.textAlign = 'center';
+      empty.innerHTML = '<div style="font-size:40px;margin-bottom:8px">🐕</div>' +
+        '<div style="font-size:14px;color:'+t.dm+'">まだ散歩の記録がないよ<br>お散歩したら記録してみてね！</div>';
+      content.appendChild(empty);
+    }
+  });
+}
+
+// ================================================
+// 3. MEAL & POOP QUICK LOG
+// ================================================
+function openQuickLog() {
+  createOverlay('🍖 ごはん・💩 うんち記録', function(content, t) {
+    var ext = getExtData();
+
+    // Meal section
+    var mealCard = makeCard(t);
+    mealCard.innerHTML = '<div style="font-size:15px;font-weight:900;color:'+t.h1+';margin-bottom:12px">🍖 ごはん記録</div>';
+
+    var mealTypes = [{e:'🍖',l:'ドライ'},{e:'🥩',l:'ウェット'},{e:'🦴',l:'おやつ'},{e:'💊',l:'サプリ'}];
+    var mealRow = document.createElement('div');
+    mealRow.style.cssText = 'display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;';
+    var selectedMeal = '🍖';
+    mealTypes.forEach(function(m) {
+      var mb = document.createElement('div');
+      mb.innerHTML = '<div style="font-size:20px">' + m.e + '</div><div style="font-size:11px">' + m.l + '</div>';
+      mb.style.cssText = 'flex:1;min-width:60px;text-align:center;padding:10px 4px;border-radius:12px;cursor:pointer;border:2px solid ' + (m.e===selectedMeal?t.ac:'transparent') + ';background:' + t.s + ';';
+      mb.onclick = function() {
+        selectedMeal = m.e;
+        mealRow.querySelectorAll('div[style*="flex:1"]').forEach(function(el){el.style.borderColor='transparent';});
+        mb.style.borderColor = t.ac;
+      };
+      mealRow.appendChild(mb);
+    });
+    mealCard.appendChild(mealRow);
+
+    var mealAmount = makeSelect(t, [{v:'少',l:'少なめ'},{v:'普通',l:'普通'},{v:'多',l:'多め'},{v:'完食',l:'完食！'}]);
+    mealAmount.value = '完食';
+    mealAmount.style.cssText += 'width:100%;margin-bottom:10px;';
+    mealCard.appendChild(mealAmount);
+
+    var mealMemo = makeInput(t, 'メモ（任意）');
+    mealMemo.style.marginBottom = '12px';
+    mealCard.appendChild(mealMemo);
+
+    mealCard.appendChild(makeBtn('🍖 ごはん記録', t, true, function() {
+      ext.meals.push({
+        id: genId(), date: todayStr(), type: selectedMeal,
+        amount: mealAmount.value, memo: mealMemo.value.trim(),
+        time: fmtTime(new Date().getHours(), new Date().getMinutes())
+      });
+      saveExtData(ext);
+      toast('ごはんを記録しました！');
+      openQuickLog();
+    }));
+    content.appendChild(mealCard);
+
+    // Poop section
+    var poopCard = makeCard(t);
+    poopCard.innerHTML = '<div style="font-size:15px;font-weight:900;color:'+t.h1+';margin-bottom:12px">💩 うんち記録</div>';
+
+    var poopTypes = [{e:'💩',l:'普通',c:'good'},{e:'💧',l:'ゆるい',c:'soft'},{e:'🟤',l:'硬い',c:'hard'},{e:'⚠️',l:'異常',c:'bad'}];
+    var poopRow = document.createElement('div');
+    poopRow.style.cssText = 'display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;';
+    var selectedPoop = '💩';
+    var selectedPoopC = 'good';
+    poopTypes.forEach(function(p) {
+      var pb = document.createElement('div');
+      pb.innerHTML = '<div style="font-size:20px">' + p.e + '</div><div style="font-size:11px">' + p.l + '</div>';
+      pb.style.cssText = 'flex:1;min-width:60px;text-align:center;padding:10px 4px;border-radius:12px;cursor:pointer;border:2px solid ' + (p.e===selectedPoop?t.ac:'transparent') + ';background:' + t.s + ';';
+      pb.onclick = function() {
+        selectedPoop = p.e; selectedPoopC = p.c;
+        poopRow.querySelectorAll('div[style*="flex:1"]').forEach(function(el){el.style.borderColor='transparent';});
+        pb.style.borderColor = t.ac;
+      };
+      poopRow.appendChild(pb);
+    });
+    poopCard.appendChild(poopRow);
+
+    var poopColor = makeSelect(t, [{v:'茶',l:'🟤 茶色（正常）'},{v:'黒',l:'⚫ 黒っぽい'},{v:'赤',l:'🔴 赤い・血混じり'},{v:'白',l:'⚪ 白っぽい'},{v:'緑',l:'🟢 緑っぽい'}]);
+    poopColor.style.cssText += 'width:100%;margin-bottom:10px;';
+    poopCard.appendChild(poopColor);
+
+    var poopMemo = makeInput(t, 'メモ（任意）');
+    poopMemo.style.marginBottom = '12px';
+    poopCard.appendChild(poopMemo);
+
+    poopCard.appendChild(makeBtn('💩 うんち記録', t, true, function() {
+      ext.poops.push({
+        id: genId(), date: todayStr(), type: selectedPoop,
+        condition: selectedPoopC, color: poopColor.value,
+        memo: poopMemo.value.trim(),
+        time: fmtTime(new Date().getHours(), new Date().getMinutes())
+      });
+      saveExtData(ext);
+      toast('うんちを記録しました！');
+      if (selectedPoopC === 'bad') {
+        toast('異常なうんちです。獣医さんに相談してね', 'warning');
+      }
+      openQuickLog();
+    }));
+    content.appendChild(poopCard);
+
+    // Today's log
+    var today = todayStr();
+    var todayMeals = (ext.meals||[]).filter(function(m){return m.date===today;}).reverse();
+    var todayPoops = (ext.poops||[]).filter(function(p){return p.date===today;}).reverse();
+
+    if (todayMeals.length > 0 || todayPoops.length > 0) {
+      var logTitle = document.createElement('div');
+      logTitle.textContent = '今日の記録';
+      logTitle.style.cssText = 'font-size:15px;font-weight:900;color:'+t.h1+';margin:16px 0 8px;';
+      content.appendChild(logTitle);
+
+      todayMeals.forEach(function(m) {
+        var c = makeCard(t, 'padding:12px;');
+        c.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center">' +
+          '<div>' + m.type + ' <strong>' + m.amount + '</strong>' + (m.memo?' - '+escHtml(m.memo):'') + '</div>' +
+          '<div style="font-size:12px;color:'+t.dm+'">' + (m.time||'') + ' <span style="color:#EF4444;cursor:pointer" data-del="1">✕</span></div></div>';
+        c.querySelector('[data-del]').onclick = function() {
+          ext.meals = ext.meals.filter(function(x){return x.id!==m.id;});
+          saveExtData(ext);
+          openQuickLog();
+        };
+        content.appendChild(c);
+      });
+
+      todayPoops.forEach(function(p) {
+        var c = makeCard(t, 'padding:12px;');
+        c.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center">' +
+          '<div>' + p.type + ' <span style="font-size:13px">' + p.color + '</span>' + (p.memo?' - '+escHtml(p.memo):'') + '</div>' +
+          '<div style="font-size:12px;color:'+t.dm+'">' + (p.time||'') + ' <span style="color:#EF4444;cursor:pointer" data-del="1">✕</span></div></div>';
+        c.querySelector('[data-del]').onclick = function() {
+          ext.poops = ext.poops.filter(function(x){return x.id!==p.id;});
+          saveExtData(ext);
+          openQuickLog();
+        };
+        content.appendChild(c);
+      });
+    }
+  });
+}
+
+// ================================================
+// 4. REMINDERS
+// ================================================
+function openReminders() {
+  createOverlay('🔔 リマインダー', function(content, t) {
+    var ext = getExtData();
+    var name = getDogName();
+
+    // Add form
+    var form = makeCard(t);
+    form.innerHTML = '<div style="font-size:15px;font-weight:900;color:'+t.h1+';margin-bottom:12px">新しいリマインダー</div>';
+
+    var presets = [{e:'💉',l:'ワクチン'},{e:'💊',l:'お薬'},{e:'✂️',l:'トリミング'},{e:'🏥',l:'健康診断'},{e:'🦷',l:'歯みがき'},{e:'🛁',l:'シャンプー'},{e:'💅',l:'爪切り'},{e:'🐛',l:'ノミダニ予防'}];
+    var presetRow = document.createElement('div');
+    presetRow.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;';
+    var selectedPreset = '💉';
+    var titleInput = makeInput(t, 'リマインダー名');
+    titleInput.value = 'ワクチン';
+    titleInput.style.marginBottom = '10px';
+
+    presets.forEach(function(p) {
+      var pb = document.createElement('div');
+      pb.textContent = p.e;
+      pb.style.cssText = 'width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:10px;cursor:pointer;font-size:18px;border:2px solid ' + (p.e===selectedPreset?t.ac:'transparent') + ';background:' + t.s + ';';
+      pb.onclick = function() {
+        selectedPreset = p.e;
+        titleInput.value = p.l;
+        presetRow.querySelectorAll('div').forEach(function(el){el.style.borderColor='transparent';});
+        pb.style.borderColor = t.ac;
+      };
+      presetRow.appendChild(pb);
+    });
+    form.appendChild(presetRow);
+    form.appendChild(titleInput);
+
+    var dateInput = document.createElement('input');
+    dateInput.type = 'date';
+    dateInput.style.cssText = 'width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid ' + t.bd + ';background:' + t.s + ';color:' + t.tx + ';font-size:15px;font-family:inherit;box-sizing:border-box;margin-bottom:10px;';
+    var tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+    dateInput.value = tomorrow.toISOString().split('T')[0];
+    form.appendChild(dateInput);
+
+    var repeatSel = makeSelect(t, [{v:'none',l:'繰り返しなし'},{v:'weekly',l:'毎週'},{v:'biweekly',l:'隔週'},{v:'monthly',l:'毎月'},{v:'yearly',l:'毎年'}]);
+    repeatSel.style.cssText += 'width:100%;margin-bottom:12px;';
+    form.appendChild(repeatSel);
+
+    var noteInput = makeInput(t, 'メモ（任意）');
+    noteInput.style.marginBottom = '12px';
+    form.appendChild(noteInput);
+
+    form.appendChild(makeBtn('🔔 登録する', t, true, function() {
+      if (!titleInput.value.trim()) { toast('名前を入力してね', 'warning'); return; }
+      if (!dateInput.value) { toast('日付を選んでね', 'warning'); return; }
+      ext.reminders.push({
+        id: genId(), emoji: selectedPreset, title: titleInput.value.trim(),
+        date: dateInput.value, repeat: repeatSel.value,
+        note: noteInput.value.trim(), done: false
+      });
+      saveExtData(ext);
+      toast('リマインダーを登録しました！');
+      scheduleNotification(ext.reminders[ext.reminders.length-1]);
+      openReminders();
+    }));
+    content.appendChild(form);
+
+    // Existing reminders
+    var reminders = (ext.reminders||[]).sort(function(a,b) { return a.date > b.date ? 1 : -1; });
+    if (reminders.length > 0) {
+      var listTitle = document.createElement('div');
+      listTitle.textContent = name + 'のリマインダー';
+      listTitle.style.cssText = 'font-size:15px;font-weight:900;color:'+t.h1+';margin:16px 0 8px;';
+      content.appendChild(listTitle);
+
+      var today = new Date().toISOString().split('T')[0];
+      reminders.forEach(function(r) {
+        var isPast = r.date < today;
+        var isToday = r.date === today;
+        var card = makeCard(t, (isToday ? 'border-color:'+t.ac+';border-width:2px;' : isPast && !r.done ? 'opacity:.6;' : ''));
+        var repeatLabel = {none:'',weekly:'毎週',biweekly:'隔週',monthly:'毎月',yearly:'毎年'}[r.repeat] || '';
+        card.innerHTML = '<div style="display:flex;align-items:center;gap:10px">' +
+          '<div style="font-size:24px">' + r.emoji + '</div>' +
+          '<div style="flex:1"><div style="font-weight:700;color:'+t.tx+'">' + escHtml(r.title) + '</div>' +
+          '<div style="font-size:12px;color:'+t.dm+'">' + r.date + (repeatLabel ? ' · ' + repeatLabel : '') + '</div>' +
+          (r.note ? '<div style="font-size:12px;color:'+t.dm+';margin-top:2px">' + escHtml(r.note) + '</div>' : '') +
+          '</div>' +
+          '<div style="display:flex;flex-direction:column;gap:4px;align-items:center">' +
+          (isToday ? '<span style="font-size:10px;color:'+t.ac+';font-weight:700">今日</span>' : '') +
+          '<span style="font-size:12px;color:#EF4444;cursor:pointer" data-del="1">削除</span>' +
+          '</div></div>';
+        card.querySelector('[data-del]').onclick = function() {
+          ext.reminders = ext.reminders.filter(function(x){return x.id!==r.id;});
+          saveExtData(ext);
+          toast('削除しました');
+          openReminders();
+        };
+        content.appendChild(card);
+      });
+    }
+  });
+}
+
+function scheduleNotification(reminder) {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+// Check reminders on load
+function checkTodayReminders() {
+  var ext = getExtData();
+  var today = new Date().toISOString().split('T')[0];
+  var due = (ext.reminders||[]).filter(function(r) { return r.date === today && !r.done; });
+  if (due.length > 0 && Notification.permission === 'granted') {
+    var name = getDogName();
+    due.forEach(function(r) {
+      try { new Notification(name + 'のリマインダー', { body: r.emoji + ' ' + r.title + ' の日です！', icon: 'icon-192.png' }); } catch(e) {}
+    });
+  }
+  if (due.length > 0) {
+    setTimeout(function() {
+      toast(due[0].emoji + ' ' + due[0].title + ' の日です！', 'info');
+    }, 2000);
+  }
+}
+
+// ================================================
+// 5. FAMILY SHARING (URL-based data export/import)
+// ================================================
+function openFamilyShare() {
+  createOverlay('👨‍👩‍👧 家族共有', function(content, t) {
+    var name = getDogName();
+
+    var infoCard = makeCard(t);
+    infoCard.style.textAlign = 'center';
+    infoCard.innerHTML = '<div style="font-size:40px;margin-bottom:8px">👨‍👩‍👧‍👦</div>' +
+      '<div style="font-size:15px;font-weight:700;color:'+t.h1+';margin-bottom:4px">' + escHtml(name) + 'の情報を家族と共有</div>' +
+      '<div style="font-size:13px;color:'+t.dm+';line-height:1.6">共有ファイルを書き出して<br>家族のスマホに取り込めます</div>';
+    content.appendChild(infoCard);
+
+    // Export
+    var exportCard = makeCard(t);
+    exportCard.innerHTML = '<div style="font-size:15px;font-weight:900;color:'+t.h1+';margin-bottom:8px">📤 データを書き出す</div>' +
+      '<div style="font-size:13px;color:'+t.dm+';margin-bottom:12px">'+escHtml(name)+'の全データをファイルに保存します。<br>家族にLINEやAirDropで送れます。</div>';
+
+    exportCard.appendChild(makeBtn('📤 共有ファイルを作成', t, true, function() {
+      var appData = getAppData();
+      var extData = getExtData();
+      var shareData = { version: 1, app: appData, ext: extData, exported: new Date().toISOString() };
+      var blob = new Blob([JSON.stringify(shareData)], {type: 'application/json'});
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = name + '_データ_' + todayStr().replace(/\./g,'') + '.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      toast('共有ファイルを保存しました！');
+    }));
+    content.appendChild(exportCard);
+
+    // Import
+    var importCard = makeCard(t);
+    importCard.innerHTML = '<div style="font-size:15px;font-weight:900;color:'+t.h1+';margin-bottom:8px">📥 データを取り込む</div>' +
+      '<div style="font-size:13px;color:'+t.dm+';margin-bottom:12px">家族から受け取ったファイルを選んでください。<br>⚠️ 現在のデータは上書きされます。</div>';
+
+    var fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.json';
+    fileInput.style.cssText = 'display:none;';
+    importCard.appendChild(fileInput);
+
+    importCard.appendChild(makeBtn('📥 ファイルを選択', t, false, function() {
+      fileInput.click();
+    }));
+
+    fileInput.onchange = function() {
+      if (!fileInput.files[0]) return;
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        try {
+          var data = JSON.parse(ev.target.result);
+          if (!data.version || !data.app) { toast('無効なファイルです', 'error'); return; }
+          if (!confirm(getDogName() + 'のデータを上書きしますか？\n（元に戻せません）')) return;
+          localStorage.setItem(STORE_KEY, JSON.stringify(data.app));
+          if (data.ext) saveExtData(data.ext);
+          toast('データを取り込みました！再読み込みします…');
+          setTimeout(function() { location.reload(); }, 1500);
+        } catch(e) {
+          toast('ファイルの読み込みに失敗しました', 'error');
+        }
+      };
+      reader.readAsText(fileInput.files[0]);
+    };
+    content.appendChild(importCard);
+
+    // Web Share API
+    if (navigator.share) {
+      var shareCard = makeCard(t);
+      shareCard.innerHTML = '<div style="font-size:15px;font-weight:900;color:'+t.h1+';margin-bottom:8px">📱 直接共有</div>' +
+        '<div style="font-size:13px;color:'+t.dm+';margin-bottom:12px">LINEやメッセージで直接送れます</div>';
+      shareCard.appendChild(makeBtn('📱 共有する', t, true, function() {
+        var appData = getAppData();
+        var extData = getExtData();
+        var shareData = { version: 1, app: appData, ext: extData, exported: new Date().toISOString() };
+        var blob = new Blob([JSON.stringify(shareData)], {type: 'application/json'});
+        var file = new File([blob], name + '_データ.json', {type: 'application/json'});
+        navigator.share({ title: name + 'の成長日記データ', files: [file] }).catch(function(){});
+      }));
+      content.appendChild(shareCard);
+    }
+  });
+}
+
+// ================================================
+// 6. DATA EXPORT
+// ================================================
+function openDataExport() {
+  createOverlay('📊 記録を保存・シェア', function(content, t) {
+    var app = getAppData();
+    var ext = getExtData();
+    var name = getDogName();
+
+    var infoCard = makeCard(t);
+    infoCard.style.textAlign = 'center';
+    infoCard.innerHTML = '<div style="font-size:40px;margin-bottom:8px">📸</div>' +
+      '<div style="font-size:15px;font-weight:700;color:'+t.h1+'">'+escHtml(name)+'の記録を画像で保存</div>' +
+      '<div style="font-size:13px;color:'+t.dm+';margin-top:4px">SNSでシェアしたり、写真に保存できます</div>';
+    content.appendChild(infoCard);
+
+    // ---- Growth Card (Image) ----
+    var cardSection = makeCard(t);
+    cardSection.innerHTML = '<div style="font-size:15px;font-weight:900;color:'+t.h1+';margin-bottom:12px">🐾 成長カード画像</div>' +
+      '<div style="font-size:13px;color:'+t.dm+';margin-bottom:12px">長押しまたはタップで画像を保存できます</div>';
+
+    function generateGrowthCard() {
+      var canvas = document.createElement('canvas');
+      var W = 750, H = 1050;
+      canvas.width = W; canvas.height = H;
+      var ctx = canvas.getContext('2d');
+
+      // Background gradient
+      var grad = ctx.createLinearGradient(0, 0, W, H);
+      grad.addColorStop(0, '#FFF8F5');
+      grad.addColorStop(1, '#FFE8E0');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Decorative circles
+      ctx.fillStyle = 'rgba(255,123,156,0.08)';
+      ctx.beginPath(); ctx.arc(650, 100, 120, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(100, 900, 80, 0, Math.PI*2); ctx.fill();
+
+      // Header
+      ctx.fillStyle = '#E8796B';
+      ctx.font = 'bold 28px "Zen Maru Gothic", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('🐾 ' + name + ' の成長記録', W/2, 70);
+
+      ctx.fillStyle = '#BFA6A0';
+      ctx.font = '16px "Zen Maru Gothic", sans-serif';
+      ctx.fillText((app.breed||'') + (app.joined ? '  |  お迎え日: ' + app.joined : ''), W/2, 100);
+
+      // Divider
+      ctx.strokeStyle = '#F0D9D1';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(60, 125); ctx.lineTo(W-60, 125); ctx.stroke();
+
+      var y = 165;
+
+      // Stats boxes
+      var diaryCount = (app.diaries||[]).length;
+      var weightCount = (app.weights||[]).length;
+      var walkCount = (ext.walks||[]).length;
+      var latestWeight = weightCount > 0 ? app.weights[weightCount-1].v + 'kg' : '-';
+
+      var stats = [
+        {label: '日記', value: diaryCount + '件', emoji: '📝'},
+        {label: '体重', value: latestWeight, emoji: '⚖️'},
+        {label: '散歩', value: walkCount + '回', emoji: '🐾'},
+        {label: '食事', value: (ext.meals||[]).length + '回', emoji: '🍖'}
+      ];
+
+      var boxW = 150, boxH = 80, boxGap = 18;
+      var startX = (W - (boxW * 4 + boxGap * 3)) / 2;
+      stats.forEach(function(s, i) {
+        var bx = startX + i * (boxW + boxGap);
+        // Box background
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        roundRect(ctx, bx, y, boxW, boxH, 14);
+        ctx.fill();
+        ctx.strokeStyle = '#F0D9D1';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.fillStyle = '#3D2C2C';
+        ctx.font = 'bold 22px "Zen Maru Gothic", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(s.emoji + ' ' + s.value, bx + boxW/2, y + 38);
+
+        ctx.fillStyle = '#BFA6A0';
+        ctx.font = '13px "Zen Maru Gothic", sans-serif';
+        ctx.fillText(s.label, bx + boxW/2, y + 62);
+      });
+
+      y += boxH + 30;
+
+      // Weight history (simple chart)
+      if (weightCount >= 2) {
+        ctx.fillStyle = '#E8796B';
+        ctx.font = 'bold 18px "Zen Maru Gothic", sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('⚖️ 体重推移', 60, y);
+        y += 15;
+
+        var chartX = 80, chartW = W - 160, chartH = 120;
+        var weights = app.weights.slice(-12);
+        var vals = weights.map(function(w){return parseFloat(w.v);});
+        var minV = Math.min.apply(null, vals) * 0.9;
+        var maxV = Math.max.apply(null, vals) * 1.1;
+        if (maxV === minV) maxV = minV + 1;
+
+        // Chart area bg
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.beginPath();
+        roundRect(ctx, chartX-20, y, chartW+40, chartH+40, 12);
+        ctx.fill();
+
+        // Line
+        ctx.strokeStyle = '#FF7B9C';
+        ctx.lineWidth = 3;
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        weights.forEach(function(w, i) {
+          var px = chartX + (i / (weights.length-1)) * chartW;
+          var py = y + 10 + chartH - ((parseFloat(w.v) - minV) / (maxV - minV)) * chartH;
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        });
+        ctx.stroke();
+
+        // Points and labels
+        weights.forEach(function(w, i) {
+          var px = chartX + (i / (weights.length-1)) * chartW;
+          var py = y + 10 + chartH - ((parseFloat(w.v) - minV) / (maxV - minV)) * chartH;
+          ctx.fillStyle = '#FF7B9C';
+          ctx.beginPath(); ctx.arc(px, py, 5, 0, Math.PI*2); ctx.fill();
+          ctx.fillStyle = '#fff';
+          ctx.beginPath(); ctx.arc(px, py, 3, 0, Math.PI*2); ctx.fill();
+
+          if (i === 0 || i === weights.length-1) {
+            ctx.fillStyle = '#3D2C2C';
+            ctx.font = '11px "Zen Maru Gothic", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(w.v + 'kg', px, py - 12);
+            ctx.fillStyle = '#BFA6A0';
+            ctx.font = '10px "Zen Maru Gothic", sans-serif';
+            ctx.fillText(w.d.slice(5), px, y + chartH + 32);
+          }
+        });
+
+        y += chartH + 60;
+      }
+
+      // Recent diaries
+      var recentDiaries = (app.diaries||[]).slice(-3).reverse();
+      if (recentDiaries.length > 0) {
+        ctx.fillStyle = '#E8796B';
+        ctx.font = 'bold 18px "Zen Maru Gothic", sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('📝 最近の日記', 60, y);
+        y += 20;
+
+        recentDiaries.forEach(function(d) {
+          ctx.fillStyle = 'rgba(255,255,255,0.7)';
+          ctx.beginPath();
+          roundRect(ctx, 60, y, W-120, 50, 10);
+          ctx.fill();
+
+          ctx.fillStyle = '#BFA6A0';
+          ctx.font = '12px "Zen Maru Gothic", sans-serif';
+          ctx.textAlign = 'left';
+          ctx.fillText(d.date||'', 75, y + 20);
+
+          ctx.fillStyle = '#3D2C2C';
+          ctx.font = 'bold 14px "Zen Maru Gothic", sans-serif';
+          ctx.fillText((d.emoji||'') + ' ' + (d.title||'').slice(0,20), 160, y + 20);
+
+          if (d.txt) {
+            ctx.fillStyle = '#888';
+            ctx.font = '12px "Zen Maru Gothic", sans-serif';
+            ctx.fillText(d.txt.slice(0,30) + (d.txt.length>30?'...':''), 75, y + 40);
+          }
+
+          y += 58;
+        });
+      }
+
+      // Footer
+      ctx.fillStyle = '#D1C4BB';
+      ctx.font = '12px "Zen Maru Gothic", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('わんちゃん成長日記  |  ' + todayStr() + ' 作成', W/2, H - 30);
+
+      return canvas;
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+
+    var canvas = generateGrowthCard();
+    var imgPreview = document.createElement('img');
+    imgPreview.src = canvas.toDataURL('image/png');
+    imgPreview.style.cssText = 'width:100%;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.1);margin-bottom:12px;';
+    cardSection.appendChild(imgPreview);
+
+    var btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:8px;';
+
+    btnRow.appendChild(makeBtn('📥 画像を保存', t, true, function() {
+      canvas.toBlob(function(blob) {
+        if (!blob) { toast('画像の生成に失敗しました', 'error'); return; }
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = name + '_成長カード_' + todayStr().replace(/\./g,'') + '.png';
+        a.click();
+        URL.revokeObjectURL(url);
+        toast('画像を保存しました！');
+      }, 'image/png');
+    }));
+
+    if (navigator.share) {
+      btnRow.appendChild(makeBtn('📱 シェア', t, false, function() {
+        canvas.toBlob(function(blob) {
+          if (!blob) return;
+          var file = new File([blob], name + '_成長カード.png', {type:'image/png'});
+          navigator.share({ title: name + 'の成長カード', files: [file] }).catch(function(){});
+        }, 'image/png');
+      }));
+    }
+    cardSection.appendChild(btnRow);
+    content.appendChild(cardSection);
+
+    // ---- Print-friendly HTML ----
+    var printCard = makeCard(t);
+    printCard.innerHTML = '<div style="font-size:15px;font-weight:900;color:'+t.h1+';margin-bottom:8px">🖨 印刷用</div>' +
+      '<div style="font-size:13px;color:'+t.dm+';margin-bottom:12px">全データを見やすいレイアウトで印刷</div>';
+    printCard.appendChild(makeBtn('🖨 印刷する', t, false, function() {
+      var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+escHtml(name)+'の成長記録</title>' +
+        '<style>body{font-family:sans-serif;max-width:700px;margin:0 auto;padding:20px;color:#333}' +
+        'h1{text-align:center;color:#E8796B}h2{color:#FF7B9C;border-bottom:2px solid #FFE0E6;padding-bottom:4px;margin-top:24px}' +
+        'table{width:100%;border-collapse:collapse;margin:8px 0}th,td{padding:8px;border:1px solid #ddd;text-align:left;font-size:13px}' +
+        'th{background:#FFF0F3}.diary{margin:12px 0;padding:12px;border-left:3px solid #FF7B9C;background:#FFF8F5}' +
+        '.diary-date{font-size:12px;color:#999}.diary-title{font-weight:700}.walk{margin:8px 0;padding:8px 12px;background:#f9f9f9;border-radius:8px}' +
+        '@media print{body{padding:0}}</style></head><body>';
+      html += '<h1>🐾 '+escHtml(name)+'の成長記録</h1>';
+      html += '<p style="text-align:center;color:#888">'+escHtml(app.breed||'')+(app.joined?' · お迎え日: '+app.joined:'')+'</p>';
+
+      if ((app.weights||[]).length > 0) {
+        html += '<h2>⚖️ 体重推移</h2><table><tr><th>日付</th><th>体重</th></tr>';
+        app.weights.forEach(function(w){html += '<tr><td>'+escHtml(w.d)+'</td><td>'+w.v+' kg</td></tr>';});
+        html += '</table>';
+      }
+      if ((app.diaries||[]).length > 0) {
+        html += '<h2>📝 日記</h2>';
+        app.diaries.slice().reverse().forEach(function(d){
+          html += '<div class="diary"><div class="diary-date">'+escHtml(d.date||'')+'</div>' +
+            '<div class="diary-title">'+(d.emoji||'')+' '+escHtml(d.title||'')+'</div>' +
+            (d.txt?'<div>'+escHtml(d.txt)+'</div>':'')+'</div>';
+        });
+      }
+      if ((ext.walks||[]).length > 0) {
+        html += '<h2>🐾 散歩記録</h2>';
+        ext.walks.slice().reverse().forEach(function(w){
+          html += '<div class="walk">'+(w.weather||'')+' '+w.date+' '+w.duration+'分'+(w.distance?' / '+w.distance+'km':'')+(w.memo?' - '+escHtml(w.memo):'')+'</div>';
+        });
+      }
+      html += '<p style="text-align:center;color:#ccc;margin-top:40px;font-size:12px">わんちゃん成長日記より出力</p></body></html>';
+
+      var w = window.open('', '_blank');
+      if (w) { w.document.write(html); w.document.close(); w.print(); }
+    }));
+    content.appendChild(printCard);
+  });
+}
+
+// ================================================
+// 7. HUMAN AGE CALCULATOR
+// ================================================
+function openHumanAge() {
+  createOverlay('🎂 人間年齢換算', function(content, t) {
+    var app = getAppData();
+    var name = getDogName();
+    var breed = app.breed || '';
+
+    // Size categories by breed
+    var smallBreeds = ['トイプードル','チワワ','ポメラニアン','マルチーズ','パグ'];
+    var mediumBreeds = ['柴犬','ダックス','フレブル','ビーグル','コーギー'];
+    var largeBreeds = ['ゴールデン','ハスキー'];
+
+    var size = 'medium';
+    if (smallBreeds.indexOf(breed) !== -1) size = 'small';
+    else if (largeBreeds.indexOf(breed) !== -1) size = 'large';
+
+    // Calculate age in months
+    var joined = app.joined;
+    var birthDate = null;
+    if (joined) {
+      // Try to parse joined date
+      var parts = joined.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/);
+      if (parts) birthDate = new Date(parseInt(parts[1]), parseInt(parts[2])-1, parseInt(parts[3]));
+    }
+
+    // Human age conversion table (approx)
+    // Small: slower aging; Large: faster aging
+    function dogToHuman(months, sz) {
+      var years = months / 12;
+      if (sz === 'small') {
+        if (years <= 1) return Math.round(years * 15);
+        if (years <= 2) return 15 + Math.round((years-1) * 9.5);
+        return 24 + Math.round((years-2) * 4);
+      } else if (sz === 'large') {
+        if (years <= 1) return Math.round(years * 12);
+        if (years <= 2) return 12 + Math.round((years-1) * 10);
+        return 22 + Math.round((years-2) * 7);
+      } else {
+        if (years <= 1) return Math.round(years * 15);
+        if (years <= 2) return 15 + Math.round((years-1) * 9);
+        return 24 + Math.round((years-2) * 5);
+      }
+    }
+
+    // Display
+    var card = makeCard(t);
+    card.style.textAlign = 'center';
+
+    if (birthDate) {
+      var now = new Date();
+      var ageMonths = (now.getFullYear() - birthDate.getFullYear()) * 12 + (now.getMonth() - birthDate.getMonth());
+      if (ageMonths < 0) ageMonths = 0;
+      var ageYears = Math.floor(ageMonths / 12);
+      var ageRemMonths = ageMonths % 12;
+      var humanAge = dogToHuman(ageMonths, size);
+
+      var sizeLabel = {small:'小型犬',medium:'中型犬',large:'大型犬'}[size];
+
+      card.innerHTML = '<div style="font-size:48px;margin-bottom:8px">🎂</div>' +
+        '<div style="font-size:20px;font-weight:900;color:'+t.h1+';margin-bottom:4px">'+escHtml(name)+'</div>' +
+        '<div style="font-size:14px;color:'+t.dm+';margin-bottom:16px">'+escHtml(breed)+' ('+sizeLabel+')</div>' +
+        '<div style="display:flex;gap:16px;justify-content:center;margin-bottom:16px">' +
+        '<div style="background:'+t.s+';padding:16px 20px;border-radius:16px;flex:1;max-width:140px">' +
+        '<div style="font-size:11px;color:'+t.dm+';margin-bottom:4px">犬の年齢</div>' +
+        '<div style="font-size:28px;font-weight:900;color:'+t.ac+'">'+ageYears+'<span style="font-size:14px">歳</span>' +
+        (ageRemMonths>0?'<span style="font-size:16px">'+ageRemMonths+'</span><span style="font-size:12px">ヶ月</span>':'') + '</div></div>' +
+        '<div style="background:'+t.s+';padding:16px 20px;border-radius:16px;flex:1;max-width:140px">' +
+        '<div style="font-size:11px;color:'+t.dm+';margin-bottom:4px">人間だと…</div>' +
+        '<div style="font-size:28px;font-weight:900;color:'+t.h1+'">'+humanAge+'<span style="font-size:14px">歳</span></div></div></div>';
+
+      // Life stage
+      var stage = '', stageEmoji = '', stageDesc = '';
+      if (ageMonths < 6) { stage='パピー期'; stageEmoji='🐶'; stageDesc='社会化が大切な時期。たくさんの経験をさせてあげてね'; }
+      else if (ageMonths < 12) { stage='ジュニア期'; stageEmoji='🐕'; stageDesc='体が大きく成長する時期。栄養バランスに気をつけて'; }
+      else if (ageMonths < 84) { stage='成犬期'; stageEmoji='🐕‍🦺'; stageDesc='心身ともに安定した時期。適度な運動と健康管理を'; }
+      else { stage='シニア期'; stageEmoji='🦮'; stageDesc='ゆったりとした時間を大切に。定期検診で早期発見を'; }
+
+      card.innerHTML += '<div style="background:'+t.a2+';border-radius:12px;padding:14px;margin-top:8px">' +
+        '<div style="font-size:16px;font-weight:700;color:'+t.tx+'">'+stageEmoji+' '+stage+'</div>' +
+        '<div style="font-size:13px;color:'+t.dm+';margin-top:4px">'+stageDesc+'</div></div>';
+
+    } else {
+      card.innerHTML = '<div style="font-size:48px;margin-bottom:8px">🎂</div>' +
+        '<div style="font-size:15px;color:'+t.dm+';line-height:1.6">お誕生日が登録されていません。<br>プロフィールからお迎え日を設定してね！</div>';
+    }
+    content.appendChild(card);
+
+    // Age chart
+    var chartCard = makeCard(t);
+    chartCard.innerHTML = '<div style="font-size:15px;font-weight:900;color:'+t.h1+';margin-bottom:12px">📊 年齢換算表</div>';
+    var table = document.createElement('div');
+    table.style.cssText = 'font-size:13px;';
+    table.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1px;background:'+t.bd+';border-radius:8px;overflow:hidden">' +
+      '<div style="background:'+t.a2+';padding:8px;font-weight:700;text-align:center">犬の年齢</div>' +
+      '<div style="background:'+t.a2+';padding:8px;font-weight:700;text-align:center">小型犬</div>' +
+      '<div style="background:'+t.a2+';padding:8px;font-weight:700;text-align:center">中型犬</div>' +
+      '<div style="background:'+t.a2+';padding:8px;font-weight:700;text-align:center">大型犬</div>';
+
+    [1,2,3,5,7,10,13,15].forEach(function(y) {
+      var m = y*12;
+      var isMe = birthDate && Math.abs(Math.round((new Date()-birthDate)/(1000*60*60*24*365))-y) < 1;
+      var bg = isMe ? t.ac+'20' : t.c;
+      table.innerHTML += '<div style="background:'+bg+';padding:8px;text-align:center;font-weight:'+(isMe?'700':'400')+'">'+y+'歳</div>' +
+        '<div style="background:'+bg+';padding:8px;text-align:center">'+dogToHuman(m,'small')+'歳</div>' +
+        '<div style="background:'+bg+';padding:8px;text-align:center">'+dogToHuman(m,'medium')+'歳</div>' +
+        '<div style="background:'+bg+';padding:8px;text-align:center">'+dogToHuman(m,'large')+'歳</div>';
+    });
+    table.innerHTML += '</div>';
+    chartCard.appendChild(table);
+    content.appendChild(chartCard);
+  });
+}
+
+// ================================================
+// UTILITY
+// ================================================
+function escHtml(s) {
+  var d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ================================================
+// MENU INJECTION - Add buttons to the app's menu
+// ================================================
+function injectMenuItems() {
+  // Find the menu page - look for the settings/menu tab content
+  var root = document.getElementById('root');
+  if (!root) return;
+
+  // Look for existing ext menu container
+  if (document.getElementById('wc-ext-menu')) return;
+
+  // Find menu indicators: look for text like "設定" or "メニュー" in visible elements
+  // The menu tab shows when user is on the menu page
+  var allText = root.innerText || '';
+  var isMenuPage = (allText.indexOf('プレミアム') !== -1 && allText.indexOf('テーマ') !== -1) ||
+                   (allText.indexOf('お問い合わせ') !== -1) ||
+                   (allText.indexOf('プロフィール編集') !== -1);
+
+  if (!isMenuPage) return;
+
+  // Find the scrollable content area - look for the main content container
+  // We inject our menu section before the last child of the menu page
+  var containers = root.querySelectorAll('div[style*="overflow"]');
+  var menuContainer = null;
+  containers.forEach(function(c) {
+    if (c.offsetHeight > 200 && c.innerText.indexOf('テーマ') !== -1) {
+      menuContainer = c;
+    }
+  });
+
+  if (!menuContainer) {
+    // Fallback: find a container with padding that has menu items
+    var divs = root.querySelectorAll('div');
+    for (var i = 0; i < divs.length; i++) {
+      var d = divs[i];
+      if (d.children.length >= 3 && d.innerText.indexOf('テーマ') !== -1 && d.offsetHeight > 300) {
+        menuContainer = d;
+        break;
+      }
+    }
+  }
+
+  if (!menuContainer) return;
+
+  var t = getTheme();
+  var extMenu = document.createElement('div');
+  extMenu.id = 'wc-ext-menu';
+  extMenu.style.cssText = 'padding:0 16px 16px;';
+
+  var sectionTitle = document.createElement('div');
+  sectionTitle.textContent = '✨ 便利ツール';
+  sectionTitle.style.cssText = 'font-size:14px;font-weight:900;color:' + t.h1 + ';margin:20px 0 10px;padding:0 4px;';
+  extMenu.appendChild(sectionTitle);
+
+  var menuItems = [
+    {emoji:'📅',label:'カレンダー',desc:'日記や記録を月間表示',fn:openCalendar},
+    {emoji:'🐾',label:'お散歩記録',desc:'散歩の時間・距離を記録',fn:openWalkLog},
+    {emoji:'🍖',label:'ごはん・うんち',desc:'毎日の食事とうんちを記録',fn:openQuickLog},
+    {emoji:'🔔',label:'リマインダー',desc:'ワクチン・お薬の予定管理',fn:openReminders},
+    {emoji:'🎂',label:'人間年齢換算',desc:'うちの子は人間だと何歳？',fn:openHumanAge},
+    {emoji:'👨‍👩‍👧',label:'家族共有',desc:'データを家族に共有',fn:openFamilyShare},
+    {emoji:'📸',label:'記録を保存',desc:'画像で保存・SNSでシェア',fn:openDataExport}
+  ];
+
+  var grid = document.createElement('div');
+  grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px;';
+
+  menuItems.forEach(function(item) {
+    var btn = document.createElement('div');
+    btn.style.cssText = 'background:' + t.c + ';border-radius:14px;padding:14px 12px;cursor:pointer;border:1px solid ' + t.bd + ';box-shadow:0 2px 6px rgba(0,0,0,.04);transition:transform .15s;';
+    btn.innerHTML = '<div style="font-size:24px;margin-bottom:4px">' + item.emoji + '</div>' +
+      '<div style="font-size:13px;font-weight:700;color:' + t.tx + '">' + item.label + '</div>' +
+      '<div style="font-size:11px;color:' + t.dm + ';margin-top:2px">' + item.desc + '</div>';
+    btn.onmousedown = function() { btn.style.transform = 'scale(.96)'; };
+    btn.onmouseup = function() { btn.style.transform = ''; };
+    btn.ontouchstart = function() { btn.style.transform = 'scale(.96)'; };
+    btn.ontouchend = function() { btn.style.transform = ''; };
+    btn.onclick = item.fn;
+    grid.appendChild(btn);
+  });
+
+  extMenu.appendChild(grid);
+
+  // Insert before the last section of the menu
+  // Find a good insertion point - before the bottom padding/spacer
+  var children = menuContainer.children;
+  var inserted = false;
+  for (var i = children.length - 1; i >= 0; i--) {
+    var child = children[i];
+    var txt = child.innerText || '';
+    // Insert before less important items like version info, support links, etc.
+    if (txt.indexOf('お問い合わせ') !== -1 || txt.indexOf('バージョン') !== -1 || txt.indexOf('ストレージ') !== -1) {
+      menuContainer.insertBefore(extMenu, child);
+      inserted = true;
+      break;
+    }
+  }
+  if (!inserted) {
+    menuContainer.appendChild(extMenu);
+  }
+}
+
+// ================================================
+// HOME PAGE - Quick action buttons
+// ================================================
+function injectHomeQuickActions() {
+  var root = document.getElementById('root');
+  if (!root) return;
+  if (document.getElementById('wc-ext-home-quick')) return;
+
+  // Detect home page: has diary entries or "日記を書く" button
+  var allText = root.innerText || '';
+  var isHomePage = (allText.indexOf('日記を書く') !== -1 || allText.indexOf('はじめての日記') !== -1) &&
+                   allText.indexOf('プロフィール編集') === -1 &&
+                   allText.indexOf('テーマ') === -1;
+  if (!isHomePage) return;
+
+  var t = getTheme();
+  var ext = getExtData();
+
+  // Find the main scrollable container
+  var container = null;
+  var divs = root.querySelectorAll('div[style*="overflow"]');
+  divs.forEach(function(d) {
+    if (d.offsetHeight > 200 && (d.innerText.indexOf('日記') !== -1)) {
+      container = d;
+    }
+  });
+  if (!container) return;
+
+  var quickBar = document.createElement('div');
+  quickBar.id = 'wc-ext-home-quick';
+  quickBar.style.cssText = 'padding:0 16px 8px;';
+
+  var row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 0;';
+
+  // Today's summary
+  var today = todayStr();
+  var todayMeals = (ext.meals||[]).filter(function(m){return m.date===today;}).length;
+  var todayPoops = (ext.poops||[]).filter(function(p){return p.date===today;}).length;
+  var todayWalks = (ext.walks||[]).filter(function(w){return w.date===today;}).length;
+
+  var quickItems = [
+    {e:'🐾',l:'散歩'+(todayWalks>0?' ('+todayWalks+')':''),fn:openWalkLog},
+    {e:'🍖',l:'ごはん'+(todayMeals>0?' ('+todayMeals+')':''),fn:openQuickLog},
+    {e:'📅',l:'カレンダー',fn:openCalendar},
+    {e:'🎂',l:'年齢',fn:openHumanAge}
+  ];
+
+  quickItems.forEach(function(q) {
+    var chip = document.createElement('div');
+    chip.style.cssText = 'display:flex;align-items:center;gap:4px;padding:8px 12px;border-radius:20px;background:' + t.c + ';border:1px solid ' + t.bd + ';cursor:pointer;white-space:nowrap;font-size:13px;font-weight:600;color:' + t.tx + ';flex-shrink:0;';
+    chip.innerHTML = '<span>' + q.e + '</span><span>' + q.l + '</span>';
+    chip.onclick = q.fn;
+    row.appendChild(chip);
+  });
+
+  quickBar.appendChild(row);
+
+  // Insert at top of scrollable content
+  if (container.firstChild) {
+    // Find a good spot - after the header/profile section but before diaries
+    var inserted = false;
+    for (var i = 0; i < container.children.length; i++) {
+      var child = container.children[i];
+      if (child.innerText && (child.innerText.indexOf('日記を書く') !== -1 || child.innerText.indexOf('はじめての日記') !== -1)) {
+        container.insertBefore(quickBar, child);
+        inserted = true;
+        break;
+      }
+    }
+    if (!inserted) {
+      container.insertBefore(quickBar, container.children[Math.min(2, container.children.length)]);
+    }
+  } else {
+    container.appendChild(quickBar);
+  }
+}
+
+// ================================================
+// REMINDER BADGE on home page
+// ================================================
+function showReminderBadge() {
+  if (document.getElementById('wc-ext-reminder-badge')) return;
+  var ext = getExtData();
+  var today = new Date().toISOString().split('T')[0];
+  var due = (ext.reminders||[]).filter(function(r){ return r.date <= today && !r.done; });
+  if (due.length === 0) return;
+
+  var root = document.getElementById('root');
+  if (!root) return;
+
+  var allText = root.innerText || '';
+  var isHomePage = (allText.indexOf('日記を書く') !== -1 || allText.indexOf('はじめての日記') !== -1) &&
+                   allText.indexOf('テーマ') === -1;
+  if (!isHomePage) return;
+
+  var t = getTheme();
+  var badge = document.createElement('div');
+  badge.id = 'wc-ext-reminder-badge';
+  badge.style.cssText = 'margin:0 16px 8px;padding:12px 16px;border-radius:14px;background:linear-gradient(135deg,'+t.g1+'15,'+t.g2+'15);border:1.5px solid '+t.ac+'40;cursor:pointer;display:flex;align-items:center;gap:10px;';
+  badge.innerHTML = '<div style="font-size:20px">🔔</div>' +
+    '<div style="flex:1"><div style="font-size:13px;font-weight:700;color:'+t.tx+'">'+due[0].emoji+' '+escHtml(due[0].title)+(due.length>1?' 他'+(due.length-1)+'件':'')+'</div>' +
+    '<div style="font-size:11px;color:'+t.dm+'">タップして確認</div></div>' +
+    '<div style="font-size:12px;font-weight:700;color:'+t.ac+'">'+due.length+'</div>';
+  badge.onclick = openReminders;
+
+  // Insert at top
+  var container = null;
+  root.querySelectorAll('div[style*="overflow"]').forEach(function(d) {
+    if (d.offsetHeight > 200 && d.innerText.indexOf('日記') !== -1) container = d;
+  });
+  if (container && container.firstChild) {
+    container.insertBefore(badge, container.children[Math.min(1, container.children.length)]);
+  }
+}
+
+// ================================================
+// INIT - Run on DOM changes
+// ================================================
+var extDebounce;
+var extObserver = new MutationObserver(function() {
+  clearTimeout(extDebounce);
+  extDebounce = setTimeout(function() {
+    injectMenuItems();
+    injectHomeQuickActions();
+    showReminderBadge();
+  }, 200);
+});
+
+function startExtFeatures() {
+  var root = document.getElementById('root');
+  if (root) {
+    extObserver.observe(root, { childList: true, subtree: true });
+    setTimeout(function() {
+      injectMenuItems();
+      injectHomeQuickActions();
+      showReminderBadge();
+      checkTodayReminders();
+    }, 1000);
+
+    // Request notification permission after first interaction
+    document.addEventListener('click', function() {
+      if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+      }
+    }, { once: true });
+  } else {
+    setTimeout(startExtFeatures, 200);
+  }
+}
+
+startExtFeatures();
+
+})();
+</script>
 </body>
 </html>
