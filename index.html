@@ -20,6 +20,7 @@
 <meta name="twitter:image" content="https://nbyk115.github.io/wanchan-seichou-nikki/og-image.png"/>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="icon-192.png"/>
+<link rel="icon" href="icon-192.png" type="image/png"/>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&family=Kosugi+Maru&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet"/>
 <title>わんちゃん日記</title>
 <style>
@@ -180,7 +181,7 @@ Error generating stack: `+n.message+`
 </head>
 <body>
 <div id="root"></div>
-<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js');}</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/wanchan-seichou-nikki/sw.js').catch(function(){});}</script>
 <script>
 (function(){
   'use strict';
@@ -302,11 +303,13 @@ Error generating stack: `+n.message+`
      4. HAPTIC FEEDBACK
      ============================== */
   function triggerHaptic(type) {
-    if (navigator.vibrate) {
-      if (type === 'light') navigator.vibrate(10);
-      else if (type === 'medium') navigator.vibrate(20);
-      else if (type === 'heavy') navigator.vibrate([10, 30, 10]);
-    }
+    try {
+      if (navigator.vibrate) {
+        if (type === 'light') navigator.vibrate(10);
+        else if (type === 'medium') navigator.vibrate(20);
+        else if (type === 'heavy') navigator.vibrate([10, 30, 10]);
+      }
+    } catch(e) {}
   }
 
   document.addEventListener('click', function(e) {
@@ -406,6 +409,7 @@ Error generating stack: `+n.message+`
           }
           ta.focus();
           hint.remove();
+          try { localStorage.removeItem(key); } catch(e) {}
           showToast('下書きを復元しました', 'success');
         }, {once: true});
         if (ta.parentNode) ta.parentNode.insertBefore(hint, ta.nextSibling);
@@ -414,11 +418,13 @@ Error generating stack: `+n.message+`
       ta.addEventListener('input', function() {
         clearTimeout(autoSaveTimers[key]);
         autoSaveTimers[key] = setTimeout(function() {
-          if (ta.value.trim()) {
-            localStorage.setItem(key, ta.value);
-          } else {
-            localStorage.removeItem(key);
-          }
+          try {
+            if (ta.value.trim()) {
+              localStorage.setItem(key, ta.value);
+            } else {
+              localStorage.removeItem(key);
+            }
+          } catch(e) {}
         }, 2000);
       });
     });
