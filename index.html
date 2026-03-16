@@ -50,8 +50,7 @@ img{max-width:100%;height:auto;}
 *:focus-visible{outline:2.5px solid #3B82F6 !important;outline-offset:2px !important;border-radius:4px;}
 [role="button"]:focus-visible,[tabindex]:focus-visible{outline:2.5px solid #3B82F6 !important;outline-offset:2px !important;}
 
-/* Touch Target Enhancement - only for block-level interactive elements */
-#root div[style*="cursor: pointer"],#root div[style*="cursor:pointer"],
+/* Touch Target Enhancement - only for standalone buttons with explicit padding */
 #root button{min-height:44px;}
 
 /* Smooth Scroll & iOS Momentum */
@@ -163,18 +162,15 @@ Error generating stack: `+n.message+`
     setTimeout(function(){ t.remove(); }, 2800);
   }
 
-  // Override native alert with toast
-  var _origAlert = window.alert;
+  // Override native alert with toast (coerce all types to string)
   window.alert = function(msg) {
-    if (typeof msg === 'string') {
-      var type = 'info';
-      if (msg.indexOf('送信') !== -1 || msg.indexOf('完了') !== -1 || msg.indexOf('成功') !== -1) type = 'success';
-      else if (msg.indexOf('エラー') !== -1 || msg.indexOf('失敗') !== -1) type = 'error';
-      else if (msg.indexOf('許可') !== -1 || msg.indexOf('注意') !== -1) type = 'warning';
-      showToast(msg, type);
-    } else {
-      _origAlert.call(window, msg);
-    }
+    var text = (msg === null || msg === undefined) ? '' : String(msg);
+    if (!text) return;
+    var type = 'info';
+    if (text.indexOf('送信') !== -1 || text.indexOf('完了') !== -1 || text.indexOf('成功') !== -1) type = 'success';
+    else if (text.indexOf('エラー') !== -1 || text.indexOf('失敗') !== -1) type = 'error';
+    else if (text.indexOf('許可') !== -1 || text.indexOf('注意') !== -1) type = 'warning';
+    showToast(text, type);
   };
 
   // Expose globally for React code
@@ -319,20 +315,39 @@ Error generating stack: `+n.message+`
     document.querySelectorAll('#root textarea').forEach(function(ta) {
       if (ta._uxAutoSave) return;
       ta._uxAutoSave = true;
-      var key = 'ux_draft_' + (ta.placeholder || 'default');
+      // Use placeholder + DOM path to create unique key per textarea
+      var path = [];
+      var node = ta;
+      while (node && node !== document.body) {
+        var idx = 0;
+        var sib = node.previousElementSibling;
+        while (sib) { idx++; sib = sib.previousElementSibling; }
+        path.unshift(idx);
+        node = node.parentNode;
+      }
+      var key = 'ux_draft_' + path.join('.') + '_' + (ta.placeholder || '');
 
-      // Restore draft - set value via native setter to trigger React's internal handler
+      // Restore draft - show as placeholder hint, user copies on click
       var draft = localStorage.getItem(key);
       if (draft && !ta.value) {
-        try {
-          var nativeSet = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
-          nativeSet.call(ta, draft);
-          ta.dispatchEvent(new Event('input', { bubbles: true }));
-          showToast('下書きを復元しました', 'info');
-        } catch(e) {
-          // Fallback: just set the DOM value (won't sync to React state)
-          ta.value = draft;
-        }
+        ta.setAttribute('placeholder', draft.substring(0, 60) + (draft.length > 60 ? '...' : ''));
+        var hint = document.createElement('div');
+        hint.textContent = '📝 下書きあり（タップで復元）';
+        hint.style.cssText = 'font-size:12px;color:#F59E0B;padding:4px 0;cursor:pointer;font-weight:600;';
+        hint.addEventListener('click', function() {
+          try {
+            // Use native setter + input event for React 19 compatibility
+            var nativeSet = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
+            nativeSet.call(ta, draft);
+            ta.dispatchEvent(new Event('input', { bubbles: true }));
+          } catch(e) {
+            ta.value = draft;
+          }
+          ta.focus();
+          hint.remove();
+          showToast('下書きを復元しました', 'success');
+        }, {once: true});
+        ta.parentNode.insertBefore(hint, ta.nextSibling);
       }
 
       ta.addEventListener('input', function() {
@@ -348,44 +363,36 @@ Error generating stack: `+n.message+`
     });
   }
 
-  // Clear draft after form submission
+  // Clear draft after successful form submission
+  // Instead of guessing success, clear when the textarea is removed from DOM (page navigated away)
+  // or when its value becomes empty after a save action
   document.addEventListener('click', function(e) {
     var btn = e.target.closest('[style*="cursor"]') || e.target;
     if (!btn) return;
-    // Check the direct text of the clicked element (not deep textContent)
-    var directText = '';
-    for (var i = 0; i < btn.childNodes.length; i++) {
-      if (btn.childNodes[i].nodeType === 3) directText += btn.childNodes[i].textContent;
-    }
-    directText = directText.trim();
-    if (!directText) directText = btn.textContent.trim();
-    if (directText === '保存' || directText === '記録する' || directText === '送信') {
+    var text = btn.textContent.trim();
+    if (text === '保存' || text === '記録する' || text === '送信') {
+      // Wait for React to potentially navigate away/clear the form
       setTimeout(function() {
-        Object.keys(localStorage).forEach(function(k) {
-          if (k.startsWith('ux_draft_')) localStorage.removeItem(k);
-        });
-      }, 500);
+        // Only clear drafts if the textarea is no longer in DOM or is now empty
+        var textareas = document.querySelectorAll('#root textarea');
+        var hasNonEmpty = false;
+        textareas.forEach(function(ta) { if (ta.value.trim()) hasNonEmpty = true; });
+        if (!hasNonEmpty || textareas.length === 0) {
+          Object.keys(localStorage).forEach(function(k) {
+            if (k.startsWith('ux_draft_')) localStorage.removeItem(k);
+          });
+        }
+      }, 1500);
     }
   });
 
   /* ==============================
      8. ENHANCED EMPTY STATES
      ============================== */
+  // Empty states are handled by the app's own React components.
+  // We avoid modifying styles heuristically to prevent false positives.
   function enhanceEmptyStates() {
-    document.querySelectorAll('#root div').forEach(function(el) {
-      var text = el.textContent.trim();
-      if (el.children.length === 0 && el.style.textAlign === 'center' && el.style.padding) {
-        var p = parseInt(el.style.padding);
-        if (p >= 40 && text.length < 30 && text.length > 0) {
-          // This looks like an empty state
-          if (!el._uxEnhanced) {
-            el._uxEnhanced = true;
-            el.style.opacity = '0.7';
-            el.style.lineHeight = '2';
-          }
-        }
-      }
-    });
+    // No-op: removed fragile heuristic that could misidentify content as empty states
   }
 
   /* ==============================
