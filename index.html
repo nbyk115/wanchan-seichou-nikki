@@ -40,9 +40,7 @@ img{max-width:100%;height:auto;}
 .ux-toast-warning{border-left:3px solid #F59E0B;}
 @keyframes ux-toast-in{from{opacity:0;transform:translateY(-20px) scale(.95);}to{opacity:1;transform:translateY(0) scale(1);}}
 
-/* Loading & Skeleton */
-.ux-skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:ux-shimmer 1.5s infinite;border-radius:8px;}
-@keyframes ux-shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+/* Loading spinner (utility class for future use) */
 .ux-spinner{display:inline-block;width:20px;height:20px;border:2.5px solid rgba(0,0,0,.1);border-top-color:currentColor;border-radius:50%;animation:ux-spin .6s linear infinite;}
 @keyframes ux-spin{to{transform:rotate(360deg);}}
 
@@ -53,9 +51,8 @@ img{max-width:100%;height:auto;}
 /* Touch Target Enhancement - only for standalone buttons with explicit padding */
 #root button{min-height:44px;}
 
-/* Smooth Scroll & iOS Momentum */
-html{scroll-behavior:smooth;}
-[style*="overflow"]{-webkit-overflow-scrolling:touch;scroll-behavior:smooth;}
+/* iOS Momentum Scrolling */
+[style*="overflow"]{-webkit-overflow-scrolling:touch;}
 
 /* Page Transition Animation */
 @keyframes ux-page-in{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
@@ -67,18 +64,8 @@ html{scroll-behavior:smooth;}
 .ux-offline-banner .ux-pulse{display:inline-block;width:8px;height:8px;border-radius:50%;background:#fff;animation:ux-pulse-anim 1.5s infinite;}
 @keyframes ux-pulse-anim{0%,100%{opacity:1;}50%{opacity:.3;}}
 
-/* Delete Confirmation Dialog Enhancement */
-.ux-confirm-overlay{position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;animation:ux-fade-in .2s ease;}
-.ux-confirm-dialog{background:#fff;border-radius:20px;padding:28px 24px;max-width:300px;width:calc(100% - 48px);text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:ux-dialog-in .3s cubic-bezier(.175,.885,.32,1.275);}
-.ux-confirm-icon{font-size:48px;margin-bottom:12px;}
-.ux-confirm-title{font-size:17px;font-weight:900;margin-bottom:8px;color:#1a1a1a;}
-.ux-confirm-desc{font-size:13px;color:#888;line-height:1.6;margin-bottom:20px;}
-.ux-confirm-danger{background:#EF4444;color:#fff;border:none;padding:14px;border-radius:14px;font-size:15px;font-weight:700;width:100%;cursor:pointer;font-family:inherit;margin-bottom:8px;min-height:48px;}
-.ux-confirm-danger:active{background:#DC2626;transform:scale(.98);}
-.ux-confirm-cancel{background:transparent;border:1.5px solid #ddd;padding:14px;border-radius:14px;font-size:15px;font-weight:600;width:100%;cursor:pointer;color:#666;font-family:inherit;min-height:48px;}
-.ux-confirm-cancel:active{background:#f5f5f5;}
+/* Fade animation (used by offline banner transition) */
 @keyframes ux-fade-in{from{opacity:0;}to{opacity:1;}}
-@keyframes ux-dialog-in{from{opacity:0;transform:scale(.9);}to{opacity:1;transform:scale(1);}}
 
 /* Tablet & Landscape */
 @media (min-width:768px){
@@ -195,21 +182,26 @@ Error generating stack: `+n.message+`
      3. ACCESSIBILITY ENHANCEMENTS
      ============================== */
   function enhanceAccessibility() {
-    // Add roles to clickable divs
+    // Add role="button" to clickable divs (for screen readers)
+    // Only add tabindex to prominent standalone buttons, not every clickable element
     var clickables = document.querySelectorAll('#root div[style*="cursor"]');
     clickables.forEach(function(el) {
       if (el.style.cursor === 'pointer' && !el.getAttribute('role') && el.tagName !== 'BUTTON' && el.tagName !== 'A') {
         el.setAttribute('role', 'button');
-        if (!el.getAttribute('tabindex')) el.setAttribute('tabindex', '0');
-        // Allow keyboard activation
-        if (!el._uxKeyHandler) {
-          el._uxKeyHandler = true;
-          el.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              el.click();
-            }
-          });
+        // Only add tabindex to elements with significant padding (standalone buttons)
+        // Skip small inline text links, icon pickers, etc.
+        var h = el.offsetHeight;
+        if (h >= 40 && !el.getAttribute('tabindex')) {
+          el.setAttribute('tabindex', '0');
+          if (!el._uxKeyHandler) {
+            el._uxKeyHandler = true;
+            el.addEventListener('keydown', function(e) {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                el.click();
+              }
+            });
+          }
         }
       }
     });
@@ -226,12 +218,16 @@ Error generating stack: `+n.message+`
       }
     });
 
-    // Add nav role to bottom tab bar (fixed bottom element)
-    var bottomBars = document.querySelectorAll('#root div[style*="position: fixed"][style*="bottom"]');
-    if (bottomBars.length === 0) bottomBars = document.querySelectorAll('#root div[style*="position:fixed"]');
-    bottomBars.forEach(function(el) {
-      var style = el.getAttribute('style') || '';
-      if (style.indexOf('bottom') !== -1 && !el.getAttribute('role')) {
+    // Add nav role to bottom tab bar only
+    // Identify by: fixed position + bottom:0 + has multiple clickable children (tab items)
+    var fixedEls = document.querySelectorAll('#root div[style*="position: fixed"], #root div[style*="position:fixed"]');
+    fixedEls.forEach(function(el) {
+      if (el.getAttribute('role')) return;
+      // Must have bottom: 0 (the actual bottom positioning, not padding-bottom etc.)
+      if (el.style.bottom !== '0px' && el.style.bottom !== '0') return;
+      // Must have multiple clickable children (tab bar pattern)
+      var clickableKids = el.querySelectorAll('[style*="cursor"]');
+      if (clickableKids.length >= 3) {
         el.setAttribute('role', 'navigation');
         el.setAttribute('aria-label', 'メインナビゲーション');
       }
