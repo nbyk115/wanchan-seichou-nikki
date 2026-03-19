@@ -1845,5 +1845,596 @@ startExtFeatures();
 
 })();
 </script>
+<script>
+/* ========================================================================
+   UI/UX Enhancement Pack v2 - アルバム拡大・投稿ボタン改善・アルバム直接追加・
+   全体UI/UXバグ修正
+   ======================================================================== */
+(function(){
+'use strict';
+
+var STORE_KEY = 'wc2';
+
+function getAppData() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch(e) { return {}; }
+}
+function saveAppData(d) {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify(d));
+    return true;
+  } catch(e) {
+    if (e.name === 'QuotaExceededError' || e.code === 22) {
+      toast('\u30B9\u30C8\u30EC\u30FC\u30B8\u5BB9\u91CF\u304C\u3044\u3063\u3071\u3044\u3067\u3059\u3002\u4E0D\u8981\u306A\u5199\u771F\u3092\u524A\u9664\u3057\u3066\u304F\u3060\u3055\u3044', 'error');
+    } else {
+      toast('\u4FDD\u5B58\u306B\u5931\u6557\u3057\u307E\u3057\u305F', 'error');
+    }
+    return false;
+  }
+}
+
+function getTheme() {
+  var app = getAppData();
+  var themes = {
+    pink:{bg:"#FFF8F5",c:"#fff",s:"#FFF0EB",tx:"#3D2C2C",h1:"#E8796B",ac:"#FF7B9C",a2:"#FFF0F3",bd:"#F0D9D1",dm:"#BFA6A0",g1:"#F5A6B8",g2:"#FF7B9C"},
+    blue:{bg:"#F0F8FF",c:"#fff",s:"#E8F4FD",tx:"#2C3E50",h1:"#2980B9",ac:"#3498DB",a2:"#EBF5FB",bd:"#BDD7EE",dm:"#7FB3D3",g1:"#5DADE2",g2:"#3498DB"},
+    green:{bg:"#F5FAF0",c:"#fff",s:"#EAF5E0",tx:"#2D3B2D",h1:"#4CAF50",ac:"#43A047",a2:"#E8F5E9",bd:"#C8E6C9",dm:"#8DB98E",g1:"#81C784",g2:"#43A047"},
+    purple:{bg:"#F8F5FF",c:"#fff",s:"#F0EAFF",tx:"#352D4A",h1:"#7C4DFF",ac:"#651FFF",a2:"#EDE7F6",bd:"#D1C4E9",dm:"#9E8DC1",g1:"#B388FF",g2:"#651FFF"}
+  };
+  var t = themes[app.theme] || themes.pink;
+  if (app.dark) {
+    t = Object.assign({}, t, {bg:"#121212",c:"#1E1E1E",s:"#252525",tx:"#E8E8E8",bd:"#333",dm:"#999",a2:"#2a2030"});
+  }
+  return t;
+}
+
+function toast(msg, type) {
+  if (window.showToast) window.showToast(msg, type || 'success');
+  else if (window.__uxToast) window.__uxToast(msg, type || 'success');
+}
+
+/* ==============================
+   1. PHOTO LIGHTBOX - アルバム写真拡大表示
+   ============================== */
+function injectLightboxStyles() {
+  if (document.getElementById('ux2-lightbox-style')) return;
+  var style = document.createElement('style');
+  style.id = 'ux2-lightbox-style';
+  style.textContent = [
+    '.ux2-lightbox { position:fixed; inset:0; z-index:10001; background:rgba(0,0,0,.92); display:flex; flex-direction:column; animation:ux2-fade-in .2s ease-out; }',
+    '.ux2-lightbox-header { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; padding-top:calc(12px + env(safe-area-inset-top,0px)); flex-shrink:0; }',
+    '.ux2-lightbox-close { width:44px; height:44px; border-radius:22px; background:rgba(255,255,255,.15); color:#fff; border:none; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; }',
+    '.ux2-lightbox-counter { color:rgba(255,255,255,.7); font-size:13px; }',
+    '.ux2-lightbox-body { flex:1; display:flex; align-items:center; justify-content:center; overflow:hidden; touch-action:pan-y pinch-zoom; padding:0 8px; }',
+    '.ux2-lightbox-body img { max-width:100%; max-height:100%; object-fit:contain; border-radius:8px; user-select:none; -webkit-user-select:none; }',
+    '.ux2-lightbox-nav { display:flex; justify-content:center; gap:16px; padding:16px; flex-shrink:0; }',
+    '.ux2-lightbox-nav button { width:44px; height:44px; border-radius:22px; background:rgba(255,255,255,.15); color:#fff; border:none; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; }',
+    '.ux2-lightbox-nav button:disabled { opacity:.3; cursor:default; }',
+    '.ux2-lightbox-dots { display:flex; justify-content:center; gap:6px; padding-bottom:8px; }',
+    '.ux2-lightbox-dot { width:8px; height:8px; border-radius:4px; background:rgba(255,255,255,.3); transition:all .2s; }',
+    '.ux2-lightbox-dot.active { background:#fff; width:20px; }',
+    '@keyframes ux2-fade-in { from{opacity:0} to{opacity:1} }',
+    /* Delete button in lightbox */
+    '.ux2-lightbox-delete { color:rgba(255,255,255,.6); font-size:12px; cursor:pointer; padding:6px 12px; border-radius:16px; background:rgba(255,255,255,.1); }',
+    '.ux2-lightbox-delete:hover { background:rgba(239,68,68,.3); color:#fff; }',
+    /* Swipe hint */
+    '.ux2-lightbox-hint { color:rgba(255,255,255,.4); font-size:11px; text-align:center; padding:4px 0 calc(4px + env(safe-area-inset-bottom,0px)); }'
+  ].join('\n');
+  document.head.appendChild(style);
+}
+
+function openLightbox(images, startIndex) {
+  injectLightboxStyles();
+  var currentIndex = startIndex || 0;
+  var overlay = document.createElement('div');
+  overlay.className = 'ux2-lightbox';
+
+  function render() {
+    var img = images[currentIndex];
+    overlay.innerHTML = '';
+
+    // Header
+    var header = document.createElement('div');
+    header.className = 'ux2-lightbox-header';
+    var closeBtn = document.createElement('button');
+    closeBtn.className = 'ux2-lightbox-close';
+    closeBtn.textContent = '\u2715';
+    closeBtn.onclick = function() { overlay.remove(); };
+    var counter = document.createElement('span');
+    counter.className = 'ux2-lightbox-counter';
+    counter.textContent = (currentIndex + 1) + ' / ' + images.length;
+    var delBtn = document.createElement('span');
+    delBtn.className = 'ux2-lightbox-delete';
+    delBtn.textContent = '\uD83D\uDDD1 \u524A\u9664';
+    delBtn.onclick = function() {
+      if (!confirm('\u3053\u306E\u5199\u771F\u3092\u30A2\u30EB\u30D0\u30E0\u304B\u3089\u524A\u9664\u3057\u307E\u3059\u304B\uFF1F')) return;
+      var app = getAppData();
+      // Remove from photos array
+      if (app.photos) {
+        app.photos = app.photos.filter(function(p) { return p.uri !== img; });
+      }
+      // Remove from ALL diary mediaSrc references
+      if (app.diaries) {
+        app.diaries.forEach(function(d) {
+          if (d.mediaSrc === img) d.mediaSrc = null;
+        });
+      }
+      // Remove from milestones
+      if (app.milestones) {
+        app.milestones.forEach(function(m) {
+          if (m.photo === img) m.photo = null;
+        });
+      }
+      if (!saveAppData(app)) return; // Save failed - don't update UI
+      images.splice(currentIndex, 1);
+      if (images.length === 0) { overlay.remove(); location.reload(); return; }
+      if (currentIndex >= images.length) currentIndex = images.length - 1;
+      toast('\u5199\u771F\u3092\u524A\u9664\u3057\u307E\u3057\u305F', 'success');
+      render();
+    };
+    header.appendChild(closeBtn);
+    header.appendChild(counter);
+    header.appendChild(delBtn);
+    overlay.appendChild(header);
+
+    // Image body
+    var body = document.createElement('div');
+    body.className = 'ux2-lightbox-body';
+    var imgEl = document.createElement('img');
+    imgEl.src = img;
+    imgEl.alt = '\u5199\u771F ' + (currentIndex + 1);
+    body.appendChild(imgEl);
+    overlay.appendChild(body);
+
+    // Swipe handling
+    var startX = 0, startY = 0, moved = false;
+    body.addEventListener('touchstart', function(e) {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      moved = false;
+    }, {passive: true});
+    body.addEventListener('touchmove', function(e) {
+      var dx = e.touches[0].clientX - startX;
+      var dy = e.touches[0].clientY - startY;
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 30) moved = true;
+    }, {passive: true});
+    body.addEventListener('touchend', function(e) {
+      var endX = e.changedTouches[0].clientX;
+      var dx = endX - startX;
+      if (moved && Math.abs(dx) > 50) {
+        if (dx < 0 && currentIndex < images.length - 1) { currentIndex++; render(); }
+        else if (dx > 0 && currentIndex > 0) { currentIndex--; render(); }
+      }
+    }, {passive: true});
+
+    // Navigation buttons
+    if (images.length > 1) {
+      var nav = document.createElement('div');
+      nav.className = 'ux2-lightbox-nav';
+      var prevBtn = document.createElement('button');
+      prevBtn.textContent = '\u2039';
+      prevBtn.disabled = currentIndex === 0;
+      prevBtn.onclick = function() { if (currentIndex > 0) { currentIndex--; render(); } };
+      var nextBtn = document.createElement('button');
+      nextBtn.textContent = '\u203A';
+      nextBtn.disabled = currentIndex === images.length - 1;
+      nextBtn.onclick = function() { if (currentIndex < images.length - 1) { currentIndex++; render(); } };
+      nav.appendChild(prevBtn);
+      nav.appendChild(nextBtn);
+      overlay.appendChild(nav);
+
+      // Dots
+      var dots = document.createElement('div');
+      dots.className = 'ux2-lightbox-dots';
+      for (var di = 0; di < Math.min(images.length, 20); di++) {
+        var dot = document.createElement('div');
+        dot.className = 'ux2-lightbox-dot' + (di === currentIndex ? ' active' : '');
+        dots.appendChild(dot);
+      }
+      overlay.appendChild(dots);
+    }
+
+    // Hint
+    if (images.length > 1) {
+      var hint = document.createElement('div');
+      hint.className = 'ux2-lightbox-hint';
+      hint.textContent = '\u2190 \u30B9\u30EF\u30A4\u30D7\u3067\u524D\u5F8C\u306E\u5199\u771F\u3078 \u2192';
+      overlay.appendChild(hint);
+    }
+  }
+
+  // Keyboard navigation
+  function onKey(e) {
+    if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', onKey); }
+    if (e.key === 'ArrowLeft' && currentIndex > 0) { currentIndex--; render(); }
+    if (e.key === 'ArrowRight' && currentIndex < images.length - 1) { currentIndex++; render(); }
+  }
+  document.addEventListener('keydown', onKey);
+
+  // Clean up on remove
+  var obs = new MutationObserver(function() {
+    if (!document.body.contains(overlay)) {
+      document.removeEventListener('keydown', onKey);
+      obs.disconnect();
+    }
+  });
+  obs.observe(document.body, {childList: true});
+
+  render();
+  document.body.appendChild(overlay);
+}
+
+/* ==============================
+   2. ALBUM PHOTO CLICK HANDLER - アルバム写真クリックで拡大
+   ============================== */
+function enhanceAlbumPhotos() {
+  // Find the album grid (3-column grid of images)
+  var grids = document.querySelectorAll('div[style*="grid-template-columns"]');
+  grids.forEach(function(grid) {
+    var imgs = grid.querySelectorAll('img');
+    if (imgs.length === 0) return;
+    // Already enhanced?
+    if (grid.dataset.ux2Enhanced) return;
+    grid.dataset.ux2Enhanced = '1';
+
+    var allSrcs = [];
+    imgs.forEach(function(img) { allSrcs.push(img.src); });
+
+    imgs.forEach(function(img, idx) {
+      img.style.cursor = 'pointer';
+      img.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        // Refresh the image list in case of changes
+        var currentImgs = grid.querySelectorAll('img');
+        var srcs = [];
+        currentImgs.forEach(function(ci) { srcs.push(ci.src); });
+        openLightbox(srcs, idx);
+      });
+    });
+  });
+}
+
+/* ==============================
+   3. DIARY POST BUTTON - 投稿ボタンを下部にも配置
+   ============================== */
+function enhanceDiaryPostButton() {
+  // Find diary creation page - identified by header "日記を書く"
+  var headers = document.querySelectorAll('div');
+  var postPage = null;
+  for (var i = 0; i < headers.length; i++) {
+    if (headers[i].textContent === '\u65E5\u8A18\u3092\u66F8\u304F' &&
+        headers[i].style && headers[i].style.fontWeight === '700' &&
+        headers[i].style.fontSize === '15px') {
+      postPage = headers[i].closest('div[style*="100dvh"]');
+      break;
+    }
+  }
+  if (!postPage) return;
+  if (postPage.querySelector('.ux2-bottom-post-btn')) return;
+
+  // Find the top "投稿" button to clone its click handler
+  var topPostBtn = postPage.querySelector('span[style*="border-radius"]');
+  var allSpans = postPage.querySelectorAll('span');
+  var topBtn = null;
+  for (var j = 0; j < allSpans.length; j++) {
+    if (allSpans[j].textContent === '\u6295\u7A3F' && allSpans[j].style.borderRadius) {
+      topBtn = allSpans[j];
+      break;
+    }
+  }
+  if (!topBtn) return;
+
+  var t = getTheme();
+
+  // Create bottom fixed post button
+  var bottomBar = document.createElement('div');
+  bottomBar.className = 'ux2-bottom-post-btn';
+  bottomBar.style.cssText = 'position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;padding:12px 20px;padding-bottom:calc(12px + env(safe-area-inset-bottom,6px));background:' + t.bg + ';border-top:1px solid ' + t.bd + ';z-index:99;display:flex;gap:10px;';
+
+  var postButton = document.createElement('div');
+  postButton.style.cssText = 'flex:1;padding:14px 0;border-radius:28px;text-align:center;font-size:16px;font-weight:800;cursor:pointer;color:#fff;background:linear-gradient(135deg,' + t.g1 + ',' + t.g2 + ');box-shadow:0 2px 12px ' + t.ac + '44;';
+  postButton.textContent = '\uD83D\uDCDD \u6295\u7A3F\u3059\u308B';
+  postButton.addEventListener('click', function() {
+    topBtn.click();
+  });
+
+  bottomBar.appendChild(postButton);
+  postPage.appendChild(bottomBar);
+
+  // Add padding to the scrollable content area so it's not hidden behind the button
+  var scrollArea = postPage.querySelector('div[style*="overflow"]');
+  if (scrollArea) {
+    scrollArea.style.paddingBottom = '80px';
+  }
+}
+
+/* ==============================
+   4. ALBUM DIRECT PHOTO UPLOAD - アルバムから直接写真を追加
+   ============================== */
+function enhanceAlbumWithUpload() {
+  // Find album page header
+  var albumHeaders = document.querySelectorAll('div');
+  var albumPage = null;
+  for (var i = 0; i < albumHeaders.length; i++) {
+    // Look for the album title in the header bar
+    var text = albumHeaders[i].textContent;
+    if (text && text.indexOf('\uD83D\uDDBC \u30A2\u30EB\u30D0\u30E0') >= 0 &&
+        albumHeaders[i].style && albumHeaders[i].style.fontWeight) {
+      albumPage = albumHeaders[i].closest('div[style*="100dvh"]');
+      break;
+    }
+  }
+  if (!albumPage) return;
+  if (albumPage.querySelector('.ux2-album-upload')) return;
+
+  var t = getTheme();
+  var contentArea = albumPage.querySelector('div[style*="padding"]');
+  if (!contentArea) return;
+
+  // Create file input
+  var fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'image/*';
+  fileInput.multiple = true;
+  fileInput.style.display = 'none';
+  fileInput.className = 'ux2-album-upload';
+  fileInput.setAttribute('aria-label', '\u30A2\u30EB\u30D0\u30E0\u306B\u5199\u771F\u3092\u8FFD\u52A0');
+  albumPage.appendChild(fileInput);
+
+  // Create upload button at the top of the album
+  var uploadArea = document.createElement('div');
+  uploadArea.style.cssText = 'display:flex;gap:8px;margin-bottom:12px;';
+
+  var uploadBtn = document.createElement('div');
+  uploadBtn.style.cssText = 'flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border-radius:14px;cursor:pointer;font-size:14px;font-weight:700;color:#fff;background:linear-gradient(135deg,' + t.g1 + ',' + t.g2 + ');';
+  uploadBtn.innerHTML = '\uD83D\uDCF7 \u5199\u771F\u3092\u8FFD\u52A0';
+  uploadBtn.addEventListener('click', function() { fileInput.click(); });
+
+  uploadArea.appendChild(uploadBtn);
+
+  // Insert at the top of content area
+  if (contentArea.firstChild) {
+    contentArea.insertBefore(uploadArea, contentArea.firstChild);
+  } else {
+    contentArea.appendChild(uploadArea);
+  }
+
+  // Handle file selection
+  fileInput.addEventListener('change', function(e) {
+    var files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    var processed = 0;
+    var total = files.length;
+
+    files.forEach(function(file) {
+      if (!file.type.startsWith('image/')) { processed++; return; }
+
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        // Resize image to save storage
+        var img = new Image();
+        img.onload = function() {
+          var maxW = 1200, maxH = 1200;
+          var w = img.width, h = img.height;
+          if (w > maxW || h > maxH) {
+            var ratio = Math.min(maxW / w, maxH / h);
+            w = Math.round(w * ratio);
+            h = Math.round(h * ratio);
+          }
+          var canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          var ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+          // Save to app data
+          var app = getAppData();
+          if (!app.photos) app.photos = [];
+          app.photos.push({
+            uri: dataUrl,
+            date: new Date().toISOString(),
+            id: Date.now().toString(36) + Math.random().toString(36).slice(2,6)
+          });
+          var saved = saveAppData(app);
+          processed++;
+
+          if (processed === total) {
+            if (saved) {
+              toast(total + '\u679A\u306E\u5199\u771F\u3092\u8FFD\u52A0\u3057\u307E\u3057\u305F', 'success');
+            }
+            // Reload the page to reflect changes
+            setTimeout(function() { location.reload(); }, 300);
+          }
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = '';
+  });
+}
+
+/* ==============================
+   5. DIARY DETAIL PHOTO LIGHTBOX - 日記詳細の写真も拡大可能に
+   ============================== */
+function enhanceDiaryDetailPhotos() {
+  // Find diary detail pages - they have large header images
+  var detailImgs = document.querySelectorAll('img[style*="object-fit: cover"]');
+  detailImgs.forEach(function(img) {
+    if (img.dataset.ux2Lightbox) return;
+    // Only target large diary images (height >= 200px area)
+    var h = parseInt(img.style.height);
+    if (h >= 200 && img.src && img.src.startsWith('data:')) {
+      img.dataset.ux2Lightbox = '1';
+      img.style.cursor = 'pointer';
+      img.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        openLightbox([img.src], 0);
+      });
+    }
+  });
+}
+
+/* ==============================
+   6. OVERALL UI/UX IMPROVEMENTS
+   ============================== */
+function injectUIStyles() {
+  if (document.getElementById('ux2-ui-style')) return;
+  var style = document.createElement('style');
+  style.id = 'ux2-ui-style';
+  style.textContent = [
+    /* Better tap targets for small buttons */
+    'span[style*="cursor:pointer"], span[style*="cursor: pointer"] { min-height:36px; display:inline-flex; align-items:center; }',
+    /* Smooth transitions for interactive elements */
+    'div[style*="cursor:pointer"], div[style*="cursor: pointer"] { transition: transform .1s ease, opacity .1s ease; }',
+    'div[style*="cursor:pointer"]:active, div[style*="cursor: pointer"]:active { transform: scale(0.97); opacity:.9; }',
+    /* Album grid images hover effect */
+    'div[style*="grid-template-columns"] img { transition: transform .15s ease; }',
+    'div[style*="grid-template-columns"] img:active { transform: scale(0.95); }',
+    /* Bottom tab bar shadow for better visual separation */
+    'div[style*="position: fixed"][style*="bottom: 0"], div[style*="position:fixed"][style*="bottom:0"] { box-shadow: 0 -2px 12px rgba(0,0,0,.06); }',
+    /* Improve scrollbar appearance */
+    '::-webkit-scrollbar { width:4px; height:4px; }',
+    '::-webkit-scrollbar-thumb { background:rgba(0,0,0,.15); border-radius:2px; }',
+    '::-webkit-scrollbar-track { background:transparent; }',
+    /* Fix text overflow in cards */
+    'div[style*="border-radius"] { overflow-wrap:break-word; word-break:break-word; }',
+    /* Ensure images don't overflow containers */
+    'img { max-width:100%; }',
+    /* Prevent horizontal scroll on the page */
+    'html, body { overflow-x:hidden; max-width:100vw; }',
+    /* Better focus states for accessibility */
+    'input:focus, textarea:focus { box-shadow: 0 0 0 2px rgba(255,123,156,.3) !important; }',
+    /* Pull-to-refresh prevention */
+    'body { overscroll-behavior-y: contain; }'
+  ].join('\n');
+  document.head.appendChild(style);
+}
+
+/* ==============================
+   7. EMPTY STATE IMPROVEMENTS
+   ============================== */
+function enhanceEmptyAlbumState() {
+  // If album page is showing empty state, make the "日記を書く" button more prominent
+  var buttons = document.querySelectorAll('button');
+  buttons.forEach(function(btn) {
+    if (btn.textContent.indexOf('\u65E5\u8A18\u3092\u66F8\u304F') >= 0 &&
+        btn.closest('div[style*="text-align: center"], div[style*="text-align:center"]')) {
+      btn.style.marginTop = '16px';
+      btn.style.padding = '12px 28px';
+      btn.style.fontSize = '15px';
+      btn.style.boxShadow = '0 2px 8px rgba(255,123,156,.3)';
+    }
+  });
+}
+
+/* ==============================
+   8. SYMPTOM LOG PHOTO LIGHTBOX
+   ============================== */
+function enhanceSymptomPhotos() {
+  var imgs = document.querySelectorAll('img[style*="height: 120px"], img[style*="height:120px"]');
+  imgs.forEach(function(img) {
+    if (img.dataset.ux2Lightbox) return;
+    if (img.src && img.src.startsWith('data:')) {
+      img.dataset.ux2Lightbox = '1';
+      img.style.cursor = 'pointer';
+      img.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        openLightbox([img.src], 0);
+      });
+    }
+  });
+}
+
+/* ==============================
+   9. HOME DIARY LIST - 日記一覧の写真も拡大可能に
+   ============================== */
+function enhanceHomeDiaryPhotos() {
+  // Find diary entry thumbnails on home page
+  var imgs = document.querySelectorAll('img[style*="border-radius"]');
+  imgs.forEach(function(img) {
+    if (img.dataset.ux2Lightbox) return;
+    var w = parseInt(img.style.width);
+    var h = parseInt(img.style.height);
+    // Target diary list thumbnails (small square images)
+    if (w >= 48 && w <= 80 && h >= 48 && h <= 80 && img.src && img.src.startsWith('data:')) {
+      img.dataset.ux2Lightbox = '1';
+      img.style.cursor = 'pointer';
+      img.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        openLightbox([img.src], 0);
+      });
+    }
+  });
+}
+
+/* ==============================
+   10. MEMORY PHOTOS LIGHTBOX - メモリー写真も拡大
+   ============================== */
+function enhanceMemoryPhotos() {
+  var memoryImgs = document.querySelectorAll('img[style*="width: 100%"][style*="border-radius: 12px"], img[style*="width:100%"][style*="borderRadius:12"]');
+  memoryImgs.forEach(function(img) {
+    if (img.dataset.ux2Lightbox) return;
+    if (img.src && img.src.startsWith('data:')) {
+      img.dataset.ux2Lightbox = '1';
+      img.style.cursor = 'pointer';
+      img.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        openLightbox([img.src], 0);
+      });
+    }
+  });
+}
+
+/* ==============================
+   MAIN OBSERVER - DOM変更を監視して自動適用
+   ============================== */
+function applyEnhancements() {
+  enhanceAlbumPhotos();
+  enhanceDiaryPostButton();
+  enhanceAlbumWithUpload();
+  enhanceDiaryDetailPhotos();
+  enhanceEmptyAlbumState();
+  enhanceSymptomPhotos();
+  enhanceHomeDiaryPhotos();
+  enhanceMemoryPhotos();
+}
+
+function startUX2() {
+  var root = document.getElementById('root');
+  if (!root) return;
+
+  // Inject global styles
+  injectUIStyles();
+
+  // Apply immediately
+  applyEnhancements();
+
+  // Observe for React re-renders
+  var debounceTimer = null;
+  var observer = new MutationObserver(function() {
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(applyEnhancements, 150);
+  });
+  observer.observe(root, { childList: true, subtree: true });
+}
+
+// Wait for React app to mount
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  setTimeout(startUX2, 500);
+} else {
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(startUX2, 500);
+  });
+}
+
+})();
+</script>
 </body>
 </html>
