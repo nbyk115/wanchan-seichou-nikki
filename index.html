@@ -121,11 +121,36 @@ img.ux-lazy-pending.ux-loaded{opacity:1;}
 }
 /* Focus visible overrides for dark/light banners */
 .ux-install-banner *:focus-visible{outline-color:#FF7B9C !important;}
+
+/* Streak counter */
+.ux-streak{position:relative;display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:800;cursor:default;}
+.ux-streak-fire{font-size:18px;animation:ux-streak-bounce 1s ease infinite;}
+@keyframes ux-streak-bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-3px);}}
+
+/* Confetti burst */
+.ux-confetti-piece{position:fixed;width:8px;height:8px;border-radius:2px;z-index:10010;pointer-events:none;animation:ux-confetti-fall 2.5s ease-out forwards;}
+@keyframes ux-confetti-fall{0%{opacity:1;transform:translateY(0) rotate(0deg) scale(1);}100%{opacity:0;transform:translateY(100vh) rotate(720deg) scale(0.3);}}
+
+/* Daily prompt card */
+.ux-daily-prompt{border-radius:16px;padding:16px;margin-bottom:14px;cursor:pointer;transition:transform .15s;}
+.ux-daily-prompt:active{transform:scale(.97);}
+
+/* Share card button */
+.ux-share-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:14px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:inherit;min-height:44px;}
+
+/* AI free badge */
+.ux-ai-free-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700;}
+
+/* Milestone celebration overlay */
+.ux-milestone-overlay{position:fixed;inset:0;z-index:10005;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3);opacity:0;transition:opacity .3s;}
+.ux-milestone-card{background:#FFF8F5;border-radius:24px;padding:32px 24px;text-align:center;max-width:300px;width:calc(100% - 48px);box-shadow:0 20px 60px rgba(0,0,0,.15);transform:scale(.8);transition:transform .4s cubic-bezier(.175,.885,.32,1.275);}
+.ux-milestone-overlay.ux-show{opacity:1;}
+.ux-milestone-overlay.ux-show .ux-milestone-card{transform:scale(1);}
+
 /* Respect reduced motion preferences */
 @media (prefers-reduced-motion:reduce){
-.ux-toast{animation:none !important;}
-.ux-haptic{animation:none !important;}
-.ux-update-banner,.ux-install-banner{transition:none !important;}
+.ux-toast,.ux-haptic,.ux-streak-fire,.ux-confetti-piece{animation:none !important;}
+.ux-update-banner,.ux-install-banner,.ux-milestone-overlay,.ux-milestone-card,.ux-daily-prompt{transition:none !important;}
 *{scroll-behavior:auto !important;}
 }
 </style>
@@ -1007,7 +1032,624 @@ if('serviceWorker' in navigator){
   }
 
   /* ==============================
-     17. ONLINE RECOVERY CHECK
+     17. STREAK SYSTEM & MILESTONE CELEBRATIONS
+     ============================== */
+  var STREAK_DATES_KEY = 'ux_streak_dates';
+  var STREAK_CELEBRATED_KEY = 'ux_streak_celebrated';
+
+  function getStreakDates() {
+    try { return JSON.parse(localStorage.getItem(STREAK_DATES_KEY)) || []; }
+    catch(e) { return []; }
+  }
+
+  function addStreakDate() {
+    var today = new Date().toISOString().slice(0, 10);
+    var dates = getStreakDates();
+    if (dates[dates.length - 1] === today) return; // Already logged today
+    dates.push(today);
+    // Keep last 400 days max
+    if (dates.length > 400) dates = dates.slice(-400);
+    try { localStorage.setItem(STREAK_DATES_KEY, JSON.stringify(dates)); } catch(e) {}
+  }
+
+  function calculateStreak() {
+    var dates = getStreakDates();
+    if (dates.length === 0) return { current: 0, total: 0, todayLogged: false };
+    var today = new Date().toISOString().slice(0, 10);
+    var todayLogged = dates[dates.length - 1] === today;
+    var streak = todayLogged ? 1 : 0;
+    var startIdx = todayLogged ? dates.length - 2 : dates.length - 1;
+
+    for (var i = startIdx; i >= 0; i--) {
+      var d = new Date(dates[i]);
+      var next = new Date(dates[i + 1] || today);
+      var diff = (next - d) / (1000 * 60 * 60 * 24);
+      if (diff === 1) { streak++; }
+      else { break; }
+    }
+    return { current: streak, total: dates.length, todayLogged: todayLogged };
+  }
+
+  // Detect diary save: monitor for post→home navigation
+  var lastPage = '';
+  function detectPageChange() {
+    var root = document.getElementById('root');
+    if (!root) return '';
+    // Detect current page by looking at header text or structure
+    var header = root.querySelector('[style*="font-weight: 800"], [style*="font-weight:800"]');
+    var headerText = header ? header.textContent : '';
+    if (headerText.indexOf('✏️') !== -1 || headerText.indexOf('日記') !== -1) return 'post';
+    if (headerText.indexOf('🌱') !== -1 || headerText.indexOf('成長') !== -1) return 'growth';
+    // Check for nav bar = home
+    var nav = root.querySelector('[style*="position: fixed"][style*="bottom"]');
+    if (nav) return 'home';
+    return 'other';
+  }
+
+  // Watch for page transitions (post → home = diary saved)
+  var pageCheckInterval = setInterval(function() {
+    if (document.hidden) return;
+    var current = detectPageChange();
+    if (lastPage === 'post' && current === 'home') {
+      addStreakDate();
+      var info = calculateStreak();
+      checkMilestone(info.current);
+      injectStreakUI();
+    }
+    lastPage = current;
+  }, 500);
+
+  // Milestone thresholds
+  var MILESTONES = [
+    { days: 3, icon: '🌱', title: '3日連続！', msg: '素晴らしいスタート！この調子で続けよう' },
+    { days: 7, icon: '🔥', title: '1週間達成！', msg: 'すごい！毎日の記録が習慣になってきたね' },
+    { days: 14, icon: '⭐', title: '2週間達成！', msg: 'わんちゃんとの思い出がどんどん増えてる！' },
+    { days: 30, icon: '🏆', title: '1ヶ月達成！', msg: '立派な記録係！わんちゃんも喜んでるよ' },
+    { days: 50, icon: '💎', title: '50日達成！', msg: '半世紀分の愛情が詰まった日記だね' },
+    { days: 100, icon: '👑', title: '100日達成！', msg: 'レジェンド！わんちゃんと歩んだ100日の宝物' },
+    { days: 365, icon: '🎊', title: '1年達成！', msg: '1年間の成長記録、一生の宝物だね' }
+  ];
+
+  function checkMilestone(streakCount) {
+    var celebrated = {};
+    try { celebrated = JSON.parse(localStorage.getItem(STREAK_CELEBRATED_KEY)) || {}; } catch(e) {}
+
+    for (var i = 0; i < MILESTONES.length; i++) {
+      var m = MILESTONES[i];
+      if (streakCount >= m.days && !celebrated[m.days]) {
+        celebrated[m.days] = true;
+        try { localStorage.setItem(STREAK_CELEBRATED_KEY, JSON.stringify(celebrated)); } catch(e) {}
+        setTimeout(function(milestone) {
+          showMilestoneCelebration(milestone);
+        }.bind(null, m), 600);
+        break; // Show one at a time
+      }
+    }
+  }
+
+  function showMilestoneCelebration(milestone) {
+    // Confetti burst
+    launchConfetti();
+
+    var overlay = document.createElement('div');
+    overlay.className = 'ux-milestone-overlay';
+    var card = document.createElement('div');
+    card.className = 'ux-milestone-card';
+
+    var icon = document.createElement('div');
+    icon.style.cssText = 'font-size:56px;margin-bottom:12px;';
+    icon.textContent = milestone.icon;
+    var title = document.createElement('div');
+    title.style.cssText = 'font-size:20px;font-weight:900;color:#333;margin-bottom:8px;';
+    title.textContent = milestone.title;
+    var msg = document.createElement('div');
+    msg.style.cssText = 'font-size:14px;color:#888;line-height:1.6;margin-bottom:20px;';
+    msg.textContent = milestone.msg;
+    var btn = document.createElement('button');
+    btn.style.cssText = 'background:linear-gradient(135deg,#FF7B9C,#FF5A8A);color:#fff;border:none;padding:14px 32px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;min-height:44px;';
+    btn.textContent = 'やったー！🐾';
+
+    card.appendChild(icon);
+    card.appendChild(title);
+    card.appendChild(msg);
+    card.appendChild(btn);
+    overlay.appendChild(card);
+    document.body.appendChild(overlay);
+
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() { overlay.classList.add('ux-show'); });
+    });
+
+    function dismiss() {
+      overlay.classList.remove('ux-show');
+      setTimeout(function() { overlay.remove(); }, 300);
+    }
+    btn.addEventListener('click', dismiss);
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) dismiss(); });
+  }
+
+  function launchConfetti() {
+    var colors = ['#FF7B9C', '#FF5A8A', '#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7'];
+    for (var i = 0; i < 50; i++) {
+      var piece = document.createElement('div');
+      piece.className = 'ux-confetti-piece';
+      piece.style.left = Math.random() * 100 + 'vw';
+      piece.style.top = '-10px';
+      piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.animationDelay = Math.random() * 0.5 + 's';
+      piece.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
+      if (Math.random() > 0.5) {
+        piece.style.borderRadius = '50%';
+      }
+      document.body.appendChild(piece);
+      (function(p) {
+        setTimeout(function() { p.remove(); }, 3000);
+      })(piece);
+    }
+  }
+
+  // Inject streak counter into home page
+  function injectStreakUI() {
+    var root = document.getElementById('root');
+    if (!root) return;
+    // Remove old streak UI
+    var old = document.getElementById('ux-streak-counter');
+    if (old) old.remove();
+
+    var info = calculateStreak();
+    if (info.total === 0) return; // No entries yet
+
+    // Find the first content area on home page (after header)
+    var header = root.querySelector('[style*="linear-gradient"]');
+    if (!header) return;
+
+    var streakEl = document.createElement('div');
+    streakEl.id = 'ux-streak-counter';
+    streakEl.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:12px;padding:10px 16px;';
+
+    if (info.current > 0) {
+      var badge = document.createElement('div');
+      badge.className = 'ux-streak';
+      badge.style.background = info.current >= 7 ? 'linear-gradient(135deg,#FF7B9C22,#FFD70022)' : '#FFF0F3';
+      badge.style.color = '#FF5A8A';
+      var fire = document.createElement('span');
+      fire.className = 'ux-streak-fire';
+      fire.textContent = info.current >= 30 ? '👑' : info.current >= 7 ? '🔥' : '🌱';
+      var text = document.createElement('span');
+      text.textContent = '連続 ' + info.current + '日';
+      badge.appendChild(fire);
+      badge.appendChild(text);
+      streakEl.appendChild(badge);
+    }
+
+    var totalBadge = document.createElement('div');
+    totalBadge.style.cssText = 'font-size:12px;color:#999;font-weight:600;';
+    totalBadge.textContent = '累計 ' + info.total + '日記録';
+    streakEl.appendChild(totalBadge);
+
+    // Insert after the gradient header section
+    if (header.nextSibling) {
+      header.parentNode.insertBefore(streakEl, header.nextSibling);
+    } else {
+      header.parentNode.appendChild(streakEl);
+    }
+  }
+
+  /* ==============================
+     18. DAILY PROMPT SYSTEM
+     ============================== */
+  var DAILY_PROMPTS = [
+    { emoji: '📸', text: '今日のわんちゃんの表情を1枚パシャリ！' },
+    { emoji: '🐾', text: '今日のお散歩、どんな発見があった？' },
+    { emoji: '😴', text: '今日のわんちゃんの寝顔を記録しよう' },
+    { emoji: '🍽', text: '今日のごはんの食いつき、どうだった？' },
+    { emoji: '🎾', text: '今日はどんな遊びをした？' },
+    { emoji: '💕', text: 'わんちゃんの「今日いちばん可愛かった瞬間」は？' },
+    { emoji: '🏥', text: '今日の体調チェック！元気度は何点？' },
+    { emoji: '✨', text: '今日できるようになったこと、ある？' },
+    { emoji: '🐶', text: '今日のわんちゃん、ひとことで表すと？' },
+    { emoji: '🌈', text: 'わんちゃんと過ごした今日の幸せを記録しよう' },
+    { emoji: '👃', text: 'お散歩中にクンクンしたものは何だった？' },
+    { emoji: '🧸', text: '今日のお気に入りのおもちゃは？' },
+    { emoji: '🌙', text: '今日のわんちゃん、何時にウトウトした？' },
+    { emoji: '🎵', text: 'わんちゃんがしっぽを振った瞬間を記録！' }
+  ];
+
+  function getTodayPrompt() {
+    var dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+    return DAILY_PROMPTS[dayOfYear % DAILY_PROMPTS.length];
+  }
+
+  function injectDailyPrompt() {
+    var root = document.getElementById('root');
+    if (!root || document.getElementById('ux-daily-prompt')) return;
+
+    var info = calculateStreak();
+    if (info.todayLogged) return; // Already logged today
+
+    // Find home page content area (after header/gradient)
+    var gradient = root.querySelector('[style*="linear-gradient"]');
+    if (!gradient) return;
+
+    var prompt = getTodayPrompt();
+    var card = document.createElement('div');
+    card.id = 'ux-daily-prompt';
+    card.className = 'ux-daily-prompt';
+    card.style.cssText += 'background:linear-gradient(135deg,#FFF0F5,#FFE8EC);border:1.5px solid #FFD1DC;margin:12px 16px 0;';
+
+    var top = document.createElement('div');
+    top.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:8px;';
+    var emojiEl = document.createElement('span');
+    emojiEl.style.fontSize = '24px';
+    emojiEl.textContent = prompt.emoji;
+    var label = document.createElement('div');
+    label.style.cssText = 'font-size:11px;color:#FF7B9C;font-weight:700;';
+    label.textContent = '今日のひとこと';
+    top.appendChild(emojiEl);
+    top.appendChild(label);
+
+    var textEl = document.createElement('div');
+    textEl.style.cssText = 'font-size:14px;font-weight:700;color:#333;line-height:1.5;';
+    textEl.textContent = prompt.text;
+
+    var action = document.createElement('div');
+    action.style.cssText = 'margin-top:10px;display:flex;align-items:center;gap:6px;font-size:12px;color:#FF7B9C;font-weight:700;';
+    action.textContent = 'タップして記録する →';
+
+    card.appendChild(top);
+    card.appendChild(textEl);
+    card.appendChild(action);
+
+    card.addEventListener('click', function() {
+      // Navigate to post page by clicking the post button in tab bar
+      var postBtn = root.querySelector('[style*="linear-gradient"][style*="border-radius"][style*="40"]');
+      if (postBtn) postBtn.click();
+    });
+
+    // Insert after streak counter or gradient header
+    var streakEl = document.getElementById('ux-streak-counter');
+    var insertAfter = streakEl || gradient;
+    if (insertAfter.nextSibling) {
+      insertAfter.parentNode.insertBefore(card, insertAfter.nextSibling);
+    } else {
+      insertAfter.parentNode.appendChild(card);
+    }
+  }
+
+  /* ==============================
+     19. AI FREE TIER (3 uses/month)
+     ============================== */
+  var AI_FREE_KEY = 'ux_ai_free';
+  var AI_FREE_LIMIT = 3;
+
+  function getAiFreeStatus() {
+    try {
+      var data = JSON.parse(localStorage.getItem(AI_FREE_KEY)) || {};
+      var currentMonth = new Date().toISOString().slice(0, 7); // "2026-03"
+      if (data.month !== currentMonth) {
+        data = { month: currentMonth, used: 0 };
+        localStorage.setItem(AI_FREE_KEY, JSON.stringify(data));
+      }
+      return { remaining: AI_FREE_LIMIT - data.used, used: data.used, month: data.month };
+    } catch(e) { return { remaining: AI_FREE_LIMIT, used: 0 }; }
+  }
+
+  function useAiFreeCredit() {
+    try {
+      var data = JSON.parse(localStorage.getItem(AI_FREE_KEY)) || {};
+      var currentMonth = new Date().toISOString().slice(0, 7);
+      if (data.month !== currentMonth) data = { month: currentMonth, used: 0 };
+      data.used++;
+      localStorage.setItem(AI_FREE_KEY, JSON.stringify(data));
+      return true;
+    } catch(e) { return false; }
+  }
+
+  function injectAiFreeTier() {
+    var root = document.getElementById('root');
+    if (!root) return;
+
+    // Detect AI paywall page: look for "AI健康相談" title + "プレミアム" button
+    var headers = root.querySelectorAll('[style*="font-weight"]');
+    var isAiPaywall = false;
+    for (var i = 0; i < headers.length; i++) {
+      if (headers[i].textContent.indexOf('AI健康相談') !== -1) {
+        // Check if there's a premium button (= paywall)
+        var premBtn = root.querySelector('[style*="cursor"][style*="pointer"]');
+        if (premBtn && premBtn.textContent.indexOf('プレミアム') !== -1) {
+          isAiPaywall = true;
+        }
+        break;
+      }
+    }
+
+    if (!isAiPaywall) return;
+    if (document.getElementById('ux-ai-free-banner')) return;
+
+    var status = getAiFreeStatus();
+    if (status.remaining <= 0) {
+      // No free uses left - inject "used up" message
+      injectAiUsedUp();
+      return;
+    }
+
+    // Find the paywall content area and inject free-use option
+    var paywallContent = root.querySelector('[style*="padding"]');
+    if (!paywallContent) return;
+
+    var banner = document.createElement('div');
+    banner.id = 'ux-ai-free-banner';
+    banner.style.cssText = 'margin:12px 16px;padding:16px;background:linear-gradient(135deg,#E8F5FF,#F0F7FF);border:1.5px solid #90CAF9;border-radius:16px;text-align:center;';
+
+    var badgeEl = document.createElement('div');
+    badgeEl.className = 'ux-ai-free-badge';
+    badgeEl.style.cssText += 'background:#E3F2FD;color:#1976D2;margin:0 auto 10px;display:inline-flex;';
+    badgeEl.textContent = '🎁 無料おためし 残り' + status.remaining + '回';
+
+    var desc = document.createElement('div');
+    desc.style.cssText = 'font-size:13px;color:#555;margin-bottom:12px;line-height:1.5;';
+    desc.textContent = 'わんちゃんの症状をAIに相談できるよ。まずは無料で試してみて！';
+
+    var tryBtn = document.createElement('button');
+    tryBtn.className = 'ux-share-btn';
+    tryBtn.style.cssText += 'background:linear-gradient(135deg,#42A5F5,#1976D2);color:#fff;width:100%;justify-content:center;';
+    tryBtn.textContent = '🩹 無料で相談する';
+    tryBtn.addEventListener('click', function() {
+      useAiFreeCredit();
+      // Navigate to a simple AI chat by triggering the tab
+      // Store flag to bypass paywall check
+      sessionStorage.setItem('ux_ai_free_session', '1');
+      // Re-click the AI tab to reload
+      var aiTab = null;
+      var tabs = root.querySelectorAll('[style*="cursor"]');
+      for (var t = 0; t < tabs.length; t++) {
+        if (tabs[t].textContent.indexOf('AI相談') !== -1 || tabs[t].textContent.indexOf('🩹') !== -1) {
+          aiTab = tabs[t]; break;
+        }
+      }
+      if (aiTab) { aiTab.click(); setTimeout(function() { aiTab.click(); }, 100); }
+      banner.remove();
+    });
+
+    banner.appendChild(badgeEl);
+    banner.appendChild(desc);
+    banner.appendChild(tryBtn);
+
+    // Insert at top of main content
+    var firstChild = paywallContent.firstChild;
+    if (firstChild) {
+      paywallContent.insertBefore(banner, firstChild);
+    } else {
+      paywallContent.appendChild(banner);
+    }
+  }
+
+  function injectAiUsedUp() {
+    if (document.getElementById('ux-ai-used-up')) return;
+    var root = document.getElementById('root');
+    var paywallContent = root.querySelector('[style*="padding"]');
+    if (!paywallContent) return;
+
+    var notice = document.createElement('div');
+    notice.id = 'ux-ai-used-up';
+    notice.style.cssText = 'margin:12px 16px;padding:14px;background:#FFF8E1;border:1.5px solid #FFE082;border-radius:14px;text-align:center;';
+    var noticeText = document.createElement('div');
+    noticeText.style.cssText = 'font-size:13px;color:#F57F17;font-weight:600;';
+    noticeText.textContent = '今月の無料相談（3回）を使い切りました。来月リセットされます！';
+    notice.appendChild(noticeText);
+
+    var firstChild = paywallContent.firstChild;
+    if (firstChild) paywallContent.insertBefore(notice, firstChild);
+    else paywallContent.appendChild(notice);
+  }
+
+  /* ==============================
+     20. INSTAGRAM SHARE CARD GENERATOR
+     ============================== */
+  function injectShareButton() {
+    var root = document.getElementById('root');
+    if (!root || document.getElementById('ux-share-card-btn')) return;
+
+    // Detect growth page
+    var isGrowth = false;
+    var headers = root.querySelectorAll('[style*="font-weight"]');
+    for (var i = 0; i < headers.length; i++) {
+      var txt = headers[i].textContent;
+      if (txt.indexOf('成長') !== -1 || txt.indexOf('🌱') !== -1) { isGrowth = true; break; }
+    }
+    if (!isGrowth) return;
+
+    // Find content area
+    var scrollArea = root.querySelector('[style*="overflow"]') || root;
+    var existingBtn = scrollArea.querySelector('#ux-share-card-btn');
+    if (existingBtn) return;
+
+    var container = document.createElement('div');
+    container.id = 'ux-share-card-btn';
+    container.style.cssText = 'padding:0 16px 16px;';
+
+    var btn = document.createElement('button');
+    btn.className = 'ux-share-btn';
+    btn.style.cssText += 'background:linear-gradient(135deg,#E91E63,#FF5722);color:#fff;width:100%;justify-content:center;';
+    btn.textContent = '📸 成長カードをシェア';
+    btn.addEventListener('click', generateShareCard);
+
+    container.appendChild(btn);
+    scrollArea.appendChild(container);
+  }
+
+  function generateShareCard() {
+    var canvas = document.createElement('canvas');
+    canvas.width = 1080;
+    canvas.height = 1080;
+    var ctx = canvas.getContext('2d');
+
+    // Background gradient
+    var grad = ctx.createLinearGradient(0, 0, 1080, 1080);
+    grad.addColorStop(0, '#FFF0F5');
+    grad.addColorStop(0.5, '#FFE8EC');
+    grad.addColorStop(1, '#FFF5F7');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 1080, 1080);
+
+    // Decorative circles
+    ctx.globalAlpha = 0.08;
+    ctx.fillStyle = '#FF7B9C';
+    ctx.beginPath(); ctx.arc(900, 150, 200, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(180, 900, 150, 0, Math.PI * 2); ctx.fill();
+    ctx.globalAlpha = 1;
+
+    // Get app data from DOM
+    var root = document.getElementById('root');
+    var dogName = '';
+    var daysText = '';
+    var weightText = '';
+    var streakInfo = calculateStreak();
+
+    // Try to find dog name and days from the app
+    var textEls = root.querySelectorAll('[style*="font-weight"]');
+    for (var i = 0; i < textEls.length; i++) {
+      var t = textEls[i].textContent;
+      if (t.indexOf('日目') !== -1) daysText = t;
+      if (!dogName && textEls[i].style.fontWeight >= 800 && t.length < 10 && t.length > 0 && !t.match(/[0-9]/)) {
+        dogName = t;
+      }
+    }
+
+    // Find weight from growth page elements
+    var allText = root.querySelectorAll('[style*="font-size"]');
+    for (var j = 0; j < allText.length; j++) {
+      var wt = allText[j].textContent;
+      if (wt.indexOf('kg') !== -1 && wt.length < 15) { weightText = wt; break; }
+    }
+
+    // Title area
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#FF7B9C';
+    ctx.font = '900 36px "Zen Maru Gothic", sans-serif';
+    ctx.fillText('🐾 わんちゃん成長日記', 540, 120);
+
+    // Dog name (big)
+    ctx.fillStyle = '#333';
+    ctx.font = '900 72px "Zen Maru Gothic", sans-serif';
+    ctx.fillText(dogName || 'うちの子', 540, 300);
+
+    // Days count
+    if (daysText) {
+      ctx.fillStyle = '#FF5A8A';
+      ctx.font = '800 48px "Zen Maru Gothic", sans-serif';
+      ctx.fillText(daysText, 540, 400);
+    }
+
+    // Stats cards
+    var cardY = 500;
+    var cards = [];
+    if (weightText) cards.push({ icon: '⚖️', label: '体重', value: weightText });
+    if (streakInfo.current > 0) cards.push({ icon: '🔥', label: '連続記録', value: streakInfo.current + '日' });
+    if (streakInfo.total > 0) cards.push({ icon: '📖', label: '累計', value: streakInfo.total + '日記録' });
+
+    var cardWidth = 280;
+    var cardGap = 30;
+    var totalWidth = cards.length * cardWidth + (cards.length - 1) * cardGap;
+    var startX = (1080 - totalWidth) / 2;
+
+    for (var c = 0; c < cards.length; c++) {
+      var cx = startX + c * (cardWidth + cardGap);
+      // Card background
+      ctx.fillStyle = 'rgba(255,255,255,0.8)';
+      ctx.beginPath();
+      roundRect(ctx, cx, cardY, cardWidth, 160, 20);
+      ctx.fill();
+      // Card border
+      ctx.strokeStyle = '#FFD1DC';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      roundRect(ctx, cx, cardY, cardWidth, 160, 20);
+      ctx.stroke();
+      // Icon
+      ctx.font = '400 36px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#333';
+      ctx.fillText(cards[c].icon, cx + cardWidth / 2, cardY + 50);
+      // Label
+      ctx.font = '600 22px "Zen Maru Gothic", sans-serif';
+      ctx.fillStyle = '#999';
+      ctx.fillText(cards[c].label, cx + cardWidth / 2, cardY + 90);
+      // Value
+      ctx.font = '900 32px "Zen Maru Gothic", sans-serif';
+      ctx.fillStyle = '#333';
+      ctx.fillText(cards[c].value, cx + cardWidth / 2, cardY + 135);
+    }
+
+    // Paw prints decoration
+    ctx.font = '400 40px sans-serif';
+    ctx.globalAlpha = 0.15;
+    ctx.fillText('🐾', 120, 500);
+    ctx.fillText('🐾', 960, 400);
+    ctx.fillText('🐾', 200, 750);
+    ctx.fillText('🐾', 880, 800);
+    ctx.globalAlpha = 1;
+
+    // Footer
+    ctx.fillStyle = '#CCC';
+    ctx.font = '600 24px "Zen Maru Gothic", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('わんちゃん成長日記でつくりました 🐾', 540, 1000);
+
+    // Bottom date
+    ctx.fillStyle = '#DDD';
+    ctx.font = '400 20px "Zen Maru Gothic", sans-serif';
+    ctx.fillText(new Date().toLocaleDateString('ja-JP'), 540, 1045);
+
+    // Download
+    try {
+      canvas.toBlob(function(blob) {
+        if (!blob) { showToast('画像の生成に失敗しました', 'error'); return; }
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'wanchan-growth-card-' + new Date().toISOString().slice(0, 10) + '.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('成長カードを保存しました！SNSでシェアしよう 📸', 'success');
+      }, 'image/png');
+    } catch(e) {
+      showToast('画像の生成に失敗しました', 'error');
+    }
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+  }
+
+  // Hook into main observer: inject streak, prompt, share, AI free tier
+  var _origEnhanceAccessibility = enhanceAccessibility;
+  enhanceAccessibility = function() {
+    _origEnhanceAccessibility();
+    injectStreakUI();
+    injectDailyPrompt();
+    injectShareButton();
+    injectAiFreeTier();
+  };
+
+  // Initial run after app loads
+  setTimeout(function() {
+    injectStreakUI();
+    injectDailyPrompt();
+  }, 1000);
+
+  /* ==============================
+     21. ONLINE RECOVERY CHECK
      ============================== */
   var wasOffline = !navigator.onLine;
   window.addEventListener('online', function() {
