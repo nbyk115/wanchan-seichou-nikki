@@ -51,8 +51,8 @@ img{max-width:100%;height:auto;}
 /* Touch Target Enhancement - only for standalone buttons with explicit padding */
 #root button{min-height:44px;}
 
-/* iOS Momentum Scrolling */
-[style*="overflow"]{-webkit-overflow-scrolling:touch;}
+/* Smooth scrolling for overflow containers */
+[style*="overflow"]{scroll-behavior:smooth;}
 
 /* Page Transition Animation */
 @keyframes ux-page-in{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
@@ -227,10 +227,48 @@ if('serviceWorker' in navigator){
   window.__wanchan.showToast = showToast;
 
   /* ==============================
-     2. ENHANCED DELETE CONFIRMATION
+     2. CUSTOM CONFIRM DIALOG (non-blocking)
      ============================== */
-  // The app uses a custom `.ask()` pattern for deletions.
-  // We don't override window.confirm to avoid breaking synchronous return values.
+  function showConfirmDialog(message, onConfirm) {
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:10003;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .2s;';
+    var dialog = document.createElement('div');
+    dialog.style.cssText = 'background:#FFF8F5;border-radius:20px;padding:24px;max-width:320px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.15);text-align:center;';
+    dialog.setAttribute('role', 'alertdialog');
+    dialog.setAttribute('aria-modal', 'true');
+    var iconEl = document.createElement('div');
+    iconEl.style.cssText = 'font-size:36px;margin-bottom:12px;';
+    iconEl.textContent = '🐾';
+    var msgEl = document.createElement('div');
+    msgEl.style.cssText = 'font-size:14px;color:#333;line-height:1.6;margin-bottom:20px;font-weight:600;';
+    msgEl.textContent = message;
+    var btnWrap = document.createElement('div');
+    btnWrap.style.cssText = 'display:flex;gap:10px;';
+    var cancelBtn = document.createElement('button');
+    cancelBtn.style.cssText = 'flex:1;padding:12px;border:1px solid #ddd;border-radius:12px;background:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;min-height:44px;color:#666;';
+    cancelBtn.textContent = 'キャンセル';
+    var confirmBtn = document.createElement('button');
+    confirmBtn.style.cssText = 'flex:1;padding:12px;border:none;border-radius:12px;background:#FF7B9C;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;min-height:44px;';
+    confirmBtn.textContent = 'OK';
+    btnWrap.appendChild(cancelBtn);
+    btnWrap.appendChild(confirmBtn);
+    dialog.appendChild(iconEl);
+    dialog.appendChild(msgEl);
+    dialog.appendChild(btnWrap);
+    overlay.appendChild(dialog);
+    document.body.appendChild(overlay);
+    // Animate in
+    requestAnimationFrame(function() { overlay.style.opacity = '1'; });
+    // Focus confirm button
+    confirmBtn.focus();
+    function close() {
+      overlay.style.opacity = '0';
+      setTimeout(function() { overlay.remove(); }, 200);
+    }
+    cancelBtn.addEventListener('click', close);
+    confirmBtn.addEventListener('click', function() { close(); onConfirm(); });
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) close(); });
+  }
 
   /* ==============================
      3. ACCESSIBILITY ENHANCEMENTS
@@ -373,17 +411,23 @@ if('serviceWorker' in navigator){
     document.querySelectorAll('#root textarea').forEach(function(ta) {
       if (ta._uxAutoSave) return;
       ta._uxAutoSave = true;
-      // Use placeholder + DOM path to create unique key per textarea
-      var path = [];
-      var node = ta;
-      while (node && node !== document.body) {
-        var idx = 0;
-        var sib = node.previousElementSibling;
-        while (sib) { idx++; sib = sib.previousElementSibling; }
-        path.unshift(idx);
-        node = node.parentNode;
+      // Generate a stable unique key using nearby context
+      // Combine: placeholder, name/id, and nearest heading/label text
+      var context = (ta.placeholder || '') + '|' + (ta.name || '') + '|' + (ta.id || '');
+      // Find nearest label or heading for additional uniqueness
+      var parent = ta.parentNode;
+      for (var p = 0; p < 3 && parent && parent !== document.body; p++) {
+        var heading = parent.querySelector('h1,h2,h3,h4,label,[style*="font-weight: 700"],[style*="font-weight:700"]');
+        if (heading) { context += '|' + heading.textContent.trim().substring(0, 30); break; }
+        parent = parent.parentNode;
       }
-      var key = 'ux_draft_' + path.join('.') + '_' + (ta.placeholder || '');
+      // Simple hash for shorter key
+      var hash = 0;
+      for (var ci = 0; ci < context.length; ci++) {
+        hash = ((hash << 5) - hash) + context.charCodeAt(ci);
+        hash |= 0;
+      }
+      var key = 'ux_draft_' + Math.abs(hash).toString(36);
 
       // Restore draft - show as placeholder hint, user copies on click
       var draft = localStorage.getItem(key);
@@ -456,12 +500,13 @@ if('serviceWorker' in navigator){
   /* ==============================
      9. SCROLL IMPROVEMENTS
      ============================== */
-  // Add momentum scrolling to overflow containers
+  // Enhance scroll containers (removed deprecated -webkit-overflow-scrolling)
   function enhanceScrolling() {
     document.querySelectorAll('#root [style*="overflow"]').forEach(function(el) {
       if (!el._uxScroll) {
         el._uxScroll = true;
-        el.style.webkitOverflowScrolling = 'touch';
+        // scroll-behavior is supported in all modern browsers
+        if (!el.style.scrollBehavior) el.style.scrollBehavior = 'smooth';
       }
     });
   }
@@ -470,38 +515,65 @@ if('serviceWorker' in navigator){
      10. MUTATION OBSERVER - Apply enhancements on DOM changes
      ============================== */
   var debounceTimer;
-  var observer = new MutationObserver(function() {
+  var observer = new MutationObserver(function(mutations) {
+    // Quick path: check if any new nodes were actually added
+    var hasNewNodes = false;
+    for (var m = 0; m < mutations.length; m++) {
+      if (mutations[m].addedNodes.length > 0) { hasNewNodes = true; break; }
+    }
+    if (!hasNewNodes) return;
+
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(function() {
+      // Only run if tab is visible
+      if (document.hidden) return;
       enhanceAccessibility();
       enableLazyLoading();
       enableAutoSave();
       enhanceEmptyStates();
       enhanceScrolling();
+      if (typeof injectDataManager === 'function') injectDataManager();
     }, 150);
   });
 
-  // Start observing when root is ready
+  // Start/stop observing based on visibility
+  var observing = false;
   function startObserving() {
     var root = document.getElementById('root');
-    if (root) {
+    if (root && !observing) {
       observer.observe(root, { childList: true, subtree: true });
+      observing = true;
       // Initial run
       setTimeout(function() {
         enhanceAccessibility();
         enableLazyLoading();
         enhanceScrolling();
       }, 500);
-    } else {
+    } else if (!root) {
       setTimeout(startObserving, 100);
+    }
+  }
+  function stopObserving() {
+    if (observing) {
+      observer.disconnect();
+      observing = false;
     }
   }
   startObserving();
 
+  // Pause/resume observer when tab visibility changes
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+      stopObserving();
+    } else {
+      startObserving();
+    }
+  });
+
   /* ==============================
      11. PERFORMANCE: requestIdleCallback for non-critical work
      ============================== */
-  var ric = window.requestIdleCallback || function(cb) { setTimeout(cb, 200); };
+  var ric = window.requestIdleCallback || function(cb) { setTimeout(cb, 50); };
   ric(function() {
     enableAutoSave();
     enhanceEmptyStates();
@@ -523,7 +595,8 @@ if('serviceWorker' in navigator){
   });
 
   // Catch React render crashes - show fallback if #root becomes empty after error
-  setInterval(function() {
+  var crashCheckTimer = setInterval(function() {
+    if (document.hidden) return; // Skip when tab is in background
     var root = document.getElementById('root');
     if (root && root.children.length === 0 && root.textContent.trim() === '' && document.readyState === 'complete') {
       var wrap = document.createElement('div');
@@ -563,17 +636,61 @@ if('serviceWorker' in navigator){
       var limitMB = 5; // Conservative estimate
       var percent = (usedMB / limitMB) * 100;
 
-      if (percent > 80) {
-        showToast('ストレージ容量が限界に近づいています（' + Math.round(percent) + '%）。設定からバックアップを取ってください', 'warning');
+      if (percent > 80 && !storageWarningShown) {
+        storageWarningShown = true;
+        showStorageWarning(percent);
       }
       return { usedMB: usedMB, percent: percent };
     } catch(e) {
       return { usedMB: 0, percent: 0 };
     }
   }
-  // Check on startup and every 10 minutes
+  var storageWarningShown = false;
+
+  function showStorageWarning(percent) {
+    var banner = document.createElement('div');
+    banner.style.cssText = 'position:fixed;bottom:calc(80px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%) translateY(20px);z-index:10001;padding:14px 16px;background:#FFF8F5;border:1px solid #F59E0B;border-radius:16px;font-size:13px;font-weight:600;color:#92400E;box-shadow:0 8px 32px rgba(0,0,0,.1);display:flex;align-items:center;gap:10px;max-width:calc(100% - 32px);opacity:0;transition:opacity .3s,transform .3s;';
+    banner.setAttribute('role', 'alert');
+    var warnIcon = document.createElement('span');
+    warnIcon.textContent = '⚠️';
+    var warnMsg = document.createElement('div');
+    warnMsg.style.flex = '1';
+    warnMsg.textContent = 'ストレージ ' + Math.round(percent) + '% 使用中';
+    var warnBtn = document.createElement('button');
+    warnBtn.style.cssText = 'background:#F59E0B;color:#fff;border:none;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;min-height:44px;';
+    warnBtn.textContent = 'バックアップ';
+    warnBtn.addEventListener('click', function() {
+      exportAllData();
+      banner.style.opacity = '0';
+      setTimeout(function() { banner.remove(); }, 300);
+    });
+    var warnClose = document.createElement('button');
+    warnClose.style.cssText = 'background:none;border:none;color:#999;font-size:16px;cursor:pointer;padding:8px;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;';
+    warnClose.textContent = '✕';
+    warnClose.setAttribute('aria-label', '閉じる');
+    warnClose.addEventListener('click', function() {
+      banner.style.opacity = '0';
+      setTimeout(function() { banner.remove(); }, 300);
+    });
+    banner.appendChild(warnIcon);
+    banner.appendChild(warnMsg);
+    banner.appendChild(warnBtn);
+    banner.appendChild(warnClose);
+    document.body.appendChild(banner);
+    // Animate in
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        banner.style.opacity = '1';
+        banner.style.transform = 'translateX(-50%) translateY(0)';
+      });
+    });
+  }
+
+  // Check on startup; repeat only when tab is visible
   setTimeout(checkStorageCapacity, 5000);
-  setInterval(checkStorageCapacity, 10 * 60 * 1000);
+  var storageCheckTimer = setInterval(function() {
+    if (!document.hidden) checkStorageCapacity();
+  }, 10 * 60 * 1000);
 
   /* ==============================
      14. DATA EXPORT / IMPORT
@@ -710,9 +827,10 @@ if('serviceWorker' in navigator){
             input.accept = '.json';
             input.addEventListener('change', function() {
               if (input.files[0]) {
-                if (confirm('現在のデータに上書き復元します。よろしいですか？')) {
-                  importData(input.files[0]);
-                }
+                var selectedFile = input.files[0];
+                showConfirmDialog('現在のデータに上書き復元します。よろしいですか？', function() {
+                  importData(selectedFile);
+                });
               }
             });
             input.click();
@@ -736,14 +854,8 @@ if('serviceWorker' in navigator){
     }
   }
 
-  // Run on DOM changes
-  var dmDebounce;
-  var dmObserver = new MutationObserver(function() {
-    clearTimeout(dmDebounce);
-    dmDebounce = setTimeout(injectDataManager, 300);
-  });
-  var dmRoot = document.getElementById('root');
-  if (dmRoot) dmObserver.observe(dmRoot, { childList: true, subtree: true });
+  // Hook into main MutationObserver via debounced call
+  // (injectDataManager is called from the main observer callback below)
 
   /* ==============================
      15. APP UPDATE BANNER
