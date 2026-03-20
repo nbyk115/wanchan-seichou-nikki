@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wanchan-v2';
+const CACHE_NAME = 'wanchan-v3';
 const ASSETS = [
   '/wanchan-seichou-nikki/',
   '/wanchan-seichou-nikki/index.html',
@@ -41,6 +41,13 @@ self.addEventListener('activate', (e) => {
     )
   );
   self.clients.claim();
+});
+
+// Listen for skipWaiting message from the page
+self.addEventListener('message', (e) => {
+  if (e.data && e.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener('fetch', (e) => {
