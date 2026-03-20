@@ -475,10 +475,15 @@ if('serviceWorker' in navigator){
       ta.addEventListener('input', function() {
         clearTimeout(autoSaveTimers[key]);
         autoSaveTimers[key] = setTimeout(function() {
-          if (ta.value.trim()) {
-            localStorage.setItem(key, ta.value);
-          } else {
-            localStorage.removeItem(key);
+          try {
+            if (ta.value.trim()) {
+              localStorage.setItem(key, ta.value);
+            } else {
+              localStorage.removeItem(key);
+            }
+          } catch(e) {
+            // QuotaExceededError - storage full
+            showToast('ストレージがいっぱいです。設定からバックアップを取ってください', 'warning');
           }
         }, 2000);
       });
@@ -670,7 +675,7 @@ if('serviceWorker' in navigator){
 
   function showStorageWarning(percent) {
     var banner = document.createElement('div');
-    banner.style.cssText = 'position:fixed;bottom:calc(80px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%) translateY(20px);z-index:10001;padding:14px 16px;background:#FFF8F5;border:1px solid #F59E0B;border-radius:16px;font-size:13px;font-weight:600;color:#92400E;box-shadow:0 8px 32px rgba(0,0,0,.1);display:flex;align-items:center;gap:10px;max-width:calc(100% - 32px);opacity:0;transition:opacity .3s,transform .3s;';
+    banner.style.cssText = 'position:fixed;bottom:calc(80px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%) translateY(20px);z-index:10002;padding:14px 16px;background:#FFF8F5;border:1px solid #F59E0B;border-radius:16px;font-size:13px;font-weight:600;color:#92400E;box-shadow:0 8px 32px rgba(0,0,0,.1);display:flex;align-items:center;gap:10px;max-width:calc(100% - 32px);opacity:0;transition:opacity .3s,transform .3s;';
     banner.setAttribute('role', 'alert');
     var warnIcon = document.createElement('span');
     warnIcon.textContent = '⚠️';
@@ -759,6 +764,7 @@ if('serviceWorker' in navigator){
           return;
         }
         var count = 0;
+        var failed = 0;
         var keys = Object.keys(data);
         for (var i = 0; i < keys.length; i++) {
           var key = keys[i];
@@ -766,14 +772,23 @@ if('serviceWorker' in navigator){
           if (UNSAFE_KEYS.indexOf(key) !== -1) continue;
           if (key.startsWith('ux_draft_')) continue;
           if (typeof data[key] !== 'string') continue;
-          localStorage.setItem(key, data[key]);
-          count++;
+          try {
+            localStorage.setItem(key, data[key]);
+            count++;
+          } catch(se) { failed++; }
         }
-        showToast(count + '件のデータを復元しました。再読み込みします...', 'success');
+        if (failed > 0) {
+          showToast(count + '件復元、' + failed + '件失敗（ストレージ不足）', 'warning');
+        } else {
+          showToast(count + '件のデータを復元しました。再読み込みします...', 'success');
+        }
         setTimeout(function() { location.reload(); }, 1500);
       } catch(err) {
         showToast('ファイルの読み込みに失敗しました', 'error');
       }
+    };
+    reader.onerror = function() {
+      showToast('ファイルの読み込みに失敗しました', 'error');
     };
     reader.readAsText(file);
   }
