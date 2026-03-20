@@ -1632,7 +1632,344 @@ if('serviceWorker' in navigator){
     ctx.quadraticCurveTo(x, y, x + r, y);
   }
 
-  // Hook into main observer: inject streak, prompt, share, AI free tier
+  /* ==============================
+     21. WELCOME EXPERIENCE (First-time delight)
+     ============================== */
+  var WELCOME_KEY = 'ux_welcomed';
+
+  function showWelcomeFlow() {
+    if (localStorage.getItem(WELCOME_KEY)) return;
+    // Wait for app to be rendered with dog name
+    var root = document.getElementById('root');
+    if (!root || !root.children.length) return;
+
+    // Find dog name from the page
+    var dogName = '';
+    var textEls = root.querySelectorAll('[style*="font-weight"]');
+    for (var i = 0; i < textEls.length; i++) {
+      var t = textEls[i].textContent.trim();
+      if (t.length >= 1 && t.length <= 8 && !t.match(/[0-9]/) && textEls[i].style.fontWeight >= 700
+          && !t.match(/ホーム|成長|メニュー|アルバム|日記|設定|保存|戻る/)) {
+        dogName = t; break;
+      }
+    }
+    if (!dogName) return; // App not ready yet
+
+    localStorage.setItem(WELCOME_KEY, '1');
+
+    var overlay = document.createElement('div');
+    overlay.className = 'ux-milestone-overlay';
+    var card = document.createElement('div');
+    card.className = 'ux-milestone-card';
+    card.style.maxWidth = '340px';
+
+    var icon = document.createElement('div');
+    icon.style.cssText = 'font-size:56px;margin-bottom:8px;';
+    icon.textContent = '🐾';
+    var title = document.createElement('div');
+    title.style.cssText = 'font-size:20px;font-weight:900;color:#333;margin-bottom:6px;';
+    title.textContent = dogName + 'の日記へようこそ！';
+    var msg = document.createElement('div');
+    msg.style.cssText = 'font-size:13px;color:#888;line-height:1.7;margin-bottom:6px;';
+    msg.textContent = 'これから' + dogName + 'との毎日を一緒に記録していくよ。';
+
+    var features = document.createElement('div');
+    features.style.cssText = 'text-align:left;padding:12px;background:#FFF0F5;border-radius:12px;margin-bottom:16px;';
+    var tips = [
+      { e: '✏️', t: '日記を書いて思い出を残そう' },
+      { e: '🔥', t: '毎日書くとストリークが伸びる！' },
+      { e: '🎉', t: '連続記録でお祝い演出が出るよ' },
+      { e: '📸', t: '成長カードをSNSでシェアできる' }
+    ];
+    for (var j = 0; j < tips.length; j++) {
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px;color:#555;';
+      var em = document.createElement('span');
+      em.textContent = tips[j].e;
+      var tx = document.createElement('span');
+      tx.textContent = tips[j].t;
+      row.appendChild(em);
+      row.appendChild(tx);
+      features.appendChild(row);
+    }
+
+    var btn = document.createElement('button');
+    btn.style.cssText = 'background:linear-gradient(135deg,#FF7B9C,#FF5A8A);color:#fff;border:none;padding:14px 32px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;min-height:44px;width:100%;';
+    btn.textContent = dogName + 'との記録をはじめる ✨';
+
+    card.appendChild(icon);
+    card.appendChild(title);
+    card.appendChild(msg);
+    card.appendChild(features);
+    card.appendChild(btn);
+    overlay.appendChild(card);
+    document.body.appendChild(overlay);
+
+    launchConfetti();
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() { overlay.classList.add('ux-show'); });
+    });
+
+    btn.addEventListener('click', function() {
+      overlay.classList.remove('ux-show');
+      setTimeout(function() { overlay.remove(); }, 300);
+    });
+  }
+
+  /* ==============================
+     22. WEIGHT CHANGE CELEBRATIONS
+     ============================== */
+  var WEIGHT_MILESTONE_KEY = 'ux_weight_last';
+
+  function checkWeightMilestone() {
+    var root = document.getElementById('root');
+    if (!root) return;
+
+    // Find weight values on the growth page
+    var allEls = root.querySelectorAll('[style*="font-weight"]');
+    var currentWeight = 0;
+    for (var i = 0; i < allEls.length; i++) {
+      var match = allEls[i].textContent.match(/([0-9]+\.?[0-9]*)\s*kg/i);
+      if (match) {
+        var w = parseFloat(match[1]);
+        if (w > 0 && w < 100) { currentWeight = w; break; }
+      }
+    }
+    if (!currentWeight) return;
+
+    var lastWeight = parseFloat(localStorage.getItem(WEIGHT_MILESTONE_KEY) || '0');
+    if (lastWeight === 0) {
+      // First weight recorded
+      try { localStorage.setItem(WEIGHT_MILESTONE_KEY, currentWeight.toString()); } catch(e) {}
+      return;
+    }
+
+    var diff = currentWeight - lastWeight;
+    if (Math.abs(diff) < 0.1) return; // No significant change
+
+    // Update stored weight
+    try { localStorage.setItem(WEIGHT_MILESTONE_KEY, currentWeight.toString()); } catch(e) {}
+
+    // Only celebrate on growth page
+    var isGrowthPage = false;
+    for (var j = 0; j < allEls.length; j++) {
+      if (allEls[j].textContent.indexOf('成長') !== -1) { isGrowthPage = true; break; }
+    }
+    if (!isGrowthPage) return;
+
+    // Check if we already showed this celebration
+    var celebKey = 'ux_weight_cele_' + currentWeight;
+    if (sessionStorage.getItem(celebKey)) return;
+    sessionStorage.setItem(celebKey, '1');
+
+    // Whole kg milestones
+    var prevKg = Math.floor(lastWeight);
+    var currKg = Math.floor(currentWeight);
+    if (currKg > prevKg && diff > 0) {
+      setTimeout(function() {
+        showWeightCelebration(currentWeight, diff);
+      }, 800);
+    }
+  }
+
+  function showWeightCelebration(weight, diff) {
+    launchConfetti();
+    var isGain = diff > 0;
+    showToast(
+      (isGain ? '🎉 体重 ' + weight.toFixed(1) + 'kg 達成！' : '⚖️ 体重 ' + weight.toFixed(1) + 'kg に変化！') +
+      ' ' + (isGain ? 'すくすく成長中！' : ''),
+      'success'
+    );
+  }
+
+  /* ==============================
+     23. WEEKLY MINI DIGEST (Home)
+     ============================== */
+  function injectWeeklyDigest() {
+    var root = document.getElementById('root');
+    if (!root || document.getElementById('ux-weekly-digest')) return;
+
+    // Only show on home page (has tab bar)
+    var nav = root.querySelector('[style*="position: fixed"][style*="bottom"]');
+    if (!nav) return;
+
+    var streakInfo = calculateStreak();
+    if (streakInfo.total < 2) return; // Need at least a few entries
+
+    // Count this week's entries
+    var dates = getStreakDates();
+    var now = new Date();
+    var weekStart = new Date(now);
+    weekStart.setDate(weekStart.getDate() - weekStart.getDay()); // Sunday
+    weekStart.setHours(0, 0, 0, 0);
+    var thisWeekCount = 0;
+    for (var i = dates.length - 1; i >= 0; i--) {
+      if (new Date(dates[i]) >= weekStart) thisWeekCount++;
+      else break;
+    }
+
+    var digest = document.createElement('div');
+    digest.id = 'ux-weekly-digest';
+    digest.style.cssText = 'margin:0 16px 12px;padding:14px 16px;background:linear-gradient(135deg,#F0F7FF,#E8F4FD);border:1.5px solid #BBDEFB;border-radius:16px;';
+
+    var header = document.createElement('div');
+    header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;';
+    var headerLeft = document.createElement('div');
+    headerLeft.style.cssText = 'font-size:13px;font-weight:800;color:#1565C0;';
+    headerLeft.textContent = '📊 今週のまとめ';
+    var headerRight = document.createElement('div');
+    headerRight.style.cssText = 'font-size:11px;color:#90CAF9;font-weight:600;';
+    var dayNames = ['日', '月', '火', '水', '木', '金', '土'];
+    headerRight.textContent = dayNames[now.getDay()] + '曜日';
+    header.appendChild(headerLeft);
+    header.appendChild(headerRight);
+
+    var stats = document.createElement('div');
+    stats.style.cssText = 'display:flex;gap:8px;';
+
+    var statItems = [
+      { icon: '📝', value: thisWeekCount + '日', label: '今週の記録' },
+      { icon: '🔥', value: streakInfo.current + '日', label: '連続記録' },
+      { icon: '📖', value: streakInfo.total + '回', label: '累計' }
+    ];
+
+    for (var s = 0; s < statItems.length; s++) {
+      var item = document.createElement('div');
+      item.style.cssText = 'flex:1;background:rgba(255,255,255,.7);border-radius:12px;padding:10px 8px;text-align:center;';
+      var valEl = document.createElement('div');
+      valEl.style.cssText = 'font-size:18px;font-weight:900;color:#1565C0;';
+      valEl.textContent = statItems[s].icon + ' ' + statItems[s].value;
+      var labelEl = document.createElement('div');
+      labelEl.style.cssText = 'font-size:10px;color:#64B5F6;font-weight:600;margin-top:2px;';
+      labelEl.textContent = statItems[s].label;
+      item.appendChild(valEl);
+      item.appendChild(labelEl);
+      stats.appendChild(item);
+    }
+
+    // Progress bar for this week (goal: 7 days)
+    var progressWrap = document.createElement('div');
+    progressWrap.style.cssText = 'margin-top:10px;';
+    var progressLabel = document.createElement('div');
+    progressLabel.style.cssText = 'font-size:10px;color:#90CAF9;font-weight:600;margin-bottom:4px;display:flex;justify-content:space-between;';
+    var plLeft = document.createElement('span');
+    plLeft.textContent = '今週の目標';
+    var plRight = document.createElement('span');
+    plRight.textContent = thisWeekCount + '/7日';
+    progressLabel.appendChild(plLeft);
+    progressLabel.appendChild(plRight);
+    var bar = document.createElement('div');
+    bar.style.cssText = 'height:6px;background:#E3F2FD;border-radius:3px;overflow:hidden;';
+    var fill = document.createElement('div');
+    var pct = Math.min(100, (thisWeekCount / 7) * 100);
+    fill.style.cssText = 'height:100%;border-radius:3px;transition:width .5s;background:linear-gradient(90deg,#42A5F5,#1976D2);width:' + pct + '%;';
+    bar.appendChild(fill);
+    progressWrap.appendChild(progressLabel);
+    progressWrap.appendChild(bar);
+
+    digest.appendChild(header);
+    digest.appendChild(stats);
+    digest.appendChild(progressWrap);
+
+    // Insert after daily prompt or streak counter
+    var afterEl = document.getElementById('ux-daily-prompt') || document.getElementById('ux-streak-counter');
+    if (afterEl && afterEl.nextSibling) {
+      afterEl.parentNode.insertBefore(digest, afterEl.nextSibling);
+    } else {
+      var gradient = root.querySelector('[style*="linear-gradient"]');
+      if (gradient && gradient.parentNode) {
+        var target = gradient.nextSibling;
+        if (target) gradient.parentNode.insertBefore(digest, target);
+        else gradient.parentNode.appendChild(digest);
+      }
+    }
+  }
+
+  /* ==============================
+     24. EMOTIONAL EMPTY STATES
+     ============================== */
+  function enhanceEmptyStatesV2() {
+    var root = document.getElementById('root');
+    if (!root) return;
+
+    // Find empty state indicators (large centered emoji + text saying "まだ" or empty-like)
+    var emptyDivs = root.querySelectorAll('[style*="text-align: center"], [style*="text-align:center"]');
+    for (var i = 0; i < emptyDivs.length; i++) {
+      var el = emptyDivs[i];
+      if (el._uxEmptyV2) continue;
+      var text = el.textContent;
+
+      // Diary empty state
+      if (text.indexOf('まだ日記がありません') !== -1 || text.indexOf('日記を書く') !== -1 && text.indexOf('まだ') !== -1) {
+        el._uxEmptyV2 = true;
+        enhanceEmptyDiv(el, {
+          icon: '✨',
+          title: 'はじめての日記を書こう',
+          subtitle: 'わんちゃんとの「今日」を残しておくと、\nきっと宝物になるよ',
+          action: '✏️ さっそく書いてみる',
+          gradient: 'linear-gradient(135deg,#FFF0F5,#FFE8EC)'
+        });
+      }
+      // Album empty state
+      else if (text.indexOf('写真を追加すると') !== -1) {
+        el._uxEmptyV2 = true;
+        enhanceEmptyDiv(el, {
+          icon: '📷',
+          title: 'まだ写真がないよ',
+          subtitle: 'お散歩のとき、ごはんのとき、\nお気に入りの表情をパシャリ！',
+          action: null,
+          gradient: 'linear-gradient(135deg,#F3E5F5,#EDE7F6)'
+        });
+      }
+      // Growth empty state
+      else if (text.indexOf('体重を記録') !== -1 && text.indexOf('まだ') !== -1) {
+        el._uxEmptyV2 = true;
+        enhanceEmptyDiv(el, {
+          icon: '🌱',
+          title: 'これからの成長が楽しみ！',
+          subtitle: '体重を記録すると、\n成長グラフが見られるようになるよ',
+          action: null,
+          gradient: 'linear-gradient(135deg,#E8F5E9,#F1F8E9)'
+        });
+      }
+    }
+  }
+
+  function enhanceEmptyDiv(el, config) {
+    // Restyle the empty state to be more inviting
+    el.style.cssText += 'background:' + config.gradient + ';border-radius:20px;padding:32px 24px;margin:12px;';
+
+    // Clear existing content and rebuild
+    while (el.firstChild) el.removeChild(el.firstChild);
+
+    var icon = document.createElement('div');
+    icon.style.cssText = 'font-size:48px;margin-bottom:12px;';
+    icon.textContent = config.icon;
+    var title = document.createElement('div');
+    title.style.cssText = 'font-size:16px;font-weight:900;color:#333;margin-bottom:8px;';
+    title.textContent = config.title;
+    var sub = document.createElement('div');
+    sub.style.cssText = 'font-size:13px;color:#999;line-height:1.7;white-space:pre-line;';
+    sub.textContent = config.subtitle;
+
+    el.appendChild(icon);
+    el.appendChild(title);
+    el.appendChild(sub);
+
+    if (config.action) {
+      var btn = document.createElement('div');
+      btn.style.cssText = 'margin-top:16px;display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#FF7B9C,#FF5A8A);color:#fff;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;min-height:44px;line-height:20px;';
+      btn.textContent = config.action;
+      btn.addEventListener('click', function() {
+        var root = document.getElementById('root');
+        var postBtn = root.querySelector('[style*="linear-gradient"][style*="border-radius"][style*="40"]');
+        if (postBtn) postBtn.click();
+      });
+      el.appendChild(btn);
+    }
+  }
+
+  // Hook into main observer: inject all engagement features
   var _origEnhanceAccessibility = enhanceAccessibility;
   enhanceAccessibility = function() {
     _origEnhanceAccessibility();
@@ -1640,16 +1977,21 @@ if('serviceWorker' in navigator){
     injectDailyPrompt();
     injectShareButton();
     injectAiFreeTier();
+    injectWeeklyDigest();
+    checkWeightMilestone();
+    enhanceEmptyStatesV2();
   };
 
   // Initial run after app loads
   setTimeout(function() {
     injectStreakUI();
     injectDailyPrompt();
-  }, 1000);
+    injectWeeklyDigest();
+    showWelcomeFlow();
+  }, 1500);
 
   /* ==============================
-     21. ONLINE RECOVERY CHECK
+     25. ONLINE RECOVERY CHECK
      ============================== */
   var wasOffline = !navigator.onLine;
   window.addEventListener('online', function() {
