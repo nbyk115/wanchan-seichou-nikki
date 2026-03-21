@@ -715,14 +715,6 @@ Error generating stack: `+n.message+`
   var backupMenu = document.createElement('div');
   backupMenu.className = 'ux-backup-menu';
 
-  var btnExport = document.createElement('button');
-  btnExport.textContent = '📤 バックアップ保存';
-  btnExport.addEventListener('click', function() { backupMenu.classList.remove('ux-show'); exportData(); });
-
-  var btnImport = document.createElement('button');
-  btnImport.textContent = '📥 バックアップ復元';
-  btnImport.addEventListener('click', function() { backupMenu.classList.remove('ux-show'); importData(); });
-
   var btnDark = document.createElement('button');
   btnDark.textContent = '🌙 ダークモード切替';
   btnDark.addEventListener('click', function() { backupMenu.classList.remove('ux-show'); window.__wanchan.toggleDarkMode(); });
@@ -768,8 +760,6 @@ Error generating stack: `+n.message+`
   }, 200);
 
   backupMenu.appendChild(btnAuth);
-  backupMenu.appendChild(btnExport);
-  backupMenu.appendChild(btnImport);
   backupMenu.appendChild(btnDark);
   document.body.appendChild(backupMenu);
 
