@@ -1,8 +1,10 @@
-const CACHE_NAME = 'wanchan-v8';
+const CACHE_NAME = 'wanchan-v9';
 const ASSETS = [
   '/wanchan-seichou-nikki/',
   '/wanchan-seichou-nikki/index.html',
   '/wanchan-seichou-nikki/firebase-config.js',
+  '/wanchan-seichou-nikki/analytics.js',
+  '/wanchan-seichou-nikki/ai-consultation.js',
   '/wanchan-seichou-nikki/icon-192.png',
   '/wanchan-seichou-nikki/icon-512.png',
   '/wanchan-seichou-nikki/og-image.png',

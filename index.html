@@ -21,6 +21,8 @@
 <link rel="apple-touch-icon" href="icon-192.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&family=Kosugi+Maru&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet"/>
 <script type="module" src="firebase-config.js"></script>
+<script type="module" src="analytics.js"></script>
+<script type="module" src="ai-consultation.js"></script>
 <!-- komoju-payment.js removed: premium features disabled -->
 <title>わんちゃん日記</title>
 <style>
@@ -786,7 +788,34 @@ Error generating stack: `+n.message+`
     }
   }, 200);
 
+  // AI健康相談ボタン
+  var btnAI = document.createElement('button');
+  btnAI.textContent = '🩺 AI健康相談';
+  btnAI.addEventListener('click', function() {
+    backupMenu.classList.remove('ux-show');
+    var _aiCheck = setInterval(function() {
+      var ai = window.__wanchan && window.__wanchan.ai;
+      if (ai && ai.showConsultation) {
+        clearInterval(_aiCheck);
+        ai.showConsultation();
+      }
+    }, 100);
+    // Timeout after 3s
+    setTimeout(function() { clearInterval(_aiCheck); }, 3000);
+  });
+
+  // 通知ボタン（足あと・コメント）
+  var btnNotif = document.createElement('button');
+  btnNotif.textContent = '🔔 お知らせ';
+  btnNotif.style.display = 'none';
+  btnNotif.addEventListener('click', function() {
+    backupMenu.classList.remove('ux-show');
+    showNotificationsPanel();
+  });
+
   backupMenu.appendChild(btnAuth);
+  backupMenu.appendChild(btnAI);
+  backupMenu.appendChild(btnNotif);
   backupMenu.appendChild(btnDark);
   document.body.appendChild(backupMenu);
 
@@ -954,6 +983,265 @@ Error generating stack: `+n.message+`
   setTimeout(renderDogSwitcher, 1000);
   // Re-check when data changes
   window.addEventListener('storage', function() { _dogProfileCache = null; _dogProfileCacheKey = ''; setTimeout(renderDogSwitcher, 500); });
+
+  /* ==============================
+     16. SNS SHARE (シェア機能)
+     ============================== */
+  function shareToSNS(platform, text, url) {
+    url = url || window.location.href;
+    text = text || 'わんちゃん成長日記で記録中！';
+    var shareUrl = '';
+    switch (platform) {
+      case 'x':
+        shareUrl = 'https://x.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(url);
+        break;
+      case 'line':
+        shareUrl = 'https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(text);
+        break;
+      case 'copy':
+        navigator.clipboard.writeText(url).then(function() {
+          showToast('リンクをコピーしました', 'success');
+        }).catch(function() {
+          showToast('コピーに失敗しました', 'error');
+        });
+        // Track
+        var a = window.__wanchan && window.__wanchan.analytics;
+        if (a && a.trackShare) a.trackShare('clipboard', 'link');
+        return;
+    }
+    if (shareUrl) {
+      window.open(shareUrl, '_blank', 'width=600,height=400');
+      var an = window.__wanchan && window.__wanchan.analytics;
+      if (an && an.trackShare) an.trackShare(platform, 'diary');
+    }
+  }
+
+  function showShareSheet(text, url) {
+    // Web Share API 対応ブラウザ
+    if (navigator.share) {
+      navigator.share({
+        title: 'わんちゃん成長日記',
+        text: text || 'うちの子の成長記録を見てね！',
+        url: url || window.location.href
+      }).catch(function() {});
+      return;
+    }
+
+    // フォールバック: シェアシート
+    var existing = document.getElementById('wanchan-share-sheet');
+    if (existing) existing.remove();
+
+    var isDark = document.body.classList.contains('ux-dark-on') ||
+      (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+    var overlay = document.createElement('div');
+    overlay.id = 'wanchan-share-sheet';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10001;display:flex;align-items:flex-end;justify-content:center;animation:ux-fade-in .2s ease;';
+
+    var sheet = document.createElement('div');
+    sheet.style.cssText = 'background:' + (isDark ? '#1e1e2e' : '#fff') + ';border-radius:20px 20px 0 0;max-width:500px;width:100%;padding:24px 20px env(safe-area-inset-bottom,20px);';
+
+    var html = '<div style="font-size:16px;font-weight:700;margin-bottom:16px;color:' + (isDark ? '#e0e0e0' : '#333') + ';">シェアする</div>';
+    html += '<div style="display:flex;gap:16px;justify-content:center;margin-bottom:20px;">';
+
+    var buttons = [
+      { id: 'share-x', icon: '𝕏', label: 'X', color: '#000' },
+      { id: 'share-line', icon: '💬', label: 'LINE', color: '#06C755' },
+      { id: 'share-copy', icon: '🔗', label: 'コピー', color: '#888' }
+    ];
+    buttons.forEach(function(b) {
+      html += '<div id="' + b.id + '" style="text-align:center;cursor:pointer;">';
+      html += '<div style="width:56px;height:56px;border-radius:50%;background:' + b.color + ';display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;margin:0 auto 6px;">' + b.icon + '</div>';
+      html += '<div style="font-size:11px;color:' + (isDark ? '#aaa' : '#888') + ';">' + b.label + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+    html += '<button id="share-cancel" style="width:100%;padding:14px;border:none;border-radius:14px;background:' + (isDark ? '#333' : '#f0f0f0') + ';color:' + (isDark ? '#ccc' : '#888') + ';font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">キャンセル</button>';
+
+    sheet.innerHTML = html;
+    overlay.appendChild(sheet);
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+    document.getElementById('share-cancel').addEventListener('click', function() { overlay.remove(); });
+    document.getElementById('share-x').addEventListener('click', function() { overlay.remove(); shareToSNS('x', text, url); });
+    document.getElementById('share-line').addEventListener('click', function() { overlay.remove(); shareToSNS('line', text, url); });
+    document.getElementById('share-copy').addEventListener('click', function() { overlay.remove(); shareToSNS('copy', text, url); });
+  }
+
+  window.__wanchan.shareToSNS = shareToSNS;
+  window.__wanchan.showShareSheet = showShareSheet;
+
+  /* ==============================
+     17. NOTIFICATIONS PANEL (お知らせ)
+     ============================== */
+  var _notifCache = { footprints: [], lastCheck: 0 };
+
+  function showNotificationsPanel() {
+    var existing = document.getElementById('wanchan-notif-panel');
+    if (existing) existing.remove();
+
+    var isDark = document.body.classList.contains('ux-dark-on') ||
+      (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+    var overlay = document.createElement('div');
+    overlay.id = 'wanchan-notif-panel';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10001;display:flex;align-items:flex-end;justify-content:center;animation:ux-fade-in .2s ease;';
+
+    var panel = document.createElement('div');
+    panel.style.cssText = 'background:' + (isDark ? '#1e1e2e' : '#fff') + ';border-radius:20px 20px 0 0;max-width:500px;width:100%;padding:24px 20px env(safe-area-inset-bottom,20px);max-height:70vh;overflow-y:auto;';
+
+    panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div style="font-size:18px;font-weight:900;color:' + (isDark ? '#e0e0e0' : '#333') + ';">🔔 お知らせ</div><div id="notif-close" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:' + (isDark ? '#333' : '#f0f0f0') + ';cursor:pointer;font-size:14px;">✕</div></div><div id="notif-content" style="text-align:center;padding:20px;"><div class="ux-spinner" style="width:24px;height:24px;border-width:2.5px;color:#FF7B9C;margin:0 auto;"></div></div>';
+
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+    document.getElementById('notif-close').addEventListener('click', function() { overlay.remove(); });
+
+    // 足あとを取得して表示
+    var fb = window.__wanchan && window.__wanchan.firebase;
+    if (fb && fb.isConfigured && fb.getFootprints) {
+      // onAuthでユーザーUIDを取得
+      fb.onAuth(function(user) {
+        if (!user) {
+          document.getElementById('notif-content').innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">ログインするとお知らせが届きます</div>';
+          return;
+        }
+        fb.getFootprints(user.uid, 20).then(function(footprints) {
+          var content = document.getElementById('notif-content');
+          if (!content) return;
+
+          if (footprints.length === 0) {
+            content.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;line-height:1.7;">まだお知らせはありません<br><span style="font-size:12px;">犬友ができると足あとが届きます</span></div>';
+            return;
+          }
+
+          var html = '';
+          var lastCheckTs = parseInt(localStorage.getItem('ux_notif_last_check') || '0', 10);
+
+          footprints.forEach(function(fp) {
+            var ts = fp.createdAt ? (fp.createdAt.seconds ? fp.createdAt.seconds * 1000 : fp.createdAt) : 0;
+            var isNew = ts > lastCheckTs;
+            var date = ts ? new Date(ts) : new Date();
+            var timeStr = date.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+            html += '<div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;margin-bottom:6px;background:' + (isNew ? (isDark ? '#2a2a3e' : '#FFF8F0') : 'transparent') + ';">';
+            if (fp.fromPhoto) {
+              html += '<img src="' + fp.fromPhoto + '" style="width:40px;height:40px;border-radius:50%;object-fit:cover;" alt="">';
+            } else {
+              html += '<div style="width:40px;height:40px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:20px;">🐾</div>';
+            }
+            html += '<div style="flex:1;">';
+            html += '<div style="font-size:14px;font-weight:' + (isNew ? '700' : '400') + ';color:' + (isDark ? '#e0e0e0' : '#333') + ';">' + (fp.fromName || '誰か') + 'が遊びに来ました</div>';
+            html += '<div style="font-size:12px;color:#888;">' + timeStr + '</div>';
+            html += '</div>';
+            if (isNew) {
+              html += '<div style="width:8px;height:8px;border-radius:50%;background:#FF7B9C;flex-shrink:0;"></div>';
+            }
+            html += '</div>';
+          });
+
+          content.innerHTML = html;
+          // Mark as checked
+          localStorage.setItem('ux_notif_last_check', String(Date.now()));
+          _updateNotifBadge(0);
+        }).catch(function() {
+          var content = document.getElementById('notif-content');
+          if (content) content.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">お知らせの取得に失敗しました</div>';
+        });
+
+        // Track
+        var an = window.__wanchan && window.__wanchan.analytics;
+        if (an && an.trackFootprintView) an.trackFootprintView();
+      });
+    } else {
+      document.getElementById('notif-content').innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">ログインするとお知らせが届きます</div>';
+    }
+  }
+
+  // Notification badge on settings button
+  function _updateNotifBadge(count) {
+    var badge = document.querySelector('.ux-notif-badge');
+    if (count > 0) {
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'ux-notif-badge';
+        badge.style.cssText = 'position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#EF4444;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;';
+        backupFab.style.position = 'relative';
+        backupFab.appendChild(badge);
+      }
+      badge.textContent = count > 9 ? '9+' : count;
+    } else if (badge) {
+      badge.remove();
+    }
+  }
+
+  // Check for new notifications periodically
+  function _checkNewNotifications() {
+    var fb = window.__wanchan && window.__wanchan.firebase;
+    if (!fb || !fb.isConfigured) return;
+
+    fb.onAuth(function(user) {
+      if (!user) return;
+      fb.getFootprints(user.uid, 10).then(function(footprints) {
+        var lastCheck = parseInt(localStorage.getItem('ux_notif_last_check') || '0', 10);
+        var newCount = 0;
+        footprints.forEach(function(fp) {
+          var ts = fp.createdAt ? (fp.createdAt.seconds ? fp.createdAt.seconds * 1000 : fp.createdAt) : 0;
+          if (ts > lastCheck) newCount++;
+        });
+        if (newCount > 0) {
+          _updateNotifBadge(newCount);
+          btnNotif.style.display = '';
+        }
+      }).catch(function() {});
+    });
+  }
+
+  // Show notification button for logged-in users & check for new notifications
+  var _notifTries = 0;
+  var _notifCheck = setInterval(function() {
+    _notifTries++;
+    var fb = window.__wanchan && window.__wanchan.firebase;
+    if (fb && fb.isConfigured) {
+      clearInterval(_notifCheck);
+      btnNotif.style.display = '';
+      _checkNewNotifications();
+      // Re-check every 2 minutes
+      setInterval(_checkNewNotifications, 120000);
+    } else if (_notifTries > 50) {
+      clearInterval(_notifCheck);
+    }
+  }, 200);
+
+  /* ==============================
+     18. SHARE CTA ON DIARY ENTRIES
+     ============================== */
+  // Observe DOM for diary entries and add share buttons
+  function addShareButtons() {
+    // Look for diary entry containers (typically have date + content)
+    var entries = document.querySelectorAll('#root [data-entry-id]:not([data-share-added])');
+    entries.forEach(function(entry) {
+      entry.setAttribute('data-share-added', '1');
+      var shareBtn = document.createElement('div');
+      shareBtn.style.cssText = 'display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:12px;background:transparent;cursor:pointer;font-size:12px;color:#888;margin-top:4px;';
+      shareBtn.textContent = '📤 シェア';
+      shareBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var text = 'わんちゃん成長日記で記録中！ #わんちゃん成長日記';
+        showShareSheet(text);
+      });
+      entry.appendChild(shareBtn);
+    });
+  }
+
+  // Add share buttons on DOM changes (via existing MutationObserver)
+  var _origRunAll = runAllEnhancements;
+  runAllEnhancements = function() {
+    _origRunAll();
+    addShareButtons();
+  };
 
   /* ==============================
      20. SW UPDATE NOTIFICATION
