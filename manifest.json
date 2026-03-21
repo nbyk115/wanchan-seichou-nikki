@@ -12,12 +12,28 @@
     {
       "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "日記を書く",
+      "short_name": "日記",
+      "url": "/wanchan-seichou-nikki/?action=diary",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "体重を記録",
+      "short_name": "体重",
+      "url": "/wanchan-seichou-nikki/?action=weight",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
     }
   ],
   "categories": ["lifestyle", "health"],
