@@ -21,7 +21,7 @@
 <link rel="apple-touch-icon" href="icon-192.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&family=Kosugi+Maru&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet"/>
 <script type="module" src="firebase-config.js"></script>
-<script src="komoju-payment.js" defer></script>
+<!-- komoju-payment.js removed: premium features disabled -->
 <title>わんちゃん日記</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -581,6 +581,15 @@ Error generating stack: `+n.message+`
     }
   }
   applyDarkMode();
+  // Enable all features (no premium paywall)
+  try {
+    var _wp = JSON.parse(localStorage.getItem('wp') || '{}');
+    if (!_wp.on) {
+      localStorage.setItem('wp', JSON.stringify({on: true, exp: "2099-12-31T00:00:00.000Z"}));
+    }
+  } catch(e) {
+    localStorage.setItem('wp', JSON.stringify({on: true, exp: "2099-12-31T00:00:00.000Z"}));
+  }
   // Sync React dark flag on page load
   try {
     var _mode = localStorage.getItem('ux_dark_mode') || 'auto';
@@ -758,21 +767,7 @@ Error generating stack: `+n.message+`
     }
   }, 200);
 
-  // Premium button
-  var btnPremium = document.createElement('button');
-  btnPremium.textContent = '✨ プレミアムプラン';
-  btnPremium.addEventListener('click', function() {
-    backupMenu.classList.remove('ux-show');
-    var payment = window.__wanchan && window.__wanchan.payment;
-    if (payment) {
-      payment.showPremiumModal();
-    } else {
-      showToast('決済機能を読み込み中…', 'info');
-    }
-  });
-
   backupMenu.appendChild(btnAuth);
-  backupMenu.appendChild(btnPremium);
   backupMenu.appendChild(btnExport);
   backupMenu.appendChild(btnImport);
   backupMenu.appendChild(btnDark);
