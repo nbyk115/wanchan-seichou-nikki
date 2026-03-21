@@ -130,86 +130,16 @@ body.ux-dark-on .ux-backup-menu{background:#2a2a3e;}
 body.ux-dark-on .ux-backup-menu button{color:#e0e0e0;}
 body.ux-dark-on .ux-backup-menu button:hover,body.ux-dark-on .ux-backup-menu button:focus{background:#3a3a4e;}
 
-/* Streak Counter */
-.ux-streak-badge{position:fixed;top:env(safe-area-inset-top,12px);right:12px;z-index:9997;display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;background:linear-gradient(135deg,#FF7B9C,#FF9A76);color:#fff;font-size:13px;font-weight:900;box-shadow:0 2px 12px rgba(255,123,156,.3);cursor:pointer;border:none;font-family:inherit;animation:ux-streak-pop .4s cubic-bezier(.175,.885,.32,1.275);}
-.ux-streak-badge .ux-streak-fire{font-size:16px;animation:ux-flame .8s ease-in-out infinite alternate;}
-@keyframes ux-streak-pop{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
-@keyframes ux-flame{from{transform:translateY(0) scale(1);}to{transform:translateY(-2px) scale(1.1);}}
-
-/* Share Card Modal */
-.ux-share-overlay{position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;pointer-events:none;padding:24px;}
-.ux-share-overlay.ux-show{opacity:1;pointer-events:auto;}
-.ux-share-card{width:100%;max-width:360px;background:linear-gradient(145deg,#FFF8F5,#FFE8EC);border-radius:24px;padding:32px 24px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2);transform:scale(.9);transition:transform .3s cubic-bezier(.175,.885,.32,1.275);}
-.ux-share-overlay.ux-show .ux-share-card{transform:scale(1);}
-.ux-share-card .ux-share-emoji{font-size:48px;margin-bottom:12px;}
-.ux-share-card .ux-share-title{font-size:20px;font-weight:900;color:#333;margin-bottom:8px;}
-.ux-share-card .ux-share-subtitle{font-size:14px;color:#888;line-height:1.6;margin-bottom:20px;}
-.ux-share-card .ux-share-stat{display:inline-flex;align-items:center;gap:6px;background:#fff;padding:8px 16px;border-radius:12px;font-size:15px;font-weight:700;color:#FF7B9C;margin:4px;}
-.ux-share-card .ux-share-actions{display:flex;gap:10px;margin-top:20px;}
-.ux-share-card .ux-share-actions button{flex:1;padding:12px;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
-.ux-share-card .ux-share-btn-primary{background:#FF7B9C;color:#fff;}
-.ux-share-card .ux-share-btn-secondary{background:#fff;color:#666;border:1px solid #eee !important;}
-body.ux-dark-on .ux-share-card{background:linear-gradient(145deg,#2a2a3e,#3a3050);}
-body.ux-dark-on .ux-share-card .ux-share-title{color:#e0e0e0;}
-body.ux-dark-on .ux-share-card .ux-share-stat{background:#1a1a2e;}
-
-/* Milestone Celebration */
-.ux-milestone-overlay{position:fixed;inset:0;z-index:10002;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);opacity:0;transition:opacity .4s;pointer-events:none;padding:24px;}
-.ux-milestone-overlay.ux-show{opacity:1;pointer-events:auto;}
-.ux-milestone-card{max-width:340px;width:100%;background:#fff;border-radius:28px;padding:40px 28px 32px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.25);transform:translateY(20px);transition:transform .5s cubic-bezier(.175,.885,.32,1.275);}
-.ux-milestone-overlay.ux-show .ux-milestone-card{transform:translateY(0);}
-.ux-milestone-card .ux-ms-emoji{font-size:56px;margin-bottom:16px;animation:ux-bounce 1s ease infinite;}
-.ux-milestone-card .ux-ms-title{font-size:22px;font-weight:900;color:#333;margin-bottom:8px;}
-.ux-milestone-card .ux-ms-msg{font-size:14px;color:#888;line-height:1.8;margin-bottom:24px;}
-.ux-milestone-card .ux-ms-close{background:#FF7B9C;color:#fff;border:none;padding:14px 40px;border-radius:16px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;}
-@keyframes ux-bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
-body.ux-dark-on .ux-milestone-card{background:#2a2a3e;}
-body.ux-dark-on .ux-milestone-card .ux-ms-title{color:#e0e0e0;}
-
 /* Onboarding */
 .ux-onboard-overlay{position:fixed;inset:0;z-index:10003;background:linear-gradient(180deg,#FFF8F5 0%,#FFE8EC 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;opacity:0;transition:opacity .5s;pointer-events:none;text-align:center;}
 .ux-onboard-overlay.ux-show{opacity:1;pointer-events:auto;}
-.ux-onboard-overlay .ux-ob-paw{font-size:72px;margin-bottom:24px;animation:ux-bounce 2s ease infinite;}
+.ux-onboard-overlay .ux-ob-paw{font-size:72px;margin-bottom:24px;}
 .ux-onboard-overlay .ux-ob-title{font-size:26px;font-weight:900;color:#333;margin-bottom:12px;line-height:1.4;}
 .ux-onboard-overlay .ux-ob-sub{font-size:15px;color:#888;line-height:1.8;margin-bottom:40px;max-width:300px;}
 .ux-onboard-overlay .ux-ob-start{background:#FF7B9C;color:#fff;border:none;padding:16px 48px;border-radius:18px;font-size:16px;font-weight:900;cursor:pointer;font-family:inherit;box-shadow:0 8px 24px rgba(255,123,156,.4);transition:transform .2s;}
 .ux-onboard-overlay .ux-ob-start:active{transform:scale(.96);}
 .ux-onboard-overlay .ux-ob-skip{margin-top:16px;background:none;border:none;color:#888;font-size:13px;cursor:pointer;font-family:inherit;min-height:44px;}
 
-
-/* Social Feature Preview (mixi-style, backend-ready) */
-.ux-social-teaser{position:fixed;bottom:0;left:0;right:0;z-index:10001;background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -8px 40px rgba(0,0,0,.12);max-height:85vh;overflow-y:auto;-webkit-overflow-scrolling:touch;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);padding:0 0 env(safe-area-inset-bottom,16px);}
-.ux-social-teaser.ux-show{transform:translateY(0);}
-.ux-social-teaser .ux-st-header{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 12px;position:sticky;top:0;background:#fff;border-radius:24px 24px 0 0;border-bottom:1px solid #f0f0f0;z-index:1;}
-.ux-social-teaser .ux-st-title{font-size:17px;font-weight:900;color:#333;}
-.ux-social-teaser .ux-st-close{background:none;border:none;font-size:20px;cursor:pointer;padding:10px 14px;min-width:44px;min-height:44px;color:#999;}
-.ux-st-section{padding:20px;}
-.ux-st-section+.ux-st-section{border-top:1px solid #f0f0f0;}
-.ux-st-section-title{font-size:15px;font-weight:900;color:#333;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
-.ux-st-section-desc{font-size:13px;color:#888;line-height:1.7;margin-bottom:16px;}
-.ux-st-features{display:flex;flex-direction:column;gap:12px;}
-.ux-st-feature{display:flex;align-items:center;gap:14px;padding:16px;border-radius:16px;background:#FAFAFA;border:1.5px solid #f0f0f0;}
-.ux-st-feature-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
-.ux-st-feature-icon.ux-pink{background:#FFF0F3;}
-.ux-st-feature-icon.ux-blue{background:#EDF5FF;}
-.ux-st-feature-icon.ux-green{background:#EDFFF4;}
-.ux-st-feature-icon.ux-purple{background:#F3EEFF;}
-.ux-st-feature-info{flex:1;min-width:0;}
-.ux-st-feature-name{font-size:14px;font-weight:700;color:#333;}
-.ux-st-feature-detail{font-size:12px;color:#888;margin-top:3px;line-height:1.5;}
-.ux-coming-badge{display:inline-block;padding:3px 10px;border-radius:8px;background:linear-gradient(135deg,#FF7B9C,#FF9A76);color:#fff;font-size:10px;font-weight:900;letter-spacing:.5px;vertical-align:middle;}
-.ux-st-notify-btn{width:100%;padding:16px;border:none;border-radius:16px;background:linear-gradient(135deg,#FF7B9C,#FF9A76);color:#fff;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;margin-top:20px;box-shadow:0 4px 16px rgba(255,123,156,.3);transition:transform .2s;}
-.ux-st-notify-btn:active{transform:scale(.97);}
-.ux-st-notify-btn.ux-notified{background:#E8E8E8;color:#888;box-shadow:none;}
-.ux-social-tab{position:fixed;bottom:90px;left:16px;z-index:9998;width:48px;height:48px;border-radius:50%;background:#fff;border:2px solid #FF7B9C;color:#FF7B9C;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;transition:transform .2s;font-family:inherit;}
-.ux-social-tab:active{transform:scale(.9);}
-body.ux-dark-on .ux-social-teaser{background:#2a2a3e;}
-body.ux-dark-on .ux-social-teaser .ux-st-header{background:#2a2a3e;border-color:#444;}
-body.ux-dark-on .ux-st-section{border-color:#3a3a4e;}
-body.ux-dark-on .ux-st-section-title{color:#e0e0e0;}
-body.ux-dark-on .ux-st-feature-name{color:#e0e0e0;}
-body.ux-dark-on .ux-st-feature{background:#1a1a2e;border-color:#3a3a4e;}
-body.ux-dark-on .ux-social-tab{background:#2a2a3e;border-color:#FF7B9C;}
 
 /* Multi-Dog Quick Switcher */
 .ux-dog-switcher{position:fixed;top:env(safe-area-inset-top,12px);left:12px;z-index:9997;display:flex;gap:6px;align-items:center;}
@@ -265,10 +195,8 @@ Error generating stack: `+n.message+`
 
   // Close any existing overlay before opening a new one
   function closeAllOverlays() {
-    ['.ux-share-overlay', '.ux-milestone-overlay', '.ux-onboard-overlay'].forEach(function(sel) {
-      var el = document.querySelector(sel);
-      if (el) { el.classList.remove('ux-show'); setTimeout(function() { el.remove(); }, 400); }
-    });
+    var el = document.querySelector('.ux-onboard-overlay');
+    if (el) { el.classList.remove('ux-show'); setTimeout(function() { el.remove(); }, 400); }
   }
 
   // Auto-focus first button in overlay after it opens
@@ -337,8 +265,9 @@ Error generating stack: `+n.message+`
     showToast(text, type);
   };
 
-  // Expose globally for React code
-  window.__uxToast = showToast;
+  // Single namespace for React integration
+  window.__wanchan = window.__wanchan || {};
+  window.__wanchan.showToast = showToast;
 
   /* ==============================
      2. ENHANCED DELETE CONFIRMATION
@@ -629,7 +558,7 @@ Error generating stack: `+n.message+`
   }
   applyDarkMode();
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyDarkMode);
-  window.__uxToggleDarkMode = function() {
+  window.__wanchan.toggleDarkMode = function() {
     var modes = ['auto', 'on', 'off'];
     var current = localStorage.getItem('ux_dark_mode') || 'auto';
     var next = modes[(modes.indexOf(current) + 1) % modes.length];
@@ -724,7 +653,7 @@ Error generating stack: `+n.message+`
 
   var btnDark = document.createElement('button');
   btnDark.textContent = '🌙 ダークモード切替';
-  btnDark.addEventListener('click', function() { backupMenu.classList.remove('ux-show'); window.__uxToggleDarkMode(); });
+  btnDark.addEventListener('click', function() { backupMenu.classList.remove('ux-show'); window.__wanchan.toggleDarkMode(); });
 
   backupMenu.appendChild(btnExport);
   backupMenu.appendChild(btnImport);
@@ -742,265 +671,19 @@ Error generating stack: `+n.message+`
     }
   });
 
-  /* ==============================
-     14. STREAK SYSTEM (佐藤裕介的リテンション設計)
-     ============================== */
-  function getStreakData() {
-    try {
-      return JSON.parse(localStorage.getItem('ux_streak') || '{}');
-    } catch(e) { return {}; }
-  }
-
-  function updateStreak() {
-    var data = getStreakData();
-    var today = new Date().toISOString().slice(0, 10);
-    var yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-
-    if (data.lastDate === today) return data; // already recorded today
-
-    if (data.lastDate === yesterday) {
-      data.current = (data.current || 0) + 1;
-    } else if (data.lastDate !== today) {
-      data.current = 1;
-    }
-    data.lastDate = today;
-    data.best = Math.max(data.best || 0, data.current);
-    data.totalDays = (data.totalDays || 0) + 1;
-    safeSetItem('ux_streak', JSON.stringify(data));
-    return data;
-  }
-
-  // Track diary writes by listening for save-like actions
-  function trackActivity() {
-    document.addEventListener('click', function(e) {
-      var btn = e.target.closest('button, [role="button"], [style*="cursor"]');
-      if (!btn) return;
-      var text = btn.textContent.trim();
-      if (text === '保存' || text === '記録する' || text === '送信' || text.indexOf('日記を書く') !== -1) {
-        var data = updateStreak();
-        renderStreakBadge(data);
-        checkMilestone(data);
-      }
-    }, true);
-  }
-
-  function renderStreakBadge(data) {
-    if (!data || !data.current) return;
-    var existing = document.querySelector('.ux-streak-badge');
-    if (existing) existing.remove();
-
-    var badge = document.createElement('button');
-    badge.className = 'ux-streak-badge';
-    badge.setAttribute('aria-label', data.current + '日連続記録中');
-
-    var fire = document.createElement('span');
-    fire.className = 'ux-streak-fire';
-    fire.textContent = data.current >= 7 ? '🔥' : data.current >= 3 ? '✨' : '🐾';
-
-    var text = document.createElement('span');
-    text.textContent = data.current + '日連続';
-
-    badge.appendChild(fire);
-    badge.appendChild(text);
-    badge.addEventListener('click', function() { showShareCard(data); });
-    document.body.appendChild(badge);
-  }
-
-  // Initialize streak badge on load
-  var streakData = getStreakData();
-  if (streakData.current) renderStreakBadge(streakData);
-  trackActivity();
 
   /* ==============================
-     15. SNS SHARE CARD (バイラルループ)
-     ============================== */
-  function showShareCard(streakData) {
-    closeAllOverlays();
-
-    var overlay = document.createElement('div');
-    overlay.className = 'ux-share-overlay';
-
-    // Count entries from localStorage
-    var entryCount = 0;
-    for (var i = 0; i < localStorage.length; i++) {
-      var key = localStorage.key(i);
-      if (key && (key.indexOf('diary') !== -1 || key.indexOf('entries') !== -1)) {
-        try {
-          var val = JSON.parse(localStorage.getItem(key));
-          if (Array.isArray(val)) entryCount += val.length;
-        } catch(e) {}
-      }
-    }
-
-    var card = document.createElement('div');
-    card.className = 'ux-share-card';
-
-    var emoji = document.createElement('div');
-    emoji.className = 'ux-share-emoji';
-    emoji.textContent = streakData.current >= 30 ? '🏆' : streakData.current >= 7 ? '🔥' : '🐾';
-
-    var title = document.createElement('div');
-    title.className = 'ux-share-title';
-    title.textContent = streakData.current + '日連続で記録中！';
-
-    var subtitle = document.createElement('div');
-    subtitle.className = 'ux-share-subtitle';
-    subtitle.textContent = 'うちの子の毎日を、もっと愛おしく。';
-
-    var stats = document.createElement('div');
-    var statStreak = document.createElement('span');
-    statStreak.className = 'ux-share-stat';
-    statStreak.textContent = '🔥 ' + streakData.current + '日連続';
-    var statBest = document.createElement('span');
-    statBest.className = 'ux-share-stat';
-    statBest.textContent = '👑 最高' + (streakData.best || streakData.current) + '日';
-    if (entryCount > 0) {
-      var statEntries = document.createElement('span');
-      statEntries.className = 'ux-share-stat';
-      statEntries.textContent = '📖 ' + entryCount + '件の記録';
-      stats.appendChild(statEntries);
-    }
-    stats.appendChild(statStreak);
-    stats.appendChild(statBest);
-
-    var actions = document.createElement('div');
-    actions.className = 'ux-share-actions';
-
-    var shareBtn = document.createElement('button');
-    shareBtn.className = 'ux-share-btn-primary';
-    shareBtn.textContent = '📤 シェアする';
-    shareBtn.addEventListener('click', function() {
-      var shareText = '🐾 わんちゃん成長日記で' + streakData.current + '日連続記録中！\nうちの子の毎日を、もっと愛おしく。\n#わんちゃん成長日記 #犬のいる暮らし';
-      if (navigator.share) {
-        navigator.share({
-          title: 'わんちゃん成長日記',
-          text: shareText,
-          url: 'https://nbyk115.github.io/wanchan-seichou-nikki/'
-        }).catch(function() {});
-      } else {
-        // Fallback: copy to clipboard
-        navigator.clipboard.writeText(shareText).then(function() {
-          showToast('クリップボードにコピーしました', 'success');
-        }).catch(function() {});
-      }
-      overlay.classList.remove('ux-show');
-      setTimeout(function() { overlay.remove(); }, 300);
-    });
-
-    var closeBtn = document.createElement('button');
-    closeBtn.className = 'ux-share-btn-secondary';
-    closeBtn.textContent = '閉じる';
-    closeBtn.addEventListener('click', function() {
-      overlay.classList.remove('ux-show');
-      setTimeout(function() { overlay.remove(); }, 300);
-    });
-
-    actions.appendChild(shareBtn);
-    actions.appendChild(closeBtn);
-
-    card.appendChild(emoji);
-    card.appendChild(title);
-    card.appendChild(subtitle);
-    card.appendChild(stats);
-    card.appendChild(actions);
-    overlay.appendChild(card);
-    document.body.appendChild(overlay);
-
-    // Click outside to close
-    function closeShare() {
-      overlay.classList.remove('ux-show');
-      setTimeout(function() { overlay.remove(); }, 300);
-    }
-    overlay.addEventListener('click', function(e) {
-      if (e.target === overlay) closeShare();
-    });
-    trapFocus(overlay, closeShare);
-    autoFocusOverlay(overlay);
-  }
-
-  /* ==============================
-     16. MILESTONE CELEBRATIONS (感情設計)
-     ============================== */
-  var MILESTONES = [
-    { days: 3, emoji: '🌱', title: '3日連続達成！', msg: '小さな一歩が、大きな宝物になる。\nこの調子で続けよう！' },
-    { days: 7, emoji: '🌟', title: '1週間連続！', msg: '毎日の記録が、\nかけがえのない思い出になっていく。' },
-    { days: 14, emoji: '💫', title: '2週間連続！', msg: 'すごい！もう立派な習慣。\nうちの子も喜んでるよ。' },
-    { days: 30, emoji: '🏆', title: '1ヶ月達成！', msg: '30日分の愛情が詰まった日記。\nあなたは最高の飼い主です。' },
-    { days: 50, emoji: '💎', title: '50日達成！', msg: '50日分の成長記録。\n振り返ると、どれだけ大きくなったか分かるね。' },
-    { days: 100, emoji: '👑', title: '100日達成！', msg: '100日の愛の記録。\nこの日記は、一生の宝物になる。' },
-    { days: 365, emoji: '🎊', title: '1年間続けました！', msg: '365日、毎日うちの子と向き合った証。\nあなたの愛情は本物です。' }
-  ];
-
-  function checkMilestone(data) {
-    if (!data || !data.current) return;
-    var shown = {};
-    try { shown = JSON.parse(localStorage.getItem('ux_milestones_shown') || '{}'); } catch(e) {}
-
-    for (var i = 0; i < MILESTONES.length; i++) {
-      var ms = MILESTONES[i];
-      if (data.current === ms.days && !shown[ms.days]) {
-        shown[ms.days] = true;
-        safeSetItem('ux_milestones_shown', JSON.stringify(shown));
-        setTimeout(function() { showMilestone(ms, data); }, 800);
-        return;
-      }
-    }
-  }
-
-  function showMilestone(ms, streakData) {
-    var overlay = document.createElement('div');
-    overlay.className = 'ux-milestone-overlay';
-
-    var card = document.createElement('div');
-    card.className = 'ux-milestone-card';
-
-    var emoji = document.createElement('div');
-    emoji.className = 'ux-ms-emoji';
-    emoji.textContent = ms.emoji;
-
-    var title = document.createElement('div');
-    title.className = 'ux-ms-title';
-    title.textContent = ms.title;
-
-    var msg = document.createElement('div');
-    msg.className = 'ux-ms-msg';
-    msg.textContent = ms.msg;
-
-    var close = document.createElement('button');
-    close.className = 'ux-ms-close';
-    close.textContent = 'ありがとう！';
-    close.addEventListener('click', function() {
-      overlay.classList.remove('ux-show');
-      setTimeout(function() { overlay.remove(); }, 400);
-      // Prompt share after milestone
-      if (streakData) {
-        setTimeout(function() { showShareCard(streakData); }, 500);
-      }
-    });
-
-    card.appendChild(emoji);
-    card.appendChild(title);
-    card.appendChild(msg);
-    card.appendChild(close);
-    overlay.appendChild(card);
-    document.body.appendChild(overlay);
-
-    function closeMilestone() {
-      overlay.classList.remove('ux-show');
-      setTimeout(function() { overlay.remove(); }, 400);
-    }
-    trapFocus(overlay, closeMilestone);
-    autoFocusOverlay(overlay);
-
-    // Haptic for celebration
-    triggerHaptic('heavy');
-  }
-
-  /* ==============================
-     17. EMOTIONAL ONBOARDING (初回体験)
+     14. ONBOARDING (初回体験)
      ============================== */
   function showOnboarding() {
     if (localStorage.getItem('ux_onboarded')) return;
+    // Skip if user already has app data (not a new user)
+    var hasData = false;
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (k && !k.startsWith('ux_')) { hasData = true; break; }
+    }
+    if (hasData) { safeSetItem('ux_onboarded', '1'); return; }
 
     var overlay = document.createElement('div');
     overlay.className = 'ux-onboard-overlay';
@@ -1045,247 +728,11 @@ Error generating stack: `+n.message+`
     autoFocusOverlay(overlay);
   }
 
-  // Show onboarding after app is loaded
+  // Show onboarding for genuinely new users only
   setTimeout(showOnboarding, 600);
 
   /* ==============================
-     18. ANNIVERSARY DETECTION
-     ============================== */
-  function checkAnniversary() {
-    try {
-      // Look for the earliest date in any stored data
-      var earliest = null;
-      for (var i = 0; i < localStorage.length; i++) {
-        var key = localStorage.key(i);
-        if (key && key.startsWith('ux_')) continue;
-        try {
-          var val = localStorage.getItem(key);
-          var dateMatch = val.match(/\d{4}-\d{2}-\d{2}/g);
-          if (dateMatch) {
-            for (var j = 0; j < dateMatch.length; j++) {
-              var d = new Date(dateMatch[j]);
-              if (d.getTime() && (!earliest || d < earliest)) {
-                earliest = d;
-              }
-            }
-          }
-        } catch(e) {}
-      }
-
-      if (!earliest) return;
-
-      var now = new Date();
-      var diffDays = Math.floor((now - earliest) / 86400000);
-      var today = now.toISOString().slice(0, 10);
-      var lastAnniv = localStorage.getItem('ux_last_anniversary');
-
-      // Check for round-number anniversaries
-      var anniversaries = [7, 30, 50, 100, 200, 365, 500, 730, 1000];
-      for (var k = 0; k < anniversaries.length; k++) {
-        if (diffDays === anniversaries[k] && lastAnniv !== today) {
-          safeSetItem('ux_last_anniversary', today);
-          var dayLabel = diffDays >= 365 ? Math.floor(diffDays / 365) + '年' : diffDays + '日';
-          showToast('🎉 わんちゃん日記を始めて' + dayLabel + '！おめでとう！', 'success');
-          return;
-        }
-      }
-    } catch(e) {}
-  }
-
-  setTimeout(checkAnniversary, 2000);
-
-  /* ==============================
-     19. SOCIAL API LAYER (mixi-style, backend-ready)
-     ============================== */
-  // Abstract data layer: swap localStorage → API when backend is ready
-  var SocialAPI = {
-    _backend: null, // Set to API base URL when backend is deployed
-
-    isReady: function() { return !!this._backend; },
-
-    // Footprints
-    getFootprints: function(cb) {
-      if (this._backend) {
-        return fetch(this._backend + '/footprints').then(function(r) { return r.json(); }).then(cb);
-      }
-      cb([]); // No local fake data
-    },
-    leaveFootprint: function(targetUserId, cb) {
-      if (this._backend) {
-        return fetch(this._backend + '/footprints', {
-          method: 'POST', headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({ target: targetUserId })
-        }).then(function(r) { return r.json(); }).then(cb);
-      }
-      cb(null);
-    },
-
-    // Friends
-    getFriends: function(cb) {
-      if (this._backend) {
-        return fetch(this._backend + '/friends').then(function(r) { return r.json(); }).then(cb);
-      }
-      cb([]);
-    },
-    sendFriendRequest: function(userId, cb) {
-      if (this._backend) {
-        return fetch(this._backend + '/friends/request', {
-          method: 'POST', headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({ target: userId })
-        }).then(function(r) { return r.json(); }).then(cb);
-      }
-      cb(null);
-    },
-
-    // Diary comments
-    getComments: function(entryId, cb) {
-      if (this._backend) {
-        return fetch(this._backend + '/entries/' + entryId + '/comments').then(function(r) { return r.json(); }).then(cb);
-      }
-      cb([]);
-    },
-    postComment: function(entryId, text, cb) {
-      if (this._backend) {
-        return fetch(this._backend + '/entries/' + entryId + '/comments', {
-          method: 'POST', headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({ text: text })
-        }).then(function(r) { return r.json(); }).then(cb);
-      }
-      cb(null);
-    },
-
-    // Reactions (real, not faked)
-    getReactions: function(entryId, cb) {
-      if (this._backend) {
-        return fetch(this._backend + '/entries/' + entryId + '/reactions').then(function(r) { return r.json(); }).then(cb);
-      }
-      cb({});
-    },
-    react: function(entryId, emoji, cb) {
-      if (this._backend) {
-        return fetch(this._backend + '/entries/' + entryId + '/reactions', {
-          method: 'POST', headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({ emoji: emoji })
-        }).then(function(r) { return r.json(); }).then(cb);
-      }
-      cb(null);
-    }
-  };
-
-  // Expose for React app integration
-  window.__socialAPI = SocialAPI;
-
-  /* ==============================
-     20. SOCIAL FEATURE PREVIEW (正直なティーザーUI)
-     ============================== */
-  var SOCIAL_FEATURES = [
-    { icon: '🐾', color: 'ux-pink', name: 'あしあと', detail: 'あなたの日記を見た犬友が分かる。mixiのように、そっと足跡を残せます。' },
-    { icon: '💬', color: 'ux-blue', name: '日記コメント', detail: 'フレンドの日記にコメントを残せる。うちの子自慢を共有しよう。' },
-    { icon: '🐶', color: 'ux-green', name: 'フレンド', detail: '犬友とつながる。お互いの成長日記を見守り合える関係。' },
-    { icon: '🏆', color: 'ux-purple', name: 'ランキング', detail: '記録継続日数ランキング。犬友と一緒に続ける習慣づくり。' }
-  ];
-
-  function showSocialTeaser() {
-    var existing = document.querySelector('.ux-social-teaser');
-    if (existing) { existing.classList.toggle('ux-show'); return; }
-
-    var panel = document.createElement('div');
-    panel.className = 'ux-social-teaser';
-
-    // Header
-    var header = document.createElement('div');
-    header.className = 'ux-st-header';
-    var title = document.createElement('div');
-    title.className = 'ux-st-title';
-    title.textContent = '🐾 犬友つながり';
-    var close = document.createElement('button');
-    close.className = 'ux-st-close';
-    close.textContent = '✕';
-    close.setAttribute('aria-label', '閉じる');
-    close.addEventListener('click', function() { panel.classList.remove('ux-show'); });
-    header.appendChild(title);
-    header.appendChild(close);
-    panel.appendChild(header);
-
-    // Intro section
-    var intro = document.createElement('div');
-    intro.className = 'ux-st-section';
-    var introTitle = document.createElement('div');
-    introTitle.className = 'ux-st-section-title';
-    var badge = document.createElement('span');
-    badge.className = 'ux-coming-badge';
-    badge.textContent = 'COMING SOON';
-    introTitle.textContent = 'mixi風ソーシャル機能 ';
-    introTitle.appendChild(badge);
-    var introDesc = document.createElement('div');
-    introDesc.className = 'ux-st-section-desc';
-    introDesc.textContent = 'うちの子の日記を、犬友と共有。足跡を残したり、コメントで応援し合ったり。わんちゃん同士のつながりが、飼い主のつながりに。';
-    intro.appendChild(introTitle);
-    intro.appendChild(introDesc);
-
-    // Feature cards
-    var features = document.createElement('div');
-    features.className = 'ux-st-features';
-    SOCIAL_FEATURES.forEach(function(f) {
-      var card = document.createElement('div');
-      card.className = 'ux-st-feature';
-
-      var icon = document.createElement('div');
-      icon.className = 'ux-st-feature-icon ' + f.color;
-      icon.textContent = f.icon;
-
-      var info = document.createElement('div');
-      info.className = 'ux-st-feature-info';
-      var name = document.createElement('div');
-      name.className = 'ux-st-feature-name';
-      name.textContent = f.name;
-      var detail = document.createElement('div');
-      detail.className = 'ux-st-feature-detail';
-      detail.textContent = f.detail;
-      info.appendChild(name);
-      info.appendChild(detail);
-
-      card.appendChild(icon);
-      card.appendChild(info);
-      features.appendChild(card);
-    });
-    intro.appendChild(features);
-
-    // Notify button
-    var alreadyNotified = localStorage.getItem('ux_social_notify');
-    var notifyBtn = document.createElement('button');
-    notifyBtn.className = 'ux-st-notify-btn' + (alreadyNotified ? ' ux-notified' : '');
-    notifyBtn.textContent = alreadyNotified ? '登録済み ✓ リリース時にお知らせします' : '🔔 リリース時にお知らせを受け取る';
-    notifyBtn.addEventListener('click', function() {
-      if (alreadyNotified) return;
-      safeSetItem('ux_social_notify', new Date().toISOString());
-      notifyBtn.classList.add('ux-notified');
-      notifyBtn.textContent = '登録済み ✓ リリース時にお知らせします';
-      showToast('リリース時にお知らせします！', 'success');
-      triggerHaptic('medium');
-      alreadyNotified = true;
-    });
-    intro.appendChild(notifyBtn);
-
-    panel.appendChild(intro);
-    document.body.appendChild(panel);
-
-    requestAnimationFrame(function() {
-      requestAnimationFrame(function() { panel.classList.add('ux-show'); });
-    });
-  }
-
-  // Social tab button (left side, opposite of settings FAB)
-  var socialTab = document.createElement('button');
-  socialTab.className = 'ux-social-tab';
-  socialTab.textContent = '🐾';
-  socialTab.setAttribute('aria-label', '犬友つながり');
-  socialTab.title = '犬友つながり';
-  socialTab.addEventListener('click', showSocialTeaser);
-  document.body.appendChild(socialTab);
-
-  /* ==============================
-     21. MULTI-DOG QUICK SWITCHER (多頭飼い対応)
+     15. MULTI-DOG QUICK SWITCHER (多頭飼い対応)
      ============================== */
   function getDogProfiles() {
     // Try to find dog data in localStorage
