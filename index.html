@@ -155,6 +155,11 @@ body.ux-dark-on #root>div{background:#1E1E1E !important;color:#F0F0F0 !important
 body.ux-dark-on input,body.ux-dark-on textarea,body.ux-dark-on select{background:#252525 !important;color:#F0F0F0 !important;border-color:#3a3a3a !important;}
 body.ux-dark-on h1,body.ux-dark-on h2,body.ux-dark-on h3{color:#F5F5F5 !important;}
 body.ux-dark-on a{color:#FF7B9C !important;}
+body.ux-dark-on [style*="background: rgb(236, 253, 245)"],body.ux-dark-on [style*="background:#ECFDF5"]{background:#1a2e1a !important;border-color:#2a4a2a !important;}
+body.ux-dark-on [style*="color: rgb(6, 95, 70)"],body.ux-dark-on [style*="color:#065F46"]{color:#6EE7B7 !important;}
+body.ux-dark-on [style*="color: rgb(239, 68, 68)"],body.ux-dark-on [style*="color:#EF4444"]{color:#FCA5A5 !important;}
+body.ux-dark-on [style*="background: rgb(239, 68, 68)"],body.ux-dark-on [style*="background:#EF4444"]{background:#991B1B !important;}
+body.ux-dark-on [style*="background: rgb(22, 163, 106)"],body.ux-dark-on [style*="background:#16A34A"]{background:#065F46 !important;}
 @media (prefers-color-scheme: dark) {
   body.ux-dark-auto{background:#121212 !important;color:#F0F0F0 !important;}
   body.ux-dark-auto #root{background:#121212 !important;color:#F0F0F0 !important;}
@@ -162,6 +167,11 @@ body.ux-dark-on a{color:#FF7B9C !important;}
   body.ux-dark-auto input,body.ux-dark-auto textarea,body.ux-dark-auto select{background:#252525 !important;color:#F0F0F0 !important;border-color:#3a3a3a !important;}
   body.ux-dark-auto h1,body.ux-dark-auto h2,body.ux-dark-auto h3{color:#F5F5F5 !important;}
   body.ux-dark-auto a{color:#FF7B9C !important;}
+  body.ux-dark-auto [style*="background: rgb(236, 253, 245)"],body.ux-dark-auto [style*="background:#ECFDF5"]{background:#1a2e1a !important;border-color:#2a4a2a !important;}
+  body.ux-dark-auto [style*="color: rgb(6, 95, 70)"],body.ux-dark-auto [style*="color:#065F46"]{color:#6EE7B7 !important;}
+  body.ux-dark-auto [style*="color: rgb(239, 68, 68)"],body.ux-dark-auto [style*="color:#EF4444"]{color:#FCA5A5 !important;}
+  body.ux-dark-auto [style*="background: rgb(239, 68, 68)"],body.ux-dark-auto [style*="background:#EF4444"]{background:#991B1B !important;}
+  body.ux-dark-auto [style*="background: rgb(22, 163, 106)"],body.ux-dark-auto [style*="background:#16A34A"]{background:#065F46 !important;}
 }
 
 </style>
@@ -571,13 +581,49 @@ Error generating stack: `+n.message+`
     }
   }
   applyDarkMode();
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyDarkMode);
+  // Sync React dark flag on page load
+  try {
+    var _mode = localStorage.getItem('ux_dark_mode') || 'auto';
+    var _shouldDark = _mode === 'on' || (_mode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    var _appState = JSON.parse(localStorage.getItem('wc2') || '{}');
+    if (!!_appState.dark !== _shouldDark) {
+      _appState.dark = _shouldDark ? 1 : 0;
+      localStorage.setItem('wc2', JSON.stringify(_appState));
+    }
+  } catch(e) {}
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+    applyDarkMode();
+    // Sync React dark flag when OS dark mode changes
+    try {
+      var m = localStorage.getItem('ux_dark_mode') || 'auto';
+      if (m === 'auto') {
+        var st = JSON.parse(localStorage.getItem('wc2') || '{}');
+        var d = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (!!st.dark !== d) {
+          st.dark = d ? 1 : 0;
+          localStorage.setItem('wc2', JSON.stringify(st));
+          window.location.reload();
+        }
+      }
+    } catch(e) {}
+  });
   window.__wanchan.toggleDarkMode = function() {
     var modes = ['auto', 'on', 'off'];
     var current = localStorage.getItem('ux_dark_mode') || 'auto';
     var next = modes[(modes.indexOf(current) + 1) % modes.length];
     safeSetItem('ux_dark_mode', next);
     applyDarkMode();
+    // Sync React app's dark flag with UX dark mode
+    try {
+      var appState = JSON.parse(localStorage.getItem('wc2') || '{}');
+      var shouldBeDark = next === 'on' || (next === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      if (!!appState.dark !== shouldBeDark) {
+        appState.dark = shouldBeDark ? 1 : 0;
+        safeSetItem('wc2', JSON.stringify(appState));
+        // Force React to pick up the change
+        window.location.reload();
+      }
+    } catch(e) {}
     var labels = {auto: 'ダークモード: 自動', on: 'ダークモード: ON', off: 'ダークモード: OFF'};
     showToast(labels[next], 'info');
   };
