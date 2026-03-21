@@ -177,6 +177,40 @@ body.ux-dark-on .ux-milestone-card .ux-ms-title{color:#e0e0e0;}
 .ux-onboard-overlay .ux-ob-skip{margin-top:16px;background:none;border:none;color:#888;font-size:13px;cursor:pointer;font-family:inherit;min-height:44px;}
 
 
+/* Social Feature Preview (mixi-style, backend-ready) */
+.ux-social-teaser{position:fixed;bottom:0;left:0;right:0;z-index:10001;background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -8px 40px rgba(0,0,0,.12);max-height:85vh;overflow-y:auto;-webkit-overflow-scrolling:touch;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);padding:0 0 env(safe-area-inset-bottom,16px);}
+.ux-social-teaser.ux-show{transform:translateY(0);}
+.ux-social-teaser .ux-st-header{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 12px;position:sticky;top:0;background:#fff;border-radius:24px 24px 0 0;border-bottom:1px solid #f0f0f0;z-index:1;}
+.ux-social-teaser .ux-st-title{font-size:17px;font-weight:900;color:#333;}
+.ux-social-teaser .ux-st-close{background:none;border:none;font-size:20px;cursor:pointer;padding:10px 14px;min-width:44px;min-height:44px;color:#999;}
+.ux-st-section{padding:20px;}
+.ux-st-section+.ux-st-section{border-top:1px solid #f0f0f0;}
+.ux-st-section-title{font-size:15px;font-weight:900;color:#333;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.ux-st-section-desc{font-size:13px;color:#888;line-height:1.7;margin-bottom:16px;}
+.ux-st-features{display:flex;flex-direction:column;gap:12px;}
+.ux-st-feature{display:flex;align-items:center;gap:14px;padding:16px;border-radius:16px;background:#FAFAFA;border:1.5px solid #f0f0f0;}
+.ux-st-feature-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.ux-st-feature-icon.ux-pink{background:#FFF0F3;}
+.ux-st-feature-icon.ux-blue{background:#EDF5FF;}
+.ux-st-feature-icon.ux-green{background:#EDFFF4;}
+.ux-st-feature-icon.ux-purple{background:#F3EEFF;}
+.ux-st-feature-info{flex:1;min-width:0;}
+.ux-st-feature-name{font-size:14px;font-weight:700;color:#333;}
+.ux-st-feature-detail{font-size:12px;color:#888;margin-top:3px;line-height:1.5;}
+.ux-coming-badge{display:inline-block;padding:3px 10px;border-radius:8px;background:linear-gradient(135deg,#FF7B9C,#FF9A76);color:#fff;font-size:10px;font-weight:900;letter-spacing:.5px;vertical-align:middle;}
+.ux-st-notify-btn{width:100%;padding:16px;border:none;border-radius:16px;background:linear-gradient(135deg,#FF7B9C,#FF9A76);color:#fff;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;margin-top:20px;box-shadow:0 4px 16px rgba(255,123,156,.3);transition:transform .2s;}
+.ux-st-notify-btn:active{transform:scale(.97);}
+.ux-st-notify-btn.ux-notified{background:#E8E8E8;color:#888;box-shadow:none;}
+.ux-social-tab{position:fixed;bottom:90px;left:16px;z-index:9998;width:48px;height:48px;border-radius:50%;background:#fff;border:2px solid #FF7B9C;color:#FF7B9C;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;transition:transform .2s;font-family:inherit;}
+.ux-social-tab:active{transform:scale(.9);}
+body.ux-dark-on .ux-social-teaser{background:#2a2a3e;}
+body.ux-dark-on .ux-social-teaser .ux-st-header{background:#2a2a3e;border-color:#444;}
+body.ux-dark-on .ux-st-section{border-color:#3a3a4e;}
+body.ux-dark-on .ux-st-section-title{color:#e0e0e0;}
+body.ux-dark-on .ux-st-feature-name{color:#e0e0e0;}
+body.ux-dark-on .ux-st-feature{background:#1a1a2e;border-color:#3a3a4e;}
+body.ux-dark-on .ux-social-tab{background:#2a2a3e;border-color:#FF7B9C;}
+
 /* Multi-Dog Quick Switcher */
 .ux-dog-switcher{position:fixed;top:env(safe-area-inset-top,12px);left:12px;z-index:9997;display:flex;gap:6px;align-items:center;}
 .ux-dog-chip{display:flex;align-items:center;gap:4px;padding:6px 12px;border-radius:20px;background:#fff;border:2px solid #eee;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.06);color:#666;}
@@ -1061,7 +1095,197 @@ Error generating stack: `+n.message+`
   setTimeout(checkAnniversary, 2000);
 
   /* ==============================
-     19. MULTI-DOG QUICK SWITCHER (多頭飼い対応)
+     19. SOCIAL API LAYER (mixi-style, backend-ready)
+     ============================== */
+  // Abstract data layer: swap localStorage → API when backend is ready
+  var SocialAPI = {
+    _backend: null, // Set to API base URL when backend is deployed
+
+    isReady: function() { return !!this._backend; },
+
+    // Footprints
+    getFootprints: function(cb) {
+      if (this._backend) {
+        return fetch(this._backend + '/footprints').then(function(r) { return r.json(); }).then(cb);
+      }
+      cb([]); // No local fake data
+    },
+    leaveFootprint: function(targetUserId, cb) {
+      if (this._backend) {
+        return fetch(this._backend + '/footprints', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ target: targetUserId })
+        }).then(function(r) { return r.json(); }).then(cb);
+      }
+      cb(null);
+    },
+
+    // Friends
+    getFriends: function(cb) {
+      if (this._backend) {
+        return fetch(this._backend + '/friends').then(function(r) { return r.json(); }).then(cb);
+      }
+      cb([]);
+    },
+    sendFriendRequest: function(userId, cb) {
+      if (this._backend) {
+        return fetch(this._backend + '/friends/request', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ target: userId })
+        }).then(function(r) { return r.json(); }).then(cb);
+      }
+      cb(null);
+    },
+
+    // Diary comments
+    getComments: function(entryId, cb) {
+      if (this._backend) {
+        return fetch(this._backend + '/entries/' + entryId + '/comments').then(function(r) { return r.json(); }).then(cb);
+      }
+      cb([]);
+    },
+    postComment: function(entryId, text, cb) {
+      if (this._backend) {
+        return fetch(this._backend + '/entries/' + entryId + '/comments', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ text: text })
+        }).then(function(r) { return r.json(); }).then(cb);
+      }
+      cb(null);
+    },
+
+    // Reactions (real, not faked)
+    getReactions: function(entryId, cb) {
+      if (this._backend) {
+        return fetch(this._backend + '/entries/' + entryId + '/reactions').then(function(r) { return r.json(); }).then(cb);
+      }
+      cb({});
+    },
+    react: function(entryId, emoji, cb) {
+      if (this._backend) {
+        return fetch(this._backend + '/entries/' + entryId + '/reactions', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ emoji: emoji })
+        }).then(function(r) { return r.json(); }).then(cb);
+      }
+      cb(null);
+    }
+  };
+
+  // Expose for React app integration
+  window.__socialAPI = SocialAPI;
+
+  /* ==============================
+     20. SOCIAL FEATURE PREVIEW (正直なティーザーUI)
+     ============================== */
+  var SOCIAL_FEATURES = [
+    { icon: '🐾', color: 'ux-pink', name: 'あしあと', detail: 'あなたの日記を見た犬友が分かる。mixiのように、そっと足跡を残せます。' },
+    { icon: '💬', color: 'ux-blue', name: '日記コメント', detail: 'フレンドの日記にコメントを残せる。うちの子自慢を共有しよう。' },
+    { icon: '🐶', color: 'ux-green', name: 'フレンド', detail: '犬友とつながる。お互いの成長日記を見守り合える関係。' },
+    { icon: '🏆', color: 'ux-purple', name: 'ランキング', detail: '記録継続日数ランキング。犬友と一緒に続ける習慣づくり。' }
+  ];
+
+  function showSocialTeaser() {
+    var existing = document.querySelector('.ux-social-teaser');
+    if (existing) { existing.classList.toggle('ux-show'); return; }
+
+    var panel = document.createElement('div');
+    panel.className = 'ux-social-teaser';
+
+    // Header
+    var header = document.createElement('div');
+    header.className = 'ux-st-header';
+    var title = document.createElement('div');
+    title.className = 'ux-st-title';
+    title.textContent = '🐾 犬友つながり';
+    var close = document.createElement('button');
+    close.className = 'ux-st-close';
+    close.textContent = '✕';
+    close.setAttribute('aria-label', '閉じる');
+    close.addEventListener('click', function() { panel.classList.remove('ux-show'); });
+    header.appendChild(title);
+    header.appendChild(close);
+    panel.appendChild(header);
+
+    // Intro section
+    var intro = document.createElement('div');
+    intro.className = 'ux-st-section';
+    var introTitle = document.createElement('div');
+    introTitle.className = 'ux-st-section-title';
+    var badge = document.createElement('span');
+    badge.className = 'ux-coming-badge';
+    badge.textContent = 'COMING SOON';
+    introTitle.textContent = 'mixi風ソーシャル機能 ';
+    introTitle.appendChild(badge);
+    var introDesc = document.createElement('div');
+    introDesc.className = 'ux-st-section-desc';
+    introDesc.textContent = 'うちの子の日記を、犬友と共有。足跡を残したり、コメントで応援し合ったり。わんちゃん同士のつながりが、飼い主のつながりに。';
+    intro.appendChild(introTitle);
+    intro.appendChild(introDesc);
+
+    // Feature cards
+    var features = document.createElement('div');
+    features.className = 'ux-st-features';
+    SOCIAL_FEATURES.forEach(function(f) {
+      var card = document.createElement('div');
+      card.className = 'ux-st-feature';
+
+      var icon = document.createElement('div');
+      icon.className = 'ux-st-feature-icon ' + f.color;
+      icon.textContent = f.icon;
+
+      var info = document.createElement('div');
+      info.className = 'ux-st-feature-info';
+      var name = document.createElement('div');
+      name.className = 'ux-st-feature-name';
+      name.textContent = f.name;
+      var detail = document.createElement('div');
+      detail.className = 'ux-st-feature-detail';
+      detail.textContent = f.detail;
+      info.appendChild(name);
+      info.appendChild(detail);
+
+      card.appendChild(icon);
+      card.appendChild(info);
+      features.appendChild(card);
+    });
+    intro.appendChild(features);
+
+    // Notify button
+    var alreadyNotified = localStorage.getItem('ux_social_notify');
+    var notifyBtn = document.createElement('button');
+    notifyBtn.className = 'ux-st-notify-btn' + (alreadyNotified ? ' ux-notified' : '');
+    notifyBtn.textContent = alreadyNotified ? '登録済み ✓ リリース時にお知らせします' : '🔔 リリース時にお知らせを受け取る';
+    notifyBtn.addEventListener('click', function() {
+      if (alreadyNotified) return;
+      safeSetItem('ux_social_notify', new Date().toISOString());
+      notifyBtn.classList.add('ux-notified');
+      notifyBtn.textContent = '登録済み ✓ リリース時にお知らせします';
+      showToast('リリース時にお知らせします！', 'success');
+      triggerHaptic('medium');
+      alreadyNotified = true;
+    });
+    intro.appendChild(notifyBtn);
+
+    panel.appendChild(intro);
+    document.body.appendChild(panel);
+
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() { panel.classList.add('ux-show'); });
+    });
+  }
+
+  // Social tab button (left side, opposite of settings FAB)
+  var socialTab = document.createElement('button');
+  socialTab.className = 'ux-social-tab';
+  socialTab.textContent = '🐾';
+  socialTab.setAttribute('aria-label', '犬友つながり');
+  socialTab.title = '犬友つながり';
+  socialTab.addEventListener('click', showSocialTeaser);
+  document.body.appendChild(socialTab);
+
+  /* ==============================
+     21. MULTI-DOG QUICK SWITCHER (多頭飼い対応)
      ============================== */
   function getDogProfiles() {
     // Try to find dog data in localStorage
