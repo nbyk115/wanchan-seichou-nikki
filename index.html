@@ -21,6 +21,7 @@
 <link rel="apple-touch-icon" href="icon-192.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&family=Kosugi+Maru&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet"/>
 <script type="module" src="firebase-config.js"></script>
+<script src="komoju-payment.js" defer></script>
 <title>わんちゃん日記</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -519,13 +520,15 @@ Error generating stack: `+n.message+`
   });
 
   // Start observing when root is ready
+  var _observeRetries = 0;
   function startObserving() {
     var root = document.getElementById('root');
     if (root) {
       observer.observe(root, { childList: true, subtree: true });
       // Initial run
       setTimeout(runAllEnhancements, 500);
-    } else {
+    } else if (_observeRetries < 100) {
+      _observeRetries++;
       setTimeout(startObserving, 100);
     }
   }
@@ -699,7 +702,21 @@ Error generating stack: `+n.message+`
     }
   }, 200);
 
+  // Premium button
+  var btnPremium = document.createElement('button');
+  btnPremium.textContent = '✨ プレミアムプラン';
+  btnPremium.addEventListener('click', function() {
+    backupMenu.classList.remove('ux-show');
+    var payment = window.__wanchan && window.__wanchan.payment;
+    if (payment) {
+      payment.showPremiumModal();
+    } else {
+      showToast('決済機能を読み込み中…', 'info');
+    }
+  });
+
   backupMenu.appendChild(btnAuth);
+  backupMenu.appendChild(btnPremium);
   backupMenu.appendChild(btnExport);
   backupMenu.appendChild(btnImport);
   backupMenu.appendChild(btnDark);
@@ -811,7 +828,7 @@ Error generating stack: `+n.message+`
             }
           });
         }
-      } catch(e) {}
+      } catch(e) { console.warn('getDogProfiles: skipped key', key, e); }
     }
     _dogProfileCache = dogs;
     _dogProfileCacheKey = cacheKey;
@@ -832,7 +849,7 @@ Error generating stack: `+n.message+`
 
     dogs.forEach(function(dog) {
       var chip = document.createElement('button');
-      chip.className = 'ux-dog-chip' + (dog.id == activeDogId ? ' ux-active' : '');
+      chip.className = 'ux-dog-chip' + (String(dog.id) === String(activeDogId) ? ' ux-active' : '');
 
       var emoji = document.createElement('span');
       emoji.className = 'ux-dc-emoji';
