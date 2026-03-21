@@ -12,7 +12,7 @@
 // CONFIG
 // ============================================================
 const KOMOJU_CONFIG = {
-  publishableKey: 'YOUR_PUBLISHABLE_KEY',
+  publishableKey: 'pk_test_2egwjzbogaqk3c42rl78guhi',
   // セッション作成用エンドポイント（自前サーバーまたは Cloud Functions）
   sessionEndpoint: '',
   plans: {
