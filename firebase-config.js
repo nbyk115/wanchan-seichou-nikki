@@ -78,8 +78,8 @@ function onAuth(cb) {
 // ============================================================
 let _lastSyncHash = '';
 
-async function syncToCloud(uid) {
-  if (!isConfigured || !uid) return;
+// Collect app data keys (exclude ux_ prefix which is UX-only state)
+function _getAppData() {
   const data = {};
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
@@ -87,6 +87,12 @@ async function syncToCloud(uid) {
       data[key] = localStorage.getItem(key);
     }
   }
+  return data;
+}
+
+async function syncToCloud(uid) {
+  if (!isConfigured || !uid) return;
+  const data = _getAppData();
   const json = JSON.stringify(data);
   // Skip sync if nothing changed
   if (json === _lastSyncHash) return;
@@ -95,19 +101,45 @@ async function syncToCloud(uid) {
     updatedAt: serverTimestamp()
   }, { merge: true });
   _lastSyncHash = json;
+  // Record successful sync time locally
+  try { localStorage.setItem('ux_last_sync_at', Date.now().toString()); } catch (_) {}
 }
 
 async function syncFromCloud(uid) {
   if (!isConfigured || !uid) return false;
   const snap = await getDoc(doc(db, 'userData', uid));
   if (!snap.exists()) return false;
-  const raw = snap.data().data;
+  const snapData = snap.data();
+  const raw = snapData.data;
   if (!raw) return false;
   try {
-    const data = JSON.parse(raw);
-    for (const key of Object.keys(data)) {
-      try { localStorage.setItem(key, data[key]); } catch (_) { /* quota */ }
+    const cloudData = JSON.parse(raw);
+
+    // Timestamp comparison: skip cloud pull if local is newer
+    const cloudUpdatedAt = snapData.updatedAt ? snapData.updatedAt.toMillis() : 0;
+    const localSyncAt = parseInt(localStorage.getItem('ux_last_sync_at') || '0', 10);
+    if (localSyncAt > cloudUpdatedAt && cloudUpdatedAt > 0) {
+      // Local data is newer than cloud — don't overwrite, let syncToCloud push later
+      return false;
     }
+
+    // Apply cloud data to localStorage
+    const cloudKeys = new Set(Object.keys(cloudData));
+    for (const key of cloudKeys) {
+      try { localStorage.setItem(key, cloudData[key]); } catch (_) { /* quota */ }
+    }
+
+    // Remove local app keys that no longer exist in cloud (handles deletions)
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      if (key && !key.startsWith('ux_') && !cloudKeys.has(key)) {
+        localStorage.removeItem(key);
+      }
+    }
+
+    // Update sync hash to match cloud state (prevents immediate re-upload)
+    _lastSyncHash = JSON.stringify(_getAppData());
+    try { localStorage.setItem('ux_last_sync_at', Date.now().toString()); } catch (_) {}
     return true;
   } catch (e) {
     console.warn('syncFromCloud parse error:', e);

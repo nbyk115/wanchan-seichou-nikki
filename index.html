@@ -618,6 +618,9 @@ Error generating stack: `+n.message+`
           var count = 0;
           for (var key in data) {
             if (data.hasOwnProperty(key)) {
+              // Skip ux_ keys (internal UX state) and validate value is string
+              if (key.startsWith('ux_')) continue;
+              if (typeof data[key] !== 'string') continue;
               safeSetItem(key, data[key]);
               count++;
             }
@@ -776,8 +779,18 @@ Error generating stack: `+n.message+`
   /* ==============================
      15. MULTI-DOG QUICK SWITCHER (多頭飼い対応)
      ============================== */
+  var _dogProfileCache = null;
+  var _dogProfileCacheKey = '';
+
   function getDogProfiles() {
-    // Try to find dog data in localStorage
+    // Build a cheap cache key from localStorage key count + total length
+    var cacheKey = localStorage.length + ':';
+    for (var j = 0; j < localStorage.length; j++) {
+      var k = localStorage.key(j);
+      if (k && !k.startsWith('ux_')) cacheKey += k + ',';
+    }
+    if (cacheKey === _dogProfileCacheKey && _dogProfileCache) return _dogProfileCache;
+
     var dogs = [];
     for (var i = 0; i < localStorage.length; i++) {
       var key = localStorage.key(i);
@@ -785,7 +798,6 @@ Error generating stack: `+n.message+`
       try {
         var val = localStorage.getItem(key);
         var parsed = JSON.parse(val);
-        // Detect dog profile arrays (arrays of objects with name property)
         if (Array.isArray(parsed)) {
           parsed.forEach(function(item) {
             if (item && typeof item === 'object' && item.name && (item.breed || item.birthday || item.weight !== undefined)) {
@@ -801,6 +813,8 @@ Error generating stack: `+n.message+`
         }
       } catch(e) {}
     }
+    _dogProfileCache = dogs;
+    _dogProfileCacheKey = cacheKey;
     return dogs;
   }
 
@@ -847,7 +861,7 @@ Error generating stack: `+n.message+`
   // Render switcher after React is loaded
   setTimeout(renderDogSwitcher, 1000);
   // Re-check when data changes
-  window.addEventListener('storage', function() { setTimeout(renderDogSwitcher, 500); });
+  window.addEventListener('storage', function() { _dogProfileCache = null; _dogProfileCacheKey = ''; setTimeout(renderDogSwitcher, 500); });
 
   /* ==============================
      20. SW UPDATE NOTIFICATION
