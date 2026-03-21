@@ -402,7 +402,7 @@ Error generating stack: `+n.message+`
   var pulseSpan = document.createElement('span');
   pulseSpan.className = 'ux-pulse';
   offlineBanner.appendChild(pulseSpan);
-  offlineBanner.appendChild(document.createTextNode(' オフラインです — データはローカルに保存されます'));
+  offlineBanner.appendChild(document.createTextNode(' インターネットに接続していません — 記録はスマートフォンに安全に保存されています'));
   document.body.appendChild(offlineBanner);
 
   function updateOnlineStatus() {
@@ -480,7 +480,7 @@ Error generating stack: `+n.message+`
           }
           ta.focus();
           hint.remove();
-          showToast('下書きを復元しました', 'success');
+          showToast('前に書いた内容が戻りました', 'success');
         }, {once: true});
         if (ta.parentNode) ta.parentNode.insertBefore(hint, ta.nextSibling);
       }
@@ -501,23 +501,27 @@ Error generating stack: `+n.message+`
   // Clear draft after successful form submission
   // Instead of guessing success, clear when the textarea is removed from DOM (page navigated away)
   // or when its value becomes empty after a save action
+  // Clear drafts after save: poll until textarea is gone/empty (max 5s, no premature deletion)
   document.addEventListener('click', function(e) {
     var btn = e.target.closest('[style*="cursor"]') || e.target;
     if (!btn) return;
     var text = btn.textContent.trim();
     if (text === '保存' || text === '記録する' || text === '送信') {
-      // Wait for React to potentially navigate away/clear the form
-      setTimeout(function() {
-        // Only clear drafts if the textarea is no longer in DOM or is now empty
+      var attempts = 0;
+      var checkInterval = setInterval(function() {
+        attempts++;
         var textareas = document.querySelectorAll('#root textarea');
         var hasNonEmpty = false;
         textareas.forEach(function(ta) { if (ta.value.trim()) hasNonEmpty = true; });
-        if (!hasNonEmpty || textareas.length === 0) {
-          Object.keys(localStorage).forEach(function(k) {
-            if (k.startsWith('ux_draft_')) localStorage.removeItem(k);
-          });
+        if (!hasNonEmpty || textareas.length === 0 || attempts >= 10) {
+          clearInterval(checkInterval);
+          if (!hasNonEmpty || textareas.length === 0) {
+            Object.keys(localStorage).forEach(function(k) {
+              if (k.startsWith('ux_draft_')) localStorage.removeItem(k);
+            });
+          }
         }
-      }, 1500);
+      }, 500);
     }
   });
 
@@ -623,7 +627,8 @@ Error generating stack: `+n.message+`
         if (!!st.dark !== d) {
           st.dark = d ? 1 : 0;
           localStorage.setItem('wc2', JSON.stringify(st));
-          window.location.reload();
+          window.dispatchEvent(new StorageEvent('storage', { key: 'wc2', newValue: JSON.stringify(st) }));
+          setTimeout(function() { window.location.reload(); }, 500);
         }
       }
     } catch(e) {}
@@ -641,11 +646,21 @@ Error generating stack: `+n.message+`
       if (!!appState.dark !== shouldBeDark) {
         appState.dark = shouldBeDark ? 1 : 0;
         safeSetItem('wc2', JSON.stringify(appState));
-        // Force React to pick up the change
-        window.location.reload();
+        // Notify React via storage event (no reload needed)
+        window.dispatchEvent(new StorageEvent('storage', { key: 'wc2', newValue: JSON.stringify(appState) }));
+        // Fallback: if React doesn't pick it up within 300ms, reload
+        setTimeout(function() {
+          var root = document.getElementById('root');
+          var bg = root ? window.getComputedStyle(root.firstElementChild || root).backgroundColor : '';
+          var isStillLight = bg.indexOf('255') > -1;
+          var isStillDark = bg.indexOf('30') > -1 || bg.indexOf('18') > -1;
+          if ((shouldBeDark && isStillLight) || (!shouldBeDark && isStillDark)) {
+            window.location.reload();
+          }
+        }, 300);
       }
     } catch(e) {}
-    var labels = {auto: 'ダークモード: 自動', on: 'ダークモード: ON', off: 'ダークモード: OFF'};
+    var labels = {auto: '画面の明るさ: デバイスに合わせる', on: '夜間モード: ON', off: '夜間モード: OFF'};
     showToast(labels[next], 'info');
   };
 
@@ -677,9 +692,9 @@ Error generating stack: `+n.message+`
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      showToast('バックアップを保存しました', 'success');
+      showToast('思い出をしっかり保存しました', 'success');
     } catch (e) {
-      showToast('バックアップの保存に失敗しました', 'error');
+      showToast('保存がうまくいきませんでした。もう一度試してみてね', 'error');
     }
   }
 
@@ -705,10 +720,10 @@ Error generating stack: `+n.message+`
               count++;
             }
           }
-          showToast(count + '件のデータを復元しました。再読み込みします…', 'success');
+          showToast(count + '件の思い出が戻りました。画面を更新しています…', 'success');
           setTimeout(function() { location.reload(); }, 1500);
         } catch (err) {
-          showToast('ファイルの読み込みに失敗しました', 'error');
+          showToast('復元がうまくいきませんでした。ファイルを確認してもう一度試してみてね', 'error');
         }
       };
       reader.readAsText(file);
@@ -728,7 +743,7 @@ Error generating stack: `+n.message+`
   backupMenu.className = 'ux-backup-menu';
 
   var btnDark = document.createElement('button');
-  btnDark.textContent = '🌙 ダークモード切替';
+  btnDark.textContent = '🌙 夜間モード切替';
   btnDark.addEventListener('click', function() { backupMenu.classList.remove('ux-show'); window.__wanchan.toggleDarkMode(); });
 
   // Login/logout button (appears when Firebase is configured)
@@ -742,7 +757,7 @@ Error generating stack: `+n.message+`
     var fb = window.__wanchan && window.__wanchan.firebase;
     if (!fb || !fb.isConfigured) return;
     if (_currentUser) {
-      fb.logout().then(function() { showToast('ログアウトしました', 'info'); });
+      fb.logout().then(function() { showToast('同期を停止しました', 'info'); });
     } else {
       fb.login();
     }
@@ -793,11 +808,18 @@ Error generating stack: `+n.message+`
   function showOnboarding() {
     if (localStorage.getItem('ux_onboarded')) return;
     // Skip if user already has app data (not a new user)
+    // Strict check: only consider actual app data keys (wc2, wp) as "existing user"
     var hasData = false;
-    for (var i = 0; i < localStorage.length; i++) {
-      var k = localStorage.key(i);
-      if (k && !k.startsWith('ux_')) { hasData = true; break; }
-    }
+    try {
+      var appData = localStorage.getItem('wc2');
+      if (appData) {
+        var parsed = JSON.parse(appData);
+        // Check for real user data: name set or diaries/weights exist
+        if (parsed.name || (parsed.diaries && parsed.diaries.length > 0) || (parsed.weights && parsed.weights.length > 0)) {
+          hasData = true;
+        }
+      }
+    } catch(e) {}
     if (hasData) { safeSetItem('ux_onboarded', '1'); return; }
 
     var overlay = document.createElement('div');
@@ -943,7 +965,7 @@ Error generating stack: `+n.message+`
         if (!newWorker) return;
         newWorker.addEventListener('statechange', function() {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            showToast('新しいバージョンがあります。再読み込みで更新されます', 'info');
+            showToast('新しい機能が追加されました！画面を更新すると使えるようになります', 'info');
           }
         });
       });
