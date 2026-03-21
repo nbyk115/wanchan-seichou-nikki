@@ -21,7 +21,7 @@ const AI_CONFIG = {
   // 無料枠: 月5回
   freeLimit: 5,
   // モデル指定（プロキシ側で使用）
-  model: 'claude-sonnet-4-20250514'
+  model: 'claude-sonnet-4-6-20250514'
 };
 
 // ============================================================
@@ -367,7 +367,16 @@ function showConsultationModal() {
           upgradeBtn.addEventListener('click', function() {
             overlay.remove();
             var payment = window.__wanchan && window.__wanchan.payment;
-            if (payment && payment.showPremiumModal) payment.showPremiumModal();
+            if (payment && payment.showPremiumModal) {
+              payment.showPremiumModal();
+            } else {
+              // Payment module not loaded — show friendly fallback
+              if (window.__wanchan && window.__wanchan.showToast) {
+                window.__wanchan.showToast('プレミアム機能は現在準備中です', 'info');
+              } else {
+                alert('プレミアム機能は現在準備中です');
+              }
+            }
           });
         }
       }

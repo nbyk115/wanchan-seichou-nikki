@@ -188,6 +188,77 @@ body.ux-dark-on [style*="background: rgb(22, 163, 106)"],body.ux-dark-on [style*
   body.ux-dark-auto [style*="background: rgb(22, 163, 106)"],body.ux-dark-auto [style*="background:#16A34A"]{background:#065F46 !important;}
 }
 
+/* Growth Summary Card */
+.ux-growth-card{position:relative;margin:16px;border-radius:20px;background:linear-gradient(135deg,#FFF8F5 0%,#FFE8EC 50%,#E8F4FD 100%);padding:24px 20px;box-shadow:0 4px 20px rgba(255,123,156,.15);overflow:hidden;}
+.ux-growth-card::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:rgba(255,123,156,.1);}
+.ux-growth-card-title{font-size:16px;font-weight:900;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.ux-growth-card-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;}
+.ux-growth-stat{text-align:center;padding:12px 8px;border-radius:14px;background:rgba(255,255,255,.7);}
+.ux-growth-stat-value{font-size:24px;font-weight:900;color:#FF7B9C;}
+.ux-growth-stat-label{font-size:11px;color:#888;margin-top:4px;}
+.ux-growth-card-milestone{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.8);font-size:13px;font-weight:600;}
+.ux-growth-share{margin-top:12px;text-align:center;}
+.ux-growth-share button{padding:10px 24px;border-radius:14px;border:none;background:#FF7B9C;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(255,123,156,.3);}
+body.ux-dark-on .ux-growth-card{background:linear-gradient(135deg,#1a1a2e 0%,#2a1a2e 50%,#1a2a3e 100%);}
+body.ux-dark-on .ux-growth-stat{background:rgba(255,255,255,.08);}
+body.ux-dark-on .ux-growth-card-milestone{background:rgba(255,255,255,.06);}
+@media (prefers-color-scheme:dark){
+  body.ux-dark-auto .ux-growth-card{background:linear-gradient(135deg,#1a1a2e 0%,#2a1a2e 50%,#1a2a3e 100%);}
+  body.ux-dark-auto .ux-growth-stat{background:rgba(255,255,255,.08);}
+  body.ux-dark-auto .ux-growth-card-milestone{background:rgba(255,255,255,.06);}
+}
+
+/* Anniversary Reminder */
+.ux-anniversary-banner{position:fixed;top:env(safe-area-inset-top,12px);left:50%;transform:translateX(-50%);z-index:9999;max-width:380px;width:calc(100% - 32px);padding:16px 20px;border-radius:18px;background:linear-gradient(135deg,#FFD700,#FFA500);color:#fff;box-shadow:0 8px 24px rgba(255,165,0,.35);animation:ux-toast-in .35s cubic-bezier(.175,.885,.32,1.275);display:flex;align-items:center;gap:12px;cursor:pointer;}
+.ux-anniversary-banner .ux-anniv-icon{font-size:28px;flex-shrink:0;}
+.ux-anniversary-banner .ux-anniv-text{flex:1;font-size:14px;font-weight:700;line-height:1.5;}
+.ux-anniversary-banner .ux-anniv-close{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;border:none;color:#fff;cursor:pointer;font-family:inherit;}
+
+/* Breed Growth Curve */
+.ux-breed-curve-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10001;display:flex;align-items:center;justify-content:center;animation:ux-fade-in .2s ease;padding:16px;}
+.ux-breed-curve-panel{background:#fff;border-radius:20px;max-width:500px;width:100%;padding:24px 20px;max-height:85vh;overflow-y:auto;}
+.ux-breed-curve-chart{position:relative;width:100%;height:200px;border-radius:12px;background:#f8f8f8;margin:16px 0;overflow:hidden;}
+.ux-breed-curve-bar{position:absolute;bottom:0;border-radius:6px 6px 0 0;transition:height .3s ease;}
+.ux-breed-curve-label{font-size:10px;text-align:center;color:#888;margin-top:4px;}
+.ux-breed-curve-legend{display:flex;gap:16px;justify-content:center;margin-top:12px;font-size:12px;}
+.ux-breed-curve-legend span{display:flex;align-items:center;gap:4px;}
+.ux-breed-curve-legend .dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
+body.ux-dark-on .ux-breed-curve-panel{background:#1e1e2e;color:#e0e0e0;}
+body.ux-dark-on .ux-breed-curve-chart{background:#252535;}
+@media (prefers-color-scheme:dark){
+  body.ux-dark-auto .ux-breed-curve-panel{background:#1e1e2e;color:#e0e0e0;}
+  body.ux-dark-auto .ux-breed-curve-chart{background:#252535;}
+}
+
+/* Symptom Checker */
+.ux-symptom-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0;}
+.ux-symptom-chip{padding:10px 8px;border-radius:12px;border:2px solid #eee;background:#fff;text-align:center;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;}
+.ux-symptom-chip.ux-selected{border-color:#FF7B9C;background:#FFF0F3;color:#FF7B9C;}
+body.ux-dark-on .ux-symptom-chip{background:#2a2a3e;border-color:#444;color:#ccc;}
+body.ux-dark-on .ux-symptom-chip.ux-selected{border-color:#FF7B9C;background:#3a2a3e;color:#FF7B9C;}
+@media (prefers-color-scheme:dark){
+  body.ux-dark-auto .ux-symptom-chip{background:#2a2a3e;border-color:#444;color:#ccc;}
+  body.ux-dark-auto .ux-symptom-chip.ux-selected{border-color:#FF7B9C;background:#3a2a3e;color:#FF7B9C;}
+}
+
+/* PWA Install Banner */
+.ux-pwa-banner{position:fixed;bottom:0;left:0;right:0;z-index:9999;padding:16px 20px env(safe-area-inset-bottom,16px);background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -4px 24px rgba(0,0,0,.1);animation:ux-slide-up .3s ease;display:flex;align-items:center;gap:14px;}
+.ux-pwa-banner-icon{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#FF7B9C,#FF9B6A);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.ux-pwa-banner-text{flex:1;}
+.ux-pwa-banner-title{font-size:14px;font-weight:900;margin-bottom:2px;}
+.ux-pwa-banner-sub{font-size:12px;color:#888;}
+.ux-pwa-banner-actions{display:flex;gap:8px;flex-shrink:0;}
+.ux-pwa-banner-actions button{padding:10px 16px;border-radius:12px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+.ux-pwa-install-btn{background:#FF7B9C;color:#fff;}
+.ux-pwa-dismiss-btn{background:#f0f0f0;color:#888;}
+@keyframes ux-slide-up{from{transform:translateY(100%);}to{transform:translateY(0);}}
+body.ux-dark-on .ux-pwa-banner{background:#1e1e2e;}
+body.ux-dark-on .ux-pwa-dismiss-btn{background:#333;color:#aaa;}
+@media (prefers-color-scheme:dark){
+  body.ux-dark-auto .ux-pwa-banner{background:#1e1e2e;}
+  body.ux-dark-auto .ux-pwa-dismiss-btn{background:#333;color:#aaa;}
+}
+
 </style>
   <script type="module">(function(){const z=document.createElement("link").relList;if(z&&z.supports&&z.supports("modulepreload"))return;for(const S of document.querySelectorAll('link[rel="modulepreload"]'))o(S);new MutationObserver(S=>{for(const M of S)if(M.type==="childList")for(const q of M.addedNodes)q.tagName==="LINK"&&q.rel==="modulepreload"&&o(q)}).observe(document,{childList:!0,subtree:!0});function r(S){const M={};return S.integrity&&(M.integrity=S.integrity),S.referrerPolicy&&(M.referrerPolicy=S.referrerPolicy),S.crossOrigin==="use-credentials"?M.credentials="include":S.crossOrigin==="anonymous"?M.credentials="omit":M.credentials="same-origin",M}function o(S){if(S.ep)return;S.ep=!0;const M=r(S);fetch(S.href,M)}})();function c0(s){return s&&s.__esModule&&Object.prototype.hasOwnProperty.call(s,"default")?s.default:s}var hf={exports:{}},Aa={};var Tr;function f0(){if(Tr)return Aa;Tr=1;var s=Symbol.for("react.transitional.element"),z=Symbol.for("react.fragment");function r(o,S,M){var q=null;if(M!==void 0&&(q=""+M),S.key!==void 0&&(q=""+S.key),"key"in S){M={};for(var _ in S)_!=="key"&&(M[_]=S[_])}else M=S;return S=M.ref,{$$typeof:s,type:o,key:q,ref:S!==void 0?S:null,props:M}}return Aa.Fragment=z,Aa.jsx=r,Aa.jsxs=r,Aa}var Er;function s0(){return Er||(Er=1,hf.exports=f0()),hf.exports}var u=s0(),gf={exports:{}},tt={};var Ar;function o0(){if(Ar)return tt;Ar=1;var s=Symbol.for("react.transitional.element"),z=Symbol.for("react.portal"),r=Symbol.for("react.fragment"),o=Symbol.for("react.strict_mode"),S=Symbol.for("react.profiler"),M=Symbol.for("react.consumer"),q=Symbol.for("react.context"),_=Symbol.for("react.forward_ref"),x=Symbol.for("react.suspense"),y=Symbol.for("react.memo"),A=Symbol.for("react.lazy"),E=Symbol.for("react.activity"),b=Symbol.iterator;function Q(g){return g===null||typeof g!="object"?null:(g=b&&g[b]||g["@@iterator"],typeof g=="function"?g:null)}var G={isMounted:function(){return!1},enqueueForceUpdate:function(){},enqueueReplaceState:function(){},enqueueSetState:function(){}},U=Object.assign,X={};function Y(g,B,Z){this.props=g,this.context=B,this.refs=X,this.updater=Z||G}Y.prototype.isReactComponent={},Y.prototype.setState=function(g,B){if(typeof g!="object"&&typeof g!="function"&&g!=null)throw Error("takes an object of state variables to update or a function which returns an object of state variables.");this.updater.enqueueSetState(this,g,B,"setState")},Y.prototype.forceUpdate=function(g){this.updater.enqueueForceUpdate(this,g,"forceUpdate")};function J(){}J.prototype=Y.prototype;function lt(g,B,Z){this.props=g,this.context=B,this.refs=X,this.updater=Z||G}var gt=lt.prototype=new J;gt.constructor=lt,U(gt,Y.prototype),gt.isPureReactComponent=!0;var Dt=Array.isArray;function yt(){}var F={H:null,A:null,T:null,S:null},k=Object.prototype.hasOwnProperty;function N(g,B,Z){var V=Z.ref;return{$$typeof:s,type:g,key:B,ref:V!==void 0?V:null,props:Z}}function P(g,B){return N(g.type,B,g.props)}function it(g){return typeof g=="object"&&g!==null&&g.$$typeof===s}function ht(g){var B={"=":"=0",":":"=2"};return"$"+g.replace(/[=:]/g,function(Z){return B[Z]})}var xl=/\/+/g;function fl(g,B){return typeof g=="object"&&g!==null&&g.key!=null?ht(""+g.key):B.toString(36)}function Gt(g){switch(g.status){case"fulfilled":return g.value;case"rejected":throw g.reason;default:switch(typeof g.status=="string"?g.then(yt,yt):(g.status="pending",g.then(function(B){g.status==="pending"&&(g.status="fulfilled",g.value=B)},function(B){g.status==="pending"&&(g.status="rejected",g.reason=B)})),g.status){case"fulfilled":return g.value;case"rejected":throw g.reason}}throw g}function C(g,B,Z,V,et){var ct=typeof g;(ct==="undefined"||ct==="boolean")&&(g=null);var xt=!1;if(g===null)xt=!0;else switch(ct){case"bigint":case"string":case"number":xt=!0;break;case"object":switch(g.$$typeof){case s:case z:xt=!0;break;case A:return xt=g._init,C(xt(g._payload),B,Z,V,et)}}if(xt)return et=et(g),xt=V===""?"."+fl(g,0):V,Dt(et)?(Z="",xt!=null&&(Z=xt.replace(xl,"$&/")+"/"),C(et,B,Z,"",function(Bn){return Bn})):et!=null&&(it(et)&&(et=P(et,Z+(et.key==null||g&&g.key===et.key?"":(""+et.key).replace(xl,"$&/")+"/")+xt)),B.push(et)),1;xt=0;var $t=V===""?".":V+":";if(Dt(g))for(var Bt=0;Bt<g.length;Bt++)V=g[Bt],ct=$t+fl(V,Bt),xt+=C(V,B,Z,ct,et);else if(Bt=Q(g),typeof Bt=="function")for(g=Bt.call(g),Bt=0;!(V=g.next()).done;)V=V.value,ct=$t+fl(V,Bt++),xt+=C(V,B,Z,ct,et);else if(ct==="object"){if(typeof g.then=="function")return C(Gt(g),B,Z,V,et);throw B=String(g),Error("Objects are not valid as a React child (found: "+(B==="[object Object]"?"object with keys {"+Object.keys(g).join(", ")+"}":B)+"). If you meant to render a collection of children, use an array instead.")}return xt}function H(g,B,Z){if(g==null)return g;var V=[],et=0;return C(g,V,"","",function(ct){return B.call(Z,ct,et++)}),V}function w(g){if(g._status===-1){var B=g._result;B=B(),B.then(function(Z){(g._status===0||g._status===-1)&&(g._status=1,g._result=Z)},function(Z){(g._status===0||g._status===-1)&&(g._status=2,g._result=Z)}),g._status===-1&&(g._status=0,g._result=B)}if(g._status===1)return g._result.default;throw g._result}var ut=typeof reportError=="function"?reportError:function(g){if(typeof window=="object"&&typeof window.ErrorEvent=="function"){var B=new window.ErrorEvent("error",{bubbles:!0,cancelable:!0,message:typeof g=="object"&&g!==null&&typeof g.message=="string"?String(g.message):String(g),error:g});if(!window.dispatchEvent(B))return}else if(typeof process=="object"&&typeof process.emit=="function"){process.emit("uncaughtException",g);return}console.error(g)},bt={map:H,forEach:function(g,B,Z){H(g,function(){B.apply(this,arguments)},Z)},count:function(g){var B=0;return H(g,function(){B++}),B},toArray:function(g){return H(g,function(B){return B})||[]},only:function(g){if(!it(g))throw Error("React.Children.only expected to receive a single React element child.");return g}};return tt.Activity=E,tt.Children=bt,tt.Component=Y,tt.Fragment=r,tt.Profiler=S,tt.PureComponent=lt,tt.StrictMode=o,tt.Suspense=x,tt.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE=F,tt.__COMPILER_RUNTIME={__proto__:null,c:function(g){return F.H.useMemoCache(g)}},tt.cache=function(g){return function(){return g.apply(null,arguments)}},tt.cacheSignal=function(){return null},tt.cloneElement=function(g,B,Z){if(g==null)throw Error("The argument must be a React element, but you passed "+g+".");var V=U({},g.props),et=g.key;if(B!=null)for(ct in B.key!==void 0&&(et=""+B.key),B)!k.call(B,ct)||ct==="key"||ct==="__self"||ct==="__source"||ct==="ref"&&B.ref===void 0||(V[ct]=B[ct]);var ct=arguments.length-2;if(ct===1)V.children=Z;else if(1<ct){for(var xt=Array(ct),$t=0;$t<ct;$t++)xt[$t]=arguments[$t+2];V.children=xt}return N(g.type,et,V)},tt.createContext=function(g){return g={$$typeof:q,_currentValue:g,_currentValue2:g,_threadCount:0,Provider:null,Consumer:null},g.Provider=g,g.Consumer={$$typeof:M,_context:g},g},tt.createElement=function(g,B,Z){var V,et={},ct=null;if(B!=null)for(V in B.key!==void 0&&(ct=""+B.key),B)k.call(B,V)&&V!=="key"&&V!=="__self"&&V!=="__source"&&(et[V]=B[V]);var xt=arguments.length-2;if(xt===1)et.children=Z;else if(1<xt){for(var $t=Array(xt),Bt=0;Bt<xt;Bt++)$t[Bt]=arguments[Bt+2];et.children=$t}if(g&&g.defaultProps)for(V in xt=g.defaultProps,xt)et[V]===void 0&&(et[V]=xt[V]);return N(g,ct,et)},tt.createRef=function(){return{current:null}},tt.forwardRef=function(g){return{$$typeof:_,render:g}},tt.isValidElement=it,tt.lazy=function(g){return{$$typeof:A,_payload:{_status:-1,_result:g},_init:w}},tt.memo=function(g,B){return{$$typeof:y,type:g,compare:B===void 0?null:B}},tt.startTransition=function(g){var B=F.T,Z={};F.T=Z;try{var V=g(),et=F.S;et!==null&&et(Z,V),typeof V=="object"&&V!==null&&typeof V.then=="function"&&V.then(yt,ut)}catch(ct){ut(ct)}finally{B!==null&&Z.types!==null&&(B.types=Z.types),F.T=B}},tt.unstable_useCacheRefresh=function(){return F.H.useCacheRefresh()},tt.use=function(g){return F.H.use(g)},tt.useActionState=function(g,B,Z){return F.H.useActionState(g,B,Z)},tt.useCallback=function(g,B){return F.H.useCallback(g,B)},tt.useContext=function(g){return F.H.useContext(g)},tt.useDebugValue=function(){},tt.useDeferredValue=function(g,B){return F.H.useDeferredValue(g,B)},tt.useEffect=function(g,B){return F.H.useEffect(g,B)},tt.useEffectEvent=function(g){return F.H.useEffectEvent(g)},tt.useId=function(){return F.H.useId()},tt.useImperativeHandle=function(g,B,Z){return F.H.useImperativeHandle(g,B,Z)},tt.useInsertionEffect=function(g,B){return F.H.useInsertionEffect(g,B)},tt.useLayoutEffect=function(g,B){return F.H.useLayoutEffect(g,B)},tt.useMemo=function(g,B){return F.H.useMemo(g,B)},tt.useOptimistic=function(g,B){return F.H.useOptimistic(g,B)},tt.useReducer=function(g,B,Z){return F.H.useReducer(g,B,Z)},tt.useRef=function(g){return F.H.useRef(g)},tt.useState=function(g){return F.H.useState(g)},tt.useSyncExternalStore=function(g,B,Z){return F.H.useSyncExternalStore(g,B,Z)},tt.useTransition=function(){return F.H.useTransition()},tt.version="19.2.4",tt}var Dr;function Sf(){return Dr||(Dr=1,gf.exports=o0()),gf.exports}var W=Sf(),yf={exports:{}},Da={},mf={exports:{}},pf={};var Cr;function d0(){return Cr||(Cr=1,(function(s){function z(C,H){var w=C.length;C.push(H);t:for(;0<w;){var ut=w-1>>>1,bt=C[ut];if(0<S(bt,H))C[ut]=H,C[w]=bt,w=ut;else break t}}function r(C){return C.length===0?null:C[0]}function o(C){if(C.length===0)return null;var H=C[0],w=C.pop();if(w!==H){C[0]=w;t:for(var ut=0,bt=C.length,g=bt>>>1;ut<g;){var B=2*(ut+1)-1,Z=C[B],V=B+1,et=C[V];if(0>S(Z,w))V<bt&&0>S(et,Z)?(C[ut]=et,C[V]=w,ut=V):(C[ut]=Z,C[B]=w,ut=B);else if(V<bt&&0>S(et,w))C[ut]=et,C[V]=w,ut=V;else break t}}return H}function S(C,H){var w=C.sortIndex-H.sortIndex;return w!==0?w:C.id-H.id}if(s.unstable_now=void 0,typeof performance=="object"&&typeof performance.now=="function"){var M=performance;s.unstable_now=function(){return M.now()}}else{var q=Date,_=q.now();s.unstable_now=function(){return q.now()-_}}var x=[],y=[],A=1,E=null,b=3,Q=!1,G=!1,U=!1,X=!1,Y=typeof setTimeout=="function"?setTimeout:null,J=typeof clearTimeout=="function"?clearTimeout:null,lt=typeof setImmediate<"u"?setImmediate:null;function gt(C){for(var H=r(y);H!==null;){if(H.callback===null)o(y);else if(H.startTime<=C)o(y),H.sortIndex=H.expirationTime,z(x,H);else break;H=r(y)}}function Dt(C){if(U=!1,gt(C),!G)if(r(x)!==null)G=!0,yt||(yt=!0,ht());else{var H=r(y);H!==null&&Gt(Dt,H.startTime-C)}}var yt=!1,F=-1,k=5,N=-1;function P(){return X?!0:!(s.unstable_now()-N<k)}function it(){if(X=!1,yt){var C=s.unstable_now();N=C;var H=!0;try{t:{G=!1,U&&(U=!1,J(F),F=-1),Q=!0;var w=b;try{l:{for(gt(C),E=r(x);E!==null&&!(E.expirationTime>C&&P());){var ut=E.callback;if(typeof ut=="function"){E.callback=null,b=E.priorityLevel;var bt=ut(E.expirationTime<=C);if(C=s.unstable_now(),typeof bt=="function"){E.callback=bt,gt(C),H=!0;break l}E===r(x)&&o(x),gt(C)}else o(x);E=r(x)}if(E!==null)H=!0;else{var g=r(y);g!==null&&Gt(Dt,g.startTime-C),H=!1}}break t}finally{E=null,b=w,Q=!1}H=void 0}}finally{H?ht():yt=!1}}}var ht;if(typeof lt=="function")ht=function(){lt(it)};else if(typeof MessageChannel<"u"){var xl=new MessageChannel,fl=xl.port2;xl.port1.onmessage=it,ht=function(){fl.postMessage(null)}}else ht=function(){Y(it,0)};function Gt(C,H){F=Y(function(){C(s.unstable_now())},H)}s.unstable_IdlePriority=5,s.unstable_ImmediatePriority=1,s.unstable_LowPriority=4,s.unstable_NormalPriority=3,s.unstable_Profiling=null,s.unstable_UserBlockingPriority=2,s.unstable_cancelCallback=function(C){C.callback=null},s.unstable_forceFrameRate=function(C){0>C||125<C?console.error("forceFrameRate takes a positive int between 0 and 125, forcing frame rates higher than 125 fps is not supported"):k=0<C?Math.floor(1e3/C):5},s.unstable_getCurrentPriorityLevel=function(){return b},s.unstable_next=function(C){switch(b){case 1:case 2:case 3:var H=3;break;default:H=b}var w=b;b=H;try{return C()}finally{b=w}},s.unstable_requestPaint=function(){X=!0},s.unstable_runWithPriority=function(C,H){switch(C){case 1:case 2:case 3:case 4:case 5:break;default:C=3}var w=b;b=C;try{return H()}finally{b=w}},s.unstable_scheduleCallback=function(C,H,w){var ut=s.unstable_now();switch(typeof w=="object"&&w!==null?(w=w.delay,w=typeof w=="number"&&0<w?ut+w:ut):w=ut,C){case 1:var bt=-1;break;case 2:bt=250;break;case 5:bt=1073741823;break;case 4:bt=1e4;break;default:bt=5e3}return bt=w+bt,C={id:A++,callback:H,priorityLevel:C,startTime:w,expirationTime:bt,sortIndex:-1},w>ut?(C.sortIndex=w,z(y,C),r(x)===null&&C===r(y)&&(U?(J(F),F=-1):U=!0,Gt(Dt,w-ut))):(C.sortIndex=bt,z(x,C),G||Q||(G=!0,yt||(yt=!0,ht()))),C},s.unstable_shouldYield=P,s.unstable_wrapCallback=function(C){var H=b;return function(){var w=b;b=H;try{return C.apply(this,arguments)}finally{b=w}}}})(pf)),pf}var Mr;function r0(){return Mr||(Mr=1,mf.exports=d0()),mf.exports}var vf={exports:{}},Ft={};var Or;function h0(){if(Or)return Ft;Or=1;var s=Sf();function z(x){var y="https://react.dev/errors/"+x;if(1<arguments.length){y+="?args[]="+encodeURIComponent(arguments[1]);for(var A=2;A<arguments.length;A++)y+="&args[]="+encodeURIComponent(arguments[A])}return"Minified React error #"+x+"; visit "+y+" for the full message or use the non-minified dev environment for full errors and additional helpful warnings."}function r(){}var o={d:{f:r,r:function(){throw Error(z(522))},D:r,C:r,L:r,m:r,X:r,S:r,M:r},p:0,findDOMNode:null},S=Symbol.for("react.portal");function M(x,y,A){var E=3<arguments.length&&arguments[3]!==void 0?arguments[3]:null;return{$$typeof:S,key:E==null?null:""+E,children:x,containerInfo:y,implementation:A}}var q=s.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE;function _(x,y){if(x==="font")return"";if(typeof y=="string")return y==="use-credentials"?y:""}return Ft.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE=o,Ft.createPortal=function(x,y){var A=2<arguments.length&&arguments[2]!==void 0?arguments[2]:null;if(!y||y.nodeType!==1&&y.nodeType!==9&&y.nodeType!==11)throw Error(z(299));return M(x,y,null,A)},Ft.flushSync=function(x){var y=q.T,A=o.p;try{if(q.T=null,o.p=2,x)return x()}finally{q.T=y,o.p=A,o.d.f()}},Ft.preconnect=function(x,y){typeof x=="string"&&(y?(y=y.crossOrigin,y=typeof y=="string"?y==="use-credentials"?y:"":void 0):y=null,o.d.C(x,y))},Ft.prefetchDNS=function(x){typeof x=="string"&&o.d.D(x)},Ft.preinit=function(x,y){if(typeof x=="string"&&y&&typeof y.as=="string"){var A=y.as,E=_(A,y.crossOrigin),b=typeof y.integrity=="string"?y.integrity:void 0,Q=typeof y.fetchPriority=="string"?y.fetchPriority:void 0;A==="style"?o.d.S(x,typeof y.precedence=="string"?y.precedence:void 0,{crossOrigin:E,integrity:b,fetchPriority:Q}):A==="script"&&o.d.X(x,{crossOrigin:E,integrity:b,fetchPriority:Q,nonce:typeof y.nonce=="string"?y.nonce:void 0})}},Ft.preinitModule=function(x,y){if(typeof x=="string")if(typeof y=="object"&&y!==null){if(y.as==null||y.as==="script"){var A=_(y.as,y.crossOrigin);o.d.M(x,{crossOrigin:A,integrity:typeof y.integrity=="string"?y.integrity:void 0,nonce:typeof y.nonce=="string"?y.nonce:void 0})}}else y==null&&o.d.M(x)},Ft.preload=function(x,y){if(typeof x=="string"&&typeof y=="object"&&y!==null&&typeof y.as=="string"){var A=y.as,E=_(A,y.crossOrigin);o.d.L(x,A,{crossOrigin:E,integrity:typeof y.integrity=="string"?y.integrity:void 0,nonce:typeof y.nonce=="string"?y.nonce:void 0,type:typeof y.type=="string"?y.type:void 0,fetchPriority:typeof y.fetchPriority=="string"?y.fetchPriority:void 0,referrerPolicy:typeof y.referrerPolicy=="string"?y.referrerPolicy:void 0,imageSrcSet:typeof y.imageSrcSet=="string"?y.imageSrcSet:void 0,imageSizes:typeof y.imageSizes=="string"?y.imageSizes:void 0,media:typeof y.media=="string"?y.media:void 0})}},Ft.preloadModule=function(x,y){if(typeof x=="string")if(y){var A=_(y.as,y.crossOrigin);o.d.m(x,{as:typeof y.as=="string"&&y.as!=="script"?y.as:void 0,crossOrigin:A,integrity:typeof y.integrity=="string"?y.integrity:void 0})}else o.d.m(x)},Ft.requestFormReset=function(x){o.d.r(x)},Ft.unstable_batchedUpdates=function(x,y){return x(y)},Ft.useFormState=function(x,y,A){return q.H.useFormState(x,y,A)},Ft.useFormStatus=function(){return q.H.useHostTransitionStatus()},Ft.version="19.2.4",Ft}var Rr;function g0(){if(Rr)return vf.exports;Rr=1;function s(){if(!(typeof __REACT_DEVTOOLS_GLOBAL_HOOK__>"u"||typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE!="function"))try{__REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE(s)}catch(z){console.error(z)}}return s(),vf.exports=h0(),vf.exports}var _r;function y0(){if(_r)return Da;_r=1;var s=r0(),z=Sf(),r=g0();function o(t){var l="https://react.dev/errors/"+t;if(1<arguments.length){l+="?args[]="+encodeURIComponent(arguments[1]);for(var e=2;e<arguments.length;e++)l+="&args[]="+encodeURIComponent(arguments[e])}return"Minified React error #"+t+"; visit "+l+" for the full message or use the non-minified dev environment for full errors and additional helpful warnings."}function S(t){return!(!t||t.nodeType!==1&&t.nodeType!==9&&t.nodeType!==11)}function M(t){var l=t,e=t;if(t.alternate)for(;l.return;)l=l.return;else{t=l;do l=t,(l.flags&4098)!==0&&(e=l.return),t=l.return;while(t)}return l.tag===3?e:null}function q(t){if(t.tag===13){var l=t.memoizedState;if(l===null&&(t=t.alternate,t!==null&&(l=t.memoizedState)),l!==null)return l.dehydrated}return null}function _(t){if(t.tag===31){var l=t.memoizedState;if(l===null&&(t=t.alternate,t!==null&&(l=t.memoizedState)),l!==null)return l.dehydrated}return null}function x(t){if(M(t)!==t)throw Error(o(188))}function y(t){var l=t.alternate;if(!l){if(l=M(t),l===null)throw Error(o(188));return l!==t?null:t}for(var e=t,n=l;;){var a=e.return;if(a===null)break;var i=a.alternate;if(i===null){if(n=a.return,n!==null){e=n;continue}break}if(a.child===i.child){for(i=a.child;i;){if(i===e)return x(a),t;if(i===n)return x(a),l;i=i.sibling}throw Error(o(188))}if(e.return!==n.return)e=a,n=i;else{for(var c=!1,f=a.child;f;){if(f===e){c=!0,e=a,n=i;break}if(f===n){c=!0,n=a,e=i;break}f=f.sibling}if(!c){for(f=i.child;f;){if(f===e){c=!0,e=i,n=a;break}if(f===n){c=!0,n=i,e=a;break}f=f.sibling}if(!c)throw Error(o(189))}}if(e.alternate!==n)throw Error(o(190))}if(e.tag!==3)throw Error(o(188));return e.stateNode.current===e?t:l}function A(t){var l=t.tag;if(l===5||l===26||l===27||l===6)return t;for(t=t.child;t!==null;){if(l=A(t),l!==null)return l;t=t.sibling}return null}var E=Object.assign,b=Symbol.for("react.element"),Q=Symbol.for("react.transitional.element"),G=Symbol.for("react.portal"),U=Symbol.for("react.fragment"),X=Symbol.for("react.strict_mode"),Y=Symbol.for("react.profiler"),J=Symbol.for("react.consumer"),lt=Symbol.for("react.context"),gt=Symbol.for("react.forward_ref"),Dt=Symbol.for("react.suspense"),yt=Symbol.for("react.suspense_list"),F=Symbol.for("react.memo"),k=Symbol.for("react.lazy"),N=Symbol.for("react.activity"),P=Symbol.for("react.memo_cache_sentinel"),it=Symbol.iterator;function ht(t){return t===null||typeof t!="object"?null:(t=it&&t[it]||t["@@iterator"],typeof t=="function"?t:null)}var xl=Symbol.for("react.client.reference");function fl(t){if(t==null)return null;if(typeof t=="function")return t.$$typeof===xl?null:t.displayName||t.name||null;if(typeof t=="string")return t;switch(t){case U:return"Fragment";case Y:return"Profiler";case X:return"StrictMode";case Dt:return"Suspense";case yt:return"SuspenseList";case N:return"Activity"}if(typeof t=="object")switch(t.$$typeof){case G:return"Portal";case lt:return t.displayName||"Context";case J:return(t._context.displayName||"Context")+".Consumer";case gt:var l=t.render;return t=t.displayName,t||(t=l.displayName||l.name||"",t=t!==""?"ForwardRef("+t+")":"ForwardRef"),t;case F:return l=t.displayName||null,l!==null?l:fl(t.type)||"Memo";case k:l=t._payload,t=t._init;try{return fl(t(l))}catch{}}return null}var Gt=Array.isArray,C=z.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE,H=r.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE,w={pending:!1,data:null,method:null,action:null},ut=[],bt=-1;function g(t){return{current:t}}function B(t){0>bt||(t.current=ut[bt],ut[bt]=null,bt--)}function Z(t,l){bt++,ut[bt]=t.current,t.current=l}var V=g(null),et=g(null),ct=g(null),xt=g(null);function $t(t,l){switch(Z(ct,l),Z(et,t),Z(V,null),l.nodeType){case 9:case 11:t=(t=l.documentElement)&&(t=t.namespaceURI)?Kd(t):0;break;default:if(t=l.tagName,l=l.namespaceURI)l=Kd(l),t=Jd(l,t);else switch(t){case"svg":t=1;break;case"math":t=2;break;default:t=0}}B(V),Z(V,t)}function Bt(){B(V),B(et),B(ct)}function Bn(t){t.memoizedState!==null&&Z(xt,t);var l=V.current,e=Jd(l,t.type);l!==e&&(Z(et,t),Z(V,e))}function Ma(t){et.current===t&&(B(V),B(et)),xt.current===t&&(B(xt),ja._currentValue=w)}var Ji,jf;function Ce(t){if(Ji===void 0)try{throw Error()}catch(e){var l=e.stack.trim().match(/\n( *(at )?)/);Ji=l&&l[1]||"",jf=-1<e.stack.indexOf(`
     at`)?" (<anonymous>)":-1<e.stack.indexOf("@")?"@unknown:0:0":""}return`
@@ -783,7 +854,7 @@ Error generating stack: `+n.message+`
       clearInterval(_fbCheck);
       btnAuth.style.display = '';
       fb.onAuth(updateAuthButton);
-    } else if (_fbTries > 50) {
+    } else if (_fbTries > 150) {
       clearInterval(_fbCheck);
     }
   }, 200);
@@ -1071,6 +1142,7 @@ Error generating stack: `+n.message+`
 
   window.__wanchan.shareToSNS = shareToSNS;
   window.__wanchan.showShareSheet = showShareSheet;
+  window.__wanchan.showToast = showToast;
 
   /* ==============================
      17. NOTIFICATIONS PANEL (お知らせ)
@@ -1105,7 +1177,8 @@ Error generating stack: `+n.message+`
       // onAuthでユーザーUIDを取得
       fb.onAuth(function(user) {
         if (!user) {
-          document.getElementById('notif-content').innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">ログインするとお知らせが届きます</div>';
+          var nc = document.getElementById('notif-content');
+          if (nc) nc.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">ログインするとお知らせが届きます</div>';
           return;
         }
         fb.getFootprints(user.uid, 20).then(function(footprints) {
@@ -1156,7 +1229,8 @@ Error generating stack: `+n.message+`
         if (an && an.trackFootprintView) an.trackFootprintView();
       });
     } else {
-      document.getElementById('notif-content').innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">ログインするとお知らせが届きます</div>';
+      var ncFb = document.getElementById('notif-content');
+      if (ncFb) ncFb.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">ログインするとお知らせが届きます</div>';
     }
   }
 
@@ -1210,7 +1284,7 @@ Error generating stack: `+n.message+`
       _checkNewNotifications();
       // Re-check every 2 minutes
       setInterval(_checkNewNotifications, 120000);
-    } else if (_notifTries > 50) {
+    } else if (_notifTries > 150) {
       clearInterval(_notifCheck);
     }
   }, 200);
@@ -1244,7 +1318,549 @@ Error generating stack: `+n.message+`
   };
 
   /* ==============================
-     20. SW UPDATE NOTIFICATION
+     20. GROWTH SUMMARY CARD (成長まとめカード) - Feature A
+     ============================== */
+  function getGrowthData() {
+    try {
+      var data = JSON.parse(localStorage.getItem('wc2') || '{}');
+      var diaries = data.diaries || [];
+      var weights = data.weights || [];
+      var name = data.name || 'わんちゃん';
+      var birthday = data.birthday || '';
+      var breed = data.breed || '';
+
+      // Calculate age
+      var ageText = '';
+      var ageDays = 0;
+      if (birthday) {
+        var bDate = new Date(birthday);
+        var now = new Date();
+        ageDays = Math.floor((now - bDate) / (1000 * 60 * 60 * 24));
+        var years = Math.floor(ageDays / 365);
+        var months = Math.floor((ageDays % 365) / 30);
+        if (years > 0) {
+          ageText = years + '歳' + (months > 0 ? months + 'ヶ月' : '');
+        } else if (months > 0) {
+          ageText = months + 'ヶ月';
+        } else {
+          ageText = ageDays + '日';
+        }
+      }
+
+      // Weight change
+      var latestWeight = weights.length > 0 ? weights[weights.length - 1] : null;
+      var firstWeight = weights.length > 1 ? weights[0] : null;
+      var weightChange = '';
+      if (latestWeight && firstWeight) {
+        var lw = parseFloat(latestWeight.weight || latestWeight.w || 0);
+        var fw = parseFloat(firstWeight.weight || firstWeight.w || 0);
+        var diff = lw - fw;
+        weightChange = (diff >= 0 ? '+' : '') + diff.toFixed(1) + 'kg';
+      }
+
+      // Milestone detection
+      var milestone = '';
+      if (ageDays === 0) milestone = '🎉 今日が記念すべき初日！';
+      else if (ageDays === 100) milestone = '🎊 100日おめでとう！';
+      else if (ageDays === 365) milestone = '🎂 1歳のお誕生日！';
+      else if (ageDays === 730) milestone = '🎂 2歳のお誕生日！';
+      else if (ageDays === 1095) milestone = '🎂 3歳のお誕生日！';
+      else if (diaries.length === 1) milestone = '📝 はじめての日記！';
+      else if (diaries.length === 10) milestone = '📝 日記10回達成！';
+      else if (diaries.length === 50) milestone = '📝 日記50回達成！';
+      else if (diaries.length === 100) milestone = '🏆 日記100回達成！';
+
+      return {
+        name: name,
+        breed: breed,
+        ageText: ageText,
+        ageDays: ageDays,
+        diaryCount: diaries.length,
+        weightCount: weights.length,
+        latestWeight: latestWeight ? parseFloat(latestWeight.weight || latestWeight.w || 0).toFixed(1) : '-',
+        weightChange: weightChange,
+        milestone: milestone
+      };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function renderGrowthCard() {
+    var existing = document.querySelector('.ux-growth-card');
+    if (existing) existing.remove();
+
+    var data = getGrowthData();
+    if (!data || (!data.ageText && data.diaryCount === 0)) return;
+
+    var isDark = document.body.classList.contains('ux-dark-on') ||
+      (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+    var card = document.createElement('div');
+    card.className = 'ux-growth-card';
+
+    var html = '<div class="ux-growth-card-title">📊 ' + data.name + 'の成長まとめ</div>';
+    html += '<div class="ux-growth-card-stats">';
+    html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + (data.ageText || '-') + '</div><div class="ux-growth-stat-label">年齢</div></div>';
+    html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + data.latestWeight + '<span style="font-size:12px;">kg</span></div><div class="ux-growth-stat-label">現在の体重' + (data.weightChange ? ' (' + data.weightChange + ')' : '') + '</div></div>';
+    html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + data.diaryCount + '</div><div class="ux-growth-stat-label">日記数</div></div>';
+    html += '</div>';
+
+    if (data.milestone) {
+      html += '<div class="ux-growth-card-milestone" style="color:' + (isDark ? '#FFD700' : '#B45309') + ';">' + data.milestone + '</div>';
+    }
+
+    html += '<div class="ux-growth-share"><button onclick="window.__wanchan.showShareSheet(\'' + data.name + 'は' + (data.ageText || '') + '！ #わんちゃん成長日記\')">📤 成長をシェアする</button></div>';
+
+    card.innerHTML = html;
+
+    // Insert after the header area
+    var root = document.getElementById('root');
+    if (root && root.firstElementChild) {
+      var target = root.firstElementChild.querySelector('h1, h2, [style*="font-size: 2"]');
+      if (target && target.parentNode) {
+        target.parentNode.insertBefore(card, target.nextSibling);
+      } else {
+        root.firstElementChild.insertBefore(card, root.firstElementChild.children[1] || null);
+      }
+    }
+
+    // Track
+    var an = window.__wanchan && window.__wanchan.analytics;
+    if (an && an.logEvent) an.logEvent('growth_card_view', { diary_count: data.diaryCount });
+  }
+
+  // Render after React loads
+  setTimeout(renderGrowthCard, 1500);
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'wc2') setTimeout(renderGrowthCard, 500);
+  });
+
+  /* ==============================
+     21. ANNIVERSARY REMINDER (記念日リマインダー) - Feature C
+     ============================== */
+  function checkAnniversary() {
+    try {
+      var data = JSON.parse(localStorage.getItem('wc2') || '{}');
+      if (!data.birthday) return;
+
+      var birthday = new Date(data.birthday);
+      var now = new Date();
+      var todayStr = (now.getMonth() + 1) + '-' + now.getDate();
+      var bdayStr = (birthday.getMonth() + 1) + '-' + birthday.getDate();
+
+      // Check if today is birthday
+      if (todayStr === bdayStr) {
+        var years = now.getFullYear() - birthday.getFullYear();
+        showAnniversaryBanner('🎂', data.name + 'の' + years + '歳のお誕生日おめでとう！');
+        return;
+      }
+
+      // Check milestone days
+      var ageDays = Math.floor((now - birthday) / (1000 * 60 * 60 * 24));
+      var milestones = {
+        7: '1週間',
+        30: '1ヶ月',
+        100: '100日',
+        200: '200日',
+        365: '1年',
+        500: '500日',
+        730: '2年',
+        1000: '1000日',
+        1095: '3年'
+      };
+
+      if (milestones[ageDays]) {
+        showAnniversaryBanner('🎉', data.name + 'と出会って' + milestones[ageDays] + '記念日！');
+        return;
+      }
+
+      // Birthday approaching (3 days before)
+      var nextBirthday = new Date(now.getFullYear(), birthday.getMonth(), birthday.getDate());
+      if (nextBirthday < now) nextBirthday.setFullYear(nextBirthday.getFullYear() + 1);
+      var daysUntilBday = Math.ceil((nextBirthday - now) / (1000 * 60 * 60 * 24));
+      if (daysUntilBday > 0 && daysUntilBday <= 3) {
+        showAnniversaryBanner('🎁', data.name + 'のお誕生日まであと' + daysUntilBday + '日！');
+      }
+    } catch (e) {}
+  }
+
+  function showAnniversaryBanner(icon, text) {
+    var dismissed = localStorage.getItem('ux_anniv_dismissed');
+    var today = new Date().toISOString().slice(0, 10);
+    if (dismissed === today) return;
+
+    var banner = document.createElement('div');
+    banner.className = 'ux-anniversary-banner';
+    banner.innerHTML = '<div class="ux-anniv-icon">' + icon + '</div><div class="ux-anniv-text">' + text + '</div><button class="ux-anniv-close">✕</button>';
+
+    document.body.appendChild(banner);
+
+    banner.querySelector('.ux-anniv-close').addEventListener('click', function(e) {
+      e.stopPropagation();
+      safeSetItem('ux_anniv_dismissed', today);
+      banner.style.opacity = '0';
+      banner.style.transform = 'translateX(-50%) translateY(-20px)';
+      setTimeout(function() { banner.remove(); }, 300);
+    });
+
+    // Auto-dismiss after 8s
+    setTimeout(function() {
+      if (banner.parentNode) {
+        banner.style.opacity = '0';
+        banner.style.transform = 'translateX(-50%) translateY(-20px)';
+        setTimeout(function() { banner.remove(); }, 300);
+      }
+    }, 8000);
+
+    // Track
+    var an = window.__wanchan && window.__wanchan.analytics;
+    if (an && an.logEvent) an.logEvent('anniversary_shown', { text: text });
+  }
+
+  setTimeout(checkAnniversary, 2000);
+
+  /* ==============================
+     22. BREED GROWTH CURVE (犬種別成長曲線) - Feature B
+     ============================== */
+  var BREED_CURVES = {
+    'チワワ':        { m: [0.2, 0.4, 0.8, 1.2, 1.6, 1.9, 2.1, 2.3, 2.4, 2.5, 2.6, 2.7], max: 3.5 },
+    'トイプードル':  { m: [0.3, 0.8, 1.5, 2.2, 2.8, 3.2, 3.5, 3.7, 3.8, 3.9, 4.0, 4.0], max: 5 },
+    'ミニチュアダックスフンド': { m: [0.4, 0.9, 1.6, 2.4, 3.0, 3.5, 3.9, 4.2, 4.4, 4.5, 4.6, 4.8], max: 6 },
+    'ポメラニアン':  { m: [0.2, 0.5, 1.0, 1.5, 1.9, 2.2, 2.5, 2.7, 2.8, 2.9, 3.0, 3.1], max: 4 },
+    '柴犬':          { m: [0.5, 1.5, 3.0, 4.5, 5.5, 6.5, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0], max: 13 },
+    'フレンチブルドッグ': { m: [0.5, 1.5, 3.0, 4.5, 6.0, 7.5, 8.5, 9.5, 10.0, 10.5, 11.0, 11.5], max: 14 },
+    'ゴールデンレトリバー': { m: [1.0, 3.0, 6.0, 10.0, 14.0, 18.0, 22.0, 25.0, 27.0, 29.0, 30.0, 31.0], max: 36 },
+    'ラブラドールレトリバー': { m: [1.0, 3.0, 6.5, 10.5, 15.0, 19.0, 23.0, 26.0, 28.0, 30.0, 31.0, 32.0], max: 36 },
+    'ヨークシャーテリア': { m: [0.2, 0.4, 0.7, 1.0, 1.3, 1.6, 1.8, 2.0, 2.2, 2.3, 2.4, 2.5], max: 3.5 },
+    'シーズー':      { m: [0.3, 0.7, 1.3, 2.0, 2.8, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5], max: 8 },
+    'パグ':          { m: [0.3, 0.8, 1.5, 2.5, 3.5, 4.5, 5.0, 5.5, 6.0, 6.5, 6.8, 7.0], max: 9 },
+    'マルチーズ':    { m: [0.2, 0.4, 0.8, 1.2, 1.6, 1.9, 2.1, 2.3, 2.5, 2.7, 2.8, 3.0], max: 4 },
+    'ミニチュアシュナウザー': { m: [0.3, 0.8, 1.5, 2.5, 3.5, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5], max: 9 }
+  };
+
+  function showBreedCurveModal() {
+    var existing = document.querySelector('.ux-breed-curve-modal');
+    if (existing) existing.remove();
+
+    var isDark = document.body.classList.contains('ux-dark-on') ||
+      (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+    var data;
+    try { data = JSON.parse(localStorage.getItem('wc2') || '{}'); } catch(e) { data = {}; }
+    var breed = data.breed || '';
+    var weights = data.weights || [];
+    var birthday = data.birthday || '';
+    var name = data.name || 'わんちゃん';
+
+    var overlay = document.createElement('div');
+    overlay.className = 'ux-breed-curve-modal';
+
+    var panel = document.createElement('div');
+    panel.className = 'ux-breed-curve-panel';
+
+    var html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">';
+    html += '<div style="font-size:18px;font-weight:900;">📈 ' + name + 'の成長曲線</div>';
+    html += '<div id="breed-curve-close" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:' + (isDark ? '#333' : '#f0f0f0') + ';cursor:pointer;font-size:14px;">✕</div>';
+    html += '</div>';
+
+    // Breed selector
+    html += '<div style="margin-bottom:12px;"><select id="breed-curve-select" style="width:100%;padding:10px 14px;border-radius:12px;border:2px solid ' + (isDark ? '#444' : '#eee') + ';font-size:14px;font-family:inherit;background:' + (isDark ? '#252535' : '#fff') + ';color:' + (isDark ? '#e0e0e0' : '#333') + ';">';
+    html += '<option value="">犬種を選択</option>';
+    Object.keys(BREED_CURVES).forEach(function(b) {
+      html += '<option value="' + b + '"' + (b === breed ? ' selected' : '') + '>' + b + '</option>';
+    });
+    html += '</select></div>';
+
+    // Chart area
+    html += '<div id="breed-curve-chart" class="ux-breed-curve-chart"></div>';
+    html += '<div class="ux-breed-curve-legend">';
+    html += '<span><span class="dot" style="background:#FF7B9C;"></span> ' + name + 'の体重</span>';
+    html += '<span><span class="dot" style="background:rgba(59,130,246,.5);"></span> 犬種平均</span>';
+    html += '</div>';
+
+    // Status message
+    html += '<div id="breed-curve-status" style="margin-top:12px;padding:12px;border-radius:12px;background:' + (isDark ? '#1a2a1a' : '#F0FFF4') + ';font-size:13px;color:' + (isDark ? '#a7f3d0' : '#166534') + ';line-height:1.6;display:none;"></div>';
+
+    panel.innerHTML = html;
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+    document.getElementById('breed-curve-close').addEventListener('click', function() { overlay.remove(); });
+
+    function renderChart(selectedBreed) {
+      var chart = document.getElementById('breed-curve-chart');
+      var status = document.getElementById('breed-curve-status');
+      if (!chart) return;
+      chart.innerHTML = '';
+
+      var curve = BREED_CURVES[selectedBreed];
+      if (!curve) {
+        chart.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#888;font-size:14px;">犬種を選択してください</div>';
+        if (status) status.style.display = 'none';
+        return;
+      }
+
+      var maxW = curve.max;
+      var months = curve.m;
+      var barWidth = Math.floor((chart.offsetWidth - 24) / 12) - 4;
+      if (barWidth < 16) barWidth = 16;
+
+      // Get user's weights mapped to months
+      var userWeightsByMonth = {};
+      if (birthday && weights.length > 0) {
+        var bDate = new Date(birthday);
+        weights.forEach(function(w) {
+          var wDate = new Date(w.date || w.d);
+          var monthAge = Math.round((wDate - bDate) / (1000 * 60 * 60 * 24 * 30));
+          if (monthAge >= 0 && monthAge < 12) {
+            userWeightsByMonth[monthAge] = parseFloat(w.weight || w.w || 0);
+          }
+        });
+      }
+
+      for (var i = 0; i < 12; i++) {
+        var x = 12 + i * (barWidth + 4);
+
+        // Breed average bar
+        var avgH = (months[i] / maxW) * 170;
+        var avgBar = document.createElement('div');
+        avgBar.className = 'ux-breed-curve-bar';
+        avgBar.style.cssText = 'left:' + x + 'px;width:' + (barWidth / 2 - 1) + 'px;height:' + avgH + 'px;background:rgba(59,130,246,.3);';
+        chart.appendChild(avgBar);
+
+        // User weight bar
+        if (userWeightsByMonth[i] !== undefined) {
+          var userH = (userWeightsByMonth[i] / maxW) * 170;
+          var userBar = document.createElement('div');
+          userBar.className = 'ux-breed-curve-bar';
+          userBar.style.cssText = 'left:' + (x + barWidth / 2 + 1) + 'px;width:' + (barWidth / 2 - 1) + 'px;height:' + Math.min(userH, 170) + 'px;background:#FF7B9C;';
+          chart.appendChild(userBar);
+        }
+
+        // Month label
+        var label = document.createElement('div');
+        label.className = 'ux-breed-curve-label';
+        label.style.cssText = 'position:absolute;bottom:-18px;left:' + x + 'px;width:' + barWidth + 'px;';
+        label.textContent = (i + 1) + 'M';
+        chart.appendChild(label);
+      }
+
+      chart.style.height = '220px';
+
+      // Status message
+      if (status) {
+        var lastUserMonth = -1;
+        var lastUserWeight = 0;
+        Object.keys(userWeightsByMonth).forEach(function(m) {
+          var mi = parseInt(m);
+          if (mi > lastUserMonth) { lastUserMonth = mi; lastUserWeight = userWeightsByMonth[mi]; }
+        });
+
+        if (lastUserMonth >= 0 && lastUserMonth < 12) {
+          var expected = months[lastUserMonth];
+          var pct = ((lastUserWeight / expected) * 100).toFixed(0);
+          var msg = '';
+          if (pct >= 90 && pct <= 110) {
+            msg = '✅ ' + name + 'は犬種平均とほぼ同じ成長ペース（' + pct + '%）です。順調です！';
+          } else if (pct > 110) {
+            msg = '📈 ' + name + 'は犬種平均より大きめ（' + pct + '%）です。フードの量を確認しましょう。';
+          } else {
+            msg = '📉 ' + name + 'は犬種平均よりやや小さめ（' + pct + '%）です。気になる場合は獣医さんに相談を。';
+          }
+          status.textContent = msg;
+          status.style.display = 'block';
+        } else {
+          status.style.display = 'none';
+        }
+      }
+    }
+
+    var select = document.getElementById('breed-curve-select');
+    if (select) {
+      select.addEventListener('change', function() { renderChart(select.value); });
+      if (breed && BREED_CURVES[breed]) {
+        renderChart(breed);
+      } else {
+        renderChart('');
+      }
+    }
+
+    // Track
+    var an = window.__wanchan && window.__wanchan.analytics;
+    if (an && an.logEvent) an.logEvent('breed_curve_view', { breed: breed });
+  }
+
+  // Add breed curve button to menu
+  var btnBreedCurve = document.createElement('button');
+  btnBreedCurve.textContent = '📈 成長曲線';
+  btnBreedCurve.addEventListener('click', function() {
+    backupMenu.classList.remove('ux-show');
+    showBreedCurveModal();
+  });
+  backupMenu.insertBefore(btnBreedCurve, btnAI);
+
+  window.__wanchan.showBreedCurve = showBreedCurveModal;
+
+  /* ==============================
+     23. SYMPTOM × AI ENHANCEMENT (症状×AI強化) - Feature D
+     ============================== */
+  var SYMPTOM_LIST = [
+    { icon: '🤮', label: '嘔吐' },
+    { icon: '💩', label: '下痢' },
+    { icon: '😴', label: '元気がない' },
+    { icon: '🍽️', label: '食欲不振' },
+    { icon: '🤧', label: 'くしゃみ・鼻水' },
+    { icon: '👀', label: '目の異常' },
+    { icon: '🦶', label: '足を引きずる' },
+    { icon: '🐾', label: '皮膚の異常' },
+    { icon: '💧', label: '水を飲みすぎる' }
+  ];
+
+  // Override AI consultation to add symptom chips
+  var _origShowConsultation = null;
+  var _aiReadyCheck = setInterval(function() {
+    var ai = window.__wanchan && window.__wanchan.ai;
+    if (ai && ai.showConsultation && !_origShowConsultation) {
+      _origShowConsultation = ai.showConsultation;
+      ai.showConsultation = function() {
+        _origShowConsultation();
+        // Wait for modal to appear, then inject symptom chips
+        setTimeout(function() {
+          var modal = document.getElementById('wanchan-ai-modal');
+          if (!modal) return;
+          var textarea = modal.querySelector('textarea');
+          if (!textarea || textarea.parentNode.querySelector('.ux-symptom-grid')) return;
+
+          var isDark = document.body.classList.contains('ux-dark-on') ||
+            (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+          var label = document.createElement('div');
+          label.style.cssText = 'font-size:12px;color:' + (isDark ? '#aaa' : '#888') + ';margin-bottom:6px;font-weight:600;';
+          label.textContent = '💡 症状から選ぶ:';
+
+          var grid = document.createElement('div');
+          grid.className = 'ux-symptom-grid';
+
+          var selectedSymptoms = [];
+
+          SYMPTOM_LIST.forEach(function(symptom) {
+            var chip = document.createElement('button');
+            chip.className = 'ux-symptom-chip';
+            chip.innerHTML = symptom.icon + '<br>' + symptom.label;
+            chip.addEventListener('click', function() {
+              chip.classList.toggle('ux-selected');
+              var idx = selectedSymptoms.indexOf(symptom.label);
+              if (idx > -1) {
+                selectedSymptoms.splice(idx, 1);
+              } else {
+                selectedSymptoms.push(symptom.label);
+              }
+              // Update textarea with selected symptoms
+              if (selectedSymptoms.length > 0) {
+                var prefix = selectedSymptoms.join('、') + 'の症状があります。';
+                var current = textarea.value;
+                // Remove previous symptom prefix
+                current = current.replace(/^.+の症状があります。\s*/,'');
+                try {
+                  var nativeSet = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
+                  nativeSet.call(textarea, prefix + current);
+                  textarea.dispatchEvent(new Event('input', { bubbles: true }));
+                } catch(e) {
+                  textarea.value = prefix + current;
+                }
+              }
+              triggerHaptic('light');
+            });
+            grid.appendChild(chip);
+          });
+
+          textarea.parentNode.insertBefore(label, textarea);
+          textarea.parentNode.insertBefore(grid, textarea);
+        }, 200);
+      };
+      clearInterval(_aiReadyCheck);
+    }
+  }, 300);
+  setTimeout(function() { clearInterval(_aiReadyCheck); }, 10000);
+
+  /* ==============================
+     24. PWA INSTALL PROMOTION (PWAインストール促進) - Feature E
+     ============================== */
+  var _deferredPrompt = null;
+
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    _deferredPrompt = e;
+
+    // Check if already dismissed recently
+    var dismissed = localStorage.getItem('ux_pwa_dismissed');
+    if (dismissed) {
+      var dismissedDate = new Date(dismissed);
+      var daysSince = (Date.now() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24);
+      if (daysSince < 7) return; // Don't show again for 7 days
+    }
+
+    // Show banner after 30 seconds of use
+    setTimeout(showPWABanner, 30000);
+  });
+
+  function showPWABanner() {
+    if (!_deferredPrompt) return;
+    // Don't show if already installed
+    if (window.matchMedia('(display-mode: standalone)').matches) return;
+
+    var existing = document.querySelector('.ux-pwa-banner');
+    if (existing) existing.remove();
+
+    var banner = document.createElement('div');
+    banner.className = 'ux-pwa-banner';
+    banner.innerHTML = '<div class="ux-pwa-banner-icon">🐾</div>' +
+      '<div class="ux-pwa-banner-text"><div class="ux-pwa-banner-title">ホーム画面に追加</div><div class="ux-pwa-banner-sub">ワンタップでいつでも日記が書けます</div></div>' +
+      '<div class="ux-pwa-banner-actions"><button class="ux-pwa-dismiss-btn" id="pwa-dismiss">あとで</button><button class="ux-pwa-install-btn" id="pwa-install">追加する</button></div>';
+
+    document.body.appendChild(banner);
+
+    document.getElementById('pwa-install').addEventListener('click', function() {
+      if (_deferredPrompt) {
+        _deferredPrompt.prompt();
+        _deferredPrompt.userChoice.then(function(result) {
+          if (result.outcome === 'accepted') {
+            showToast('ホーム画面に追加しました！', 'success');
+            var an = window.__wanchan && window.__wanchan.analytics;
+            if (an && an.logEvent) an.logEvent('pwa_install', { outcome: 'accepted' });
+          }
+          _deferredPrompt = null;
+        });
+      }
+      banner.remove();
+    });
+
+    document.getElementById('pwa-dismiss').addEventListener('click', function() {
+      safeSetItem('ux_pwa_dismissed', new Date().toISOString());
+      banner.style.animation = 'none';
+      banner.style.transform = 'translateY(100%)';
+      banner.style.transition = 'transform .3s ease';
+      setTimeout(function() { banner.remove(); }, 300);
+      var an = window.__wanchan && window.__wanchan.analytics;
+      if (an && an.logEvent) an.logEvent('pwa_install', { outcome: 'dismissed' });
+    });
+  }
+
+  // Also show a subtle install hint in the menu for iOS (which doesn't support beforeinstallprompt)
+  if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.matchMedia('(display-mode: standalone)').matches) {
+    var btnPWA = document.createElement('button');
+    btnPWA.textContent = '📲 ホーム画面に追加';
+    btnPWA.addEventListener('click', function() {
+      backupMenu.classList.remove('ux-show');
+      showToast('Safari の「共有」ボタン → 「ホーム画面に追加」をタップしてください', 'info');
+    });
+    backupMenu.appendChild(btnPWA);
+  }
+
+  /* ==============================
+     25. SW UPDATE NOTIFICATION
      ============================== */
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.ready.then(function(reg) {
