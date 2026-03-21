@@ -17,7 +17,7 @@ import { getFirestore, collection, doc, setDoc, getDoc, getDocs, addDoc,
   from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
 
 // ============================================================
-// TODO: Replace with your Firebase project config
+// Firebase project config (wanchan-diary)
 // ============================================================
 const firebaseConfig = {
   apiKey: "AIzaSyDiQeQW9EgAI8BbZ9Z030ADJsLeA64VzAs",
@@ -76,6 +76,8 @@ function onAuth(cb) {
 // ============================================================
 // DATA SYNC: localStorage ↔ Firestore
 // ============================================================
+let _lastSyncHash = '';
+
 async function syncToCloud(uid) {
   if (!isConfigured || !uid) return;
   const data = {};
@@ -85,8 +87,12 @@ async function syncToCloud(uid) {
       data[key] = localStorage.getItem(key);
     }
   }
+  const json = JSON.stringify(data);
+  // Skip sync if nothing changed
+  if (json === _lastSyncHash) return;
+  _lastSyncHash = json;
   await setDoc(doc(db, 'userData', uid), {
-    data: JSON.stringify(data),
+    data: json,
     updatedAt: serverTimestamp()
   }, { merge: true });
 }
@@ -99,13 +105,12 @@ async function syncFromCloud(uid) {
   if (!raw) return false;
   try {
     const data = JSON.parse(raw);
-    for (const key in data) {
-      if (data.hasOwnProperty(key)) {
-        localStorage.setItem(key, data[key]);
-      }
+    for (const key of Object.keys(data)) {
+      try { localStorage.setItem(key, data[key]); } catch (_) { /* quota */ }
     }
     return true;
   } catch (e) {
+    console.warn('syncFromCloud parse error:', e);
     return false;
   }
 }
@@ -251,16 +256,17 @@ Object.assign(window.__wanchan, {
 // AUTO-SYNC ON LOGIN
 // ============================================================
 if (isConfigured) {
+  let _syncInterval = null;
   onAuth(async function(user) {
+    // Clear previous sync interval on any auth state change
+    if (_syncInterval) { clearInterval(_syncInterval); _syncInterval = null; }
     if (user) {
       window.__wanchan.showToast(user.displayName + 'でログイン中', 'success');
-      // Sync from cloud on login (cloud wins if newer)
       const synced = await syncFromCloud(user.uid);
       if (synced) {
         window.__wanchan.showToast('クラウドからデータを同期しました', 'info');
       }
-      // Auto-sync to cloud every 30 seconds
-      setInterval(function() { syncToCloud(user.uid); }, 30000);
+      _syncInterval = setInterval(function() { syncToCloud(user.uid); }, 30000);
     }
   });
 }

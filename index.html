@@ -659,24 +659,22 @@ Error generating stack: `+n.message+`
   // Login/logout button (appears when Firebase is configured)
   var btnAuth = document.createElement('button');
   btnAuth.textContent = '🔑 ログイン';
-  btnAuth.style.display = 'none'; // Hidden until Firebase is ready
+  btnAuth.style.display = 'none';
+  var _currentUser = null;
+
   btnAuth.addEventListener('click', function() {
     backupMenu.classList.remove('ux-show');
     var fb = window.__wanchan && window.__wanchan.firebase;
-    if (!fb || !fb.isConfigured) {
-      showToast('Firebase未設定です', 'error');
-      return;
+    if (!fb || !fb.isConfigured) return;
+    if (_currentUser) {
+      fb.logout().then(function() { showToast('ログアウトしました', 'info'); });
+    } else {
+      fb.login();
     }
-    fb.onAuth(function(user) {
-      if (user) {
-        fb.logout().then(function() { showToast('ログアウトしました', 'info'); updateAuthButton(null); });
-      } else {
-        fb.login().then(function(u) { if (u) updateAuthButton(u); });
-      }
-    });
   });
 
   function updateAuthButton(user) {
+    _currentUser = user;
     if (user) {
       btnAuth.textContent = '👋 ログアウト（' + (user.displayName || '').split(' ')[0] + '）';
     } else {
@@ -684,14 +682,15 @@ Error generating stack: `+n.message+`
     }
   }
 
-  // Show auth button once Firebase module loads
-  setTimeout(function() {
+  // Show auth button once Firebase module loads (check periodically)
+  var _fbCheck = setInterval(function() {
     var fb = window.__wanchan && window.__wanchan.firebase;
     if (fb && fb.isConfigured) {
+      clearInterval(_fbCheck);
       btnAuth.style.display = '';
       fb.onAuth(updateAuthButton);
     }
-  }, 1000);
+  }, 200);
 
   backupMenu.appendChild(btnAuth);
   backupMenu.appendChild(btnExport);
