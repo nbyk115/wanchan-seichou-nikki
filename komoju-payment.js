@@ -24,9 +24,7 @@ const KOMOJU_CONFIG = {
       interval: 'month',
       features: [
         'AI健康相談 無制限',
-        '写真保存 無制限',
-        '広告なし',
-        'クラウド同期'
+        '写真保存 無制限'
       ]
     },
     yearly: {
@@ -38,8 +36,6 @@ const KOMOJU_CONFIG = {
       features: [
         'AI健康相談 無制限',
         '写真保存 無制限',
-        '広告なし',
-        'クラウド同期',
         '2ヶ月分おトク！'
       ]
     }
