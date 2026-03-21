@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wanchan-v2';
+const CACHE_NAME = 'wanchan-v3';
 const ASSETS = [
   '/wanchan-seichou-nikki/',
   '/wanchan-seichou-nikki/index.html',
@@ -7,6 +7,8 @@ const ASSETS = [
   '/wanchan-seichou-nikki/og-image.png',
   '/wanchan-seichou-nikki/manifest.json'
 ];
+
+const MAX_CACHE_SIZE = 100;
 
 const OFFLINE_PAGE = `<!DOCTYPE html>
 <html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -27,6 +29,16 @@ button:active{transform:scale(.97)}
 <button onclick="location.reload()">再読み込み</button>
 </div></body></html>`;
 
+async function trimCache(cacheName, maxItems) {
+  const cache = await caches.open(cacheName);
+  const keys = await cache.keys();
+  if (keys.length > maxItems) {
+    await Promise.all(
+      keys.slice(0, keys.length - maxItems).map((key) => cache.delete(key))
+    );
+  }
+}
+
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
@@ -46,20 +58,43 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
 
-  // For navigation requests, provide offline fallback
+  // Skip cross-origin API requests (e.g. Anthropic API)
+  if (e.request.url.includes('api.anthropic.com')) return;
+
+  // For navigation requests, network-first with offline fallback
   if (e.request.mode === 'navigate') {
     e.respondWith(
-      caches.match(e.request).then((cached) => {
-        const fetched = fetch(e.request).then((res) => {
+      fetch(e.request)
+        .then((res) => {
           if (res && res.status === 200) {
             const clone = res.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
           }
           return res;
-        }).catch(() => cached || new Response(OFFLINE_PAGE, {
-          headers: { 'Content-Type': 'text/html; charset=utf-8' }
-        }));
-        return cached || fetched;
+        })
+        .catch(() =>
+          caches.match(e.request).then((cached) =>
+            cached || new Response(OFFLINE_PAGE, {
+              headers: { 'Content-Type': 'text/html; charset=utf-8' }
+            })
+          )
+        )
+    );
+    return;
+  }
+
+  // For font requests, cache-first (fonts rarely change)
+  if (e.request.url.includes('fonts.googleapis.com') || e.request.url.includes('fonts.gstatic.com')) {
+    e.respondWith(
+      caches.match(e.request).then((cached) => {
+        if (cached) return cached;
+        return fetch(e.request).then((res) => {
+          if (res && res.status === 200) {
+            const clone = res.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+          }
+          return res;
+        }).catch(() => new Response('', { status: 408 }));
       })
     );
     return;
@@ -71,11 +106,21 @@ self.addEventListener('fetch', (e) => {
       const fetched = fetch(e.request).then((res) => {
         if (res && res.status === 200) {
           const clone = res.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(e.request, clone);
+            trimCache(CACHE_NAME, MAX_CACHE_SIZE);
+          });
         }
         return res;
       }).catch(() => cached);
       return cached || fetched;
     })
   );
+});
+
+// Listen for messages from the app
+self.addEventListener('message', (e) => {
+  if (e.data === 'skipWaiting') {
+    self.skipWaiting();
+  }
 });
