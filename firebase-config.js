@@ -43,7 +43,7 @@ if (isConfigured) {
 // ============================================================
 async function login() {
   if (!isConfigured) {
-    window.__wanchan.showToast('Firebase未設定です', 'error');
+    _toast('Firebase未設定です', 'error');
     return null;
   }
   try {
@@ -57,7 +57,7 @@ async function login() {
     return result.user;
   } catch (e) {
     if (e.code !== 'auth/popup-closed-by-user') {
-      window.__wanchan.showToast('ログインに失敗しました', 'error');
+      _toast('ログインに失敗しました', 'error');
     }
     return null;
   }
@@ -65,7 +65,7 @@ async function login() {
 
 async function logout() {
   if (!isConfigured) return;
-  await signOut(auth);
+  try { await signOut(auth); } catch (_) { /* network error ok */ }
 }
 
 function onAuth(cb) {
@@ -90,11 +90,11 @@ async function syncToCloud(uid) {
   const json = JSON.stringify(data);
   // Skip sync if nothing changed
   if (json === _lastSyncHash) return;
-  _lastSyncHash = json;
   await setDoc(doc(db, 'userData', uid), {
     data: json,
     updatedAt: serverTimestamp()
   }, { merge: true });
+  _lastSyncHash = json;
 }
 
 async function syncFromCloud(uid) {
@@ -229,6 +229,12 @@ function onCommentsUpdate(entryId, cb) {
   });
 }
 
+// Safe toast helper (guards against race with inline script)
+function _toast(msg, type) {
+  var fn = window.__wanchan && window.__wanchan.showToast;
+  if (fn) fn(msg, type);
+}
+
 // ============================================================
 // EXPOSE TO APP
 // ============================================================
@@ -257,16 +263,23 @@ Object.assign(window.__wanchan, {
 // ============================================================
 if (isConfigured) {
   let _syncInterval = null;
+  let _isFirstAuth = true;
   onAuth(async function(user) {
     // Clear previous sync interval on any auth state change
     if (_syncInterval) { clearInterval(_syncInterval); _syncInterval = null; }
     if (user) {
-      window.__wanchan.showToast(user.displayName + 'でログイン中', 'success');
+      // Only show toast on actual login, not on page reload with cached session
+      if (!_isFirstAuth) {
+        _toast(user.displayName + 'でログイン中', 'success');
+      }
+      _isFirstAuth = false;
       const synced = await syncFromCloud(user.uid);
       if (synced) {
-        window.__wanchan.showToast('クラウドからデータを同期しました', 'info');
+        _toast('クラウドからデータを同期しました', 'info');
       }
-      _syncInterval = setInterval(function() { syncToCloud(user.uid); }, 30000);
+      _syncInterval = setInterval(function() { syncToCloud(user.uid).catch(function() {}); }, 30000);
+    } else {
+      _isFirstAuth = false;
     }
   });
 }

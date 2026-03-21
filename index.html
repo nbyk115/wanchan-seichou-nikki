@@ -683,12 +683,16 @@ Error generating stack: `+n.message+`
   }
 
   // Show auth button once Firebase module loads (check periodically)
+  var _fbTries = 0;
   var _fbCheck = setInterval(function() {
+    _fbTries++;
     var fb = window.__wanchan && window.__wanchan.firebase;
     if (fb && fb.isConfigured) {
       clearInterval(_fbCheck);
       btnAuth.style.display = '';
       fb.onAuth(updateAuthButton);
+    } else if (_fbTries > 50) {
+      clearInterval(_fbCheck);
     }
   }, 200);
 
