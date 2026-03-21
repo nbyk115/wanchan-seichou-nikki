@@ -658,7 +658,7 @@ Error generating stack: `+n.message+`
 
   // Login/logout button (appears when Firebase is configured)
   var btnAuth = document.createElement('button');
-  btnAuth.textContent = '🔑 ログイン';
+  btnAuth.textContent = '☁️ クラウド同期（ログイン）';
   btnAuth.style.display = 'none';
   var _currentUser = null;
 
@@ -676,9 +676,9 @@ Error generating stack: `+n.message+`
   function updateAuthButton(user) {
     _currentUser = user;
     if (user) {
-      btnAuth.textContent = '👋 ログアウト（' + (user.displayName || '').split(' ')[0] + '）';
+      btnAuth.textContent = '☁️ 同期中（' + (user.displayName || '').split(' ')[0] + '） - ログアウト';
     } else {
-      btnAuth.textContent = '🔑 ログイン';
+      btnAuth.textContent = '☁️ クラウド同期（ログイン）';
     }
   }
 
