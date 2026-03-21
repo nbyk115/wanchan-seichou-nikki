@@ -201,18 +201,22 @@ body.ux-dark-on [style*="background: rgb(22, 163, 106)"],body.ux-dark-on [style*
 .ux-growth-share button{padding:10px 24px;border-radius:14px;border:none;background:#FF7B9C;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(255,123,156,.3);}
 body.ux-dark-on .ux-growth-card{background:linear-gradient(135deg,#1a1a2e 0%,#2a1a2e 50%,#1a2a3e 100%);}
 body.ux-dark-on .ux-growth-stat{background:rgba(255,255,255,.08);}
+body.ux-dark-on .ux-growth-stat-label{color:#aaa;}
+body.ux-dark-on .ux-growth-stat-value{color:#FF9BB5;}
 body.ux-dark-on .ux-growth-card-milestone{background:rgba(255,255,255,.06);}
 @media (prefers-color-scheme:dark){
   body.ux-dark-auto .ux-growth-card{background:linear-gradient(135deg,#1a1a2e 0%,#2a1a2e 50%,#1a2a3e 100%);}
   body.ux-dark-auto .ux-growth-stat{background:rgba(255,255,255,.08);}
+  body.ux-dark-auto .ux-growth-stat-label{color:#aaa;}
+  body.ux-dark-auto .ux-growth-stat-value{color:#FF9BB5;}
   body.ux-dark-auto .ux-growth-card-milestone{background:rgba(255,255,255,.06);}
 }
 
 /* Anniversary Reminder */
-.ux-anniversary-banner{position:fixed;top:env(safe-area-inset-top,12px);left:50%;transform:translateX(-50%);z-index:9999;max-width:380px;width:calc(100% - 32px);padding:16px 20px;border-radius:18px;background:linear-gradient(135deg,#FFD700,#FFA500);color:#fff;box-shadow:0 8px 24px rgba(255,165,0,.35);animation:ux-toast-in .35s cubic-bezier(.175,.885,.32,1.275);display:flex;align-items:center;gap:12px;cursor:pointer;}
+.ux-anniversary-banner{position:fixed;top:env(safe-area-inset-top,12px);left:50%;transform:translateX(-50%);z-index:9999;max-width:380px;width:calc(100% - 32px);padding:16px 20px;border-radius:18px;background:linear-gradient(135deg,#FF7B9C,#FF9B6A);color:#fff;box-shadow:0 8px 24px rgba(255,123,156,.35);animation:ux-toast-in .35s cubic-bezier(.175,.885,.32,1.275);display:flex;align-items:center;gap:12px;cursor:pointer;}
 .ux-anniversary-banner .ux-anniv-icon{font-size:28px;flex-shrink:0;}
 .ux-anniversary-banner .ux-anniv-text{flex:1;font-size:14px;font-weight:700;line-height:1.5;}
-.ux-anniversary-banner .ux-anniv-close{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;border:none;color:#fff;cursor:pointer;font-family:inherit;}
+.ux-anniversary-banner .ux-anniv-close{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;border:none;color:#fff;cursor:pointer;font-family:inherit;}
 
 /* Breed Growth Curve */
 .ux-breed-curve-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10001;display:flex;align-items:center;justify-content:center;animation:ux-fade-in .2s ease;padding:16px;}
@@ -225,9 +229,13 @@ body.ux-dark-on .ux-growth-card-milestone{background:rgba(255,255,255,.06);}
 .ux-breed-curve-legend .dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
 body.ux-dark-on .ux-breed-curve-panel{background:#1e1e2e;color:#e0e0e0;}
 body.ux-dark-on .ux-breed-curve-chart{background:#252535;}
+body.ux-dark-on .ux-breed-curve-label{color:#aaa;}
+body.ux-dark-on .ux-breed-curve-legend{color:#ccc;}
 @media (prefers-color-scheme:dark){
   body.ux-dark-auto .ux-breed-curve-panel{background:#1e1e2e;color:#e0e0e0;}
   body.ux-dark-auto .ux-breed-curve-chart{background:#252535;}
+  body.ux-dark-auto .ux-breed-curve-label{color:#aaa;}
+  body.ux-dark-auto .ux-breed-curve-legend{color:#ccc;}
 }
 
 /* Symptom Checker */
@@ -298,6 +306,19 @@ Error generating stack: `+n.message+`
   function safeSetItem(key, value) {
     try { localStorage.setItem(key, value); return true; }
     catch(e) { console.warn('localStorage quota exceeded for key:', key); return false; }
+  }
+
+  // HTML escape helper (prevent XSS from user-input like dog names)
+  function _escHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // Dark mode detection helper (DRY)
+  function _isDark() {
+    return document.body.classList.contains('ux-dark-on') ||
+      (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
   }
 
   // Close any existing overlay before opening a new one
@@ -1334,6 +1355,7 @@ Error generating stack: `+n.message+`
       var ageDays = 0;
       if (birthday) {
         var bDate = new Date(birthday);
+        if (isNaN(bDate.getTime())) return null; // Invalid date guard
         var now = new Date();
         ageDays = Math.floor((now - bDate) / (1000 * 60 * 60 * 24));
         var years = Math.floor(ageDays / 365);
@@ -1398,8 +1420,11 @@ Error generating stack: `+n.message+`
 
     var card = document.createElement('div');
     card.className = 'ux-growth-card';
+    card.setAttribute('role', 'region');
+    card.setAttribute('aria-label', '成長まとめ');
 
-    var html = '<div class="ux-growth-card-title">📊 ' + data.name + 'の成長まとめ</div>';
+    var safeName = _escHtml(data.name);
+    var html = '<div class="ux-growth-card-title">📊 ' + safeName + 'の成長まとめ</div>';
     html += '<div class="ux-growth-card-stats">';
     html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + (data.ageText || '-') + '</div><div class="ux-growth-stat-label">年齢</div></div>';
     html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + data.latestWeight + '<span style="font-size:12px;">kg</span></div><div class="ux-growth-stat-label">現在の体重' + (data.weightChange ? ' (' + data.weightChange + ')' : '') + '</div></div>';
@@ -1410,9 +1435,18 @@ Error generating stack: `+n.message+`
       html += '<div class="ux-growth-card-milestone" style="color:' + (isDark ? '#FFD700' : '#B45309') + ';">' + data.milestone + '</div>';
     }
 
-    html += '<div class="ux-growth-share"><button onclick="window.__wanchan.showShareSheet(\'' + data.name + 'は' + (data.ageText || '') + '！ #わんちゃん成長日記\')">📤 成長をシェアする</button></div>';
+    html += '<div class="ux-growth-share"><button id="ux-growth-share-btn">📤 成長をみんなにシェアしてね</button></div>';
 
     card.innerHTML = html;
+
+    // Share button — use event listener to avoid XSS via data.name
+    var shareBtn = card.querySelector('#ux-growth-share-btn');
+    if (shareBtn) {
+      shareBtn.addEventListener('click', function() {
+        var shareText = data.name + 'は' + (data.ageText || '') + '！ #わんちゃん成長日記';
+        window.__wanchan.showShareSheet(shareText);
+      });
+    }
 
     // Insert after the header area
     var root = document.getElementById('root');
@@ -1445,14 +1479,16 @@ Error generating stack: `+n.message+`
       if (!data.birthday) return;
 
       var birthday = new Date(data.birthday);
+      if (isNaN(birthday.getTime())) return; // Invalid date guard
       var now = new Date();
+      var dogName = _escHtml(data.name || 'わんちゃん');
       var todayStr = (now.getMonth() + 1) + '-' + now.getDate();
       var bdayStr = (birthday.getMonth() + 1) + '-' + birthday.getDate();
 
       // Check if today is birthday
       if (todayStr === bdayStr) {
         var years = now.getFullYear() - birthday.getFullYear();
-        showAnniversaryBanner('🎂', data.name + 'の' + years + '歳のお誕生日おめでとう！');
+        showAnniversaryBanner('🎂', dogName + 'の' + years + '歳のお誕生日おめでとう！');
         return;
       }
 
@@ -1471,7 +1507,7 @@ Error generating stack: `+n.message+`
       };
 
       if (milestones[ageDays]) {
-        showAnniversaryBanner('🎉', data.name + 'と出会って' + milestones[ageDays] + '記念日！');
+        showAnniversaryBanner('🎉', dogName + 'と出会って' + milestones[ageDays] + '記念日！');
         return;
       }
 
@@ -1480,7 +1516,7 @@ Error generating stack: `+n.message+`
       if (nextBirthday < now) nextBirthday.setFullYear(nextBirthday.getFullYear() + 1);
       var daysUntilBday = Math.ceil((nextBirthday - now) / (1000 * 60 * 60 * 24));
       if (daysUntilBday > 0 && daysUntilBday <= 3) {
-        showAnniversaryBanner('🎁', data.name + 'のお誕生日まであと' + daysUntilBday + '日！');
+        showAnniversaryBanner('🎁', dogName + 'のお誕生日まであと' + daysUntilBday + '日！');
       }
     } catch (e) {}
   }
@@ -1492,7 +1528,9 @@ Error generating stack: `+n.message+`
 
     var banner = document.createElement('div');
     banner.className = 'ux-anniversary-banner';
-    banner.innerHTML = '<div class="ux-anniv-icon">' + icon + '</div><div class="ux-anniv-text">' + text + '</div><button class="ux-anniv-close">✕</button>';
+    banner.setAttribute('role', 'alert');
+    banner.setAttribute('aria-live', 'polite');
+    banner.innerHTML = '<div class="ux-anniv-icon">' + icon + '</div><div class="ux-anniv-text">' + text + '</div><button class="ux-anniv-close" aria-label="閉じる">✕</button>';
 
     document.body.appendChild(banner);
 
@@ -1555,18 +1593,22 @@ Error generating stack: `+n.message+`
 
     var overlay = document.createElement('div');
     overlay.className = 'ux-breed-curve-modal';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', name + 'の成長曲線');
 
     var panel = document.createElement('div');
     panel.className = 'ux-breed-curve-panel';
 
+    var safeName = _escHtml(name);
     var html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">';
-    html += '<div style="font-size:18px;font-weight:900;">📈 ' + name + 'の成長曲線</div>';
-    html += '<div id="breed-curve-close" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:' + (isDark ? '#333' : '#f0f0f0') + ';cursor:pointer;font-size:14px;">✕</div>';
+    html += '<div style="font-size:18px;font-weight:900;">📈 ' + safeName + 'の成長曲線</div>';
+    html += '<button id="breed-curve-close" aria-label="閉じる" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:' + (isDark ? '#333' : '#f0f0f0') + ';cursor:pointer;font-size:14px;border:none;font-family:inherit;">✕</button>';
     html += '</div>';
 
     // Breed selector
     html += '<div style="margin-bottom:12px;"><select id="breed-curve-select" style="width:100%;padding:10px 14px;border-radius:12px;border:2px solid ' + (isDark ? '#444' : '#eee') + ';font-size:14px;font-family:inherit;background:' + (isDark ? '#252535' : '#fff') + ';color:' + (isDark ? '#e0e0e0' : '#333') + ';">';
-    html += '<option value="">犬種を選択</option>';
+    html += '<option value="">犬種を選んでね</option>';
     Object.keys(BREED_CURVES).forEach(function(b) {
       html += '<option value="' + b + '"' + (b === breed ? ' selected' : '') + '>' + b + '</option>';
     });
@@ -1575,7 +1617,7 @@ Error generating stack: `+n.message+`
     // Chart area
     html += '<div id="breed-curve-chart" class="ux-breed-curve-chart"></div>';
     html += '<div class="ux-breed-curve-legend">';
-    html += '<span><span class="dot" style="background:#FF7B9C;"></span> ' + name + 'の体重</span>';
+    html += '<span><span class="dot" style="background:#FF7B9C;"></span> ' + safeName + 'の体重</span>';
     html += '<span><span class="dot" style="background:rgba(59,130,246,.5);"></span> 犬種平均</span>';
     html += '</div>';
 
@@ -1586,8 +1628,11 @@ Error generating stack: `+n.message+`
     overlay.appendChild(panel);
     document.body.appendChild(overlay);
 
-    overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
-    document.getElementById('breed-curve-close').addEventListener('click', function() { overlay.remove(); });
+    function closeCurveModal() { overlay.remove(); document.removeEventListener('keydown', curveEscHandler); }
+    function curveEscHandler(e) { if (e.key === 'Escape') closeCurveModal(); }
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) closeCurveModal(); });
+    document.getElementById('breed-curve-close').addEventListener('click', closeCurveModal);
+    document.addEventListener('keydown', curveEscHandler);
 
     function renderChart(selectedBreed) {
       var chart = document.getElementById('breed-curve-chart');
@@ -1597,7 +1642,7 @@ Error generating stack: `+n.message+`
 
       var curve = BREED_CURVES[selectedBreed];
       if (!curve) {
-        chart.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#888;font-size:14px;">犬種を選択してください</div>';
+        chart.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#888;font-size:14px;">犬種を選ぶと成長の目安がわかるよ</div>';
         if (status) status.style.display = 'none';
         return;
       }
@@ -1611,7 +1656,7 @@ Error generating stack: `+n.message+`
       var userWeightsByMonth = {};
       if (birthday && weights.length > 0) {
         var bDate = new Date(birthday);
-        weights.forEach(function(w) {
+        if (!isNaN(bDate.getTime())) weights.forEach(function(w) {
           var wDate = new Date(w.date || w.d);
           var monthAge = Math.round((wDate - bDate) / (1000 * 60 * 60 * 24 * 30));
           if (monthAge >= 0 && monthAge < 12) {
@@ -1660,14 +1705,15 @@ Error generating stack: `+n.message+`
 
         if (lastUserMonth >= 0 && lastUserMonth < 12) {
           var expected = months[lastUserMonth];
+          if (expected <= 0) { status.style.display = 'none'; return; } // zero division guard
           var pct = ((lastUserWeight / expected) * 100).toFixed(0);
           var msg = '';
           if (pct >= 90 && pct <= 110) {
-            msg = '✅ ' + name + 'は犬種平均とほぼ同じ成長ペース（' + pct + '%）です。順調です！';
+            msg = '✅ ' + safeName + 'は犬種平均とほぼ同じペースで育っているよ（' + pct + '%）。順調だね！';
           } else if (pct > 110) {
-            msg = '📈 ' + name + 'は犬種平均より大きめ（' + pct + '%）です。フードの量を確認しましょう。';
+            msg = '📈 ' + safeName + 'は犬種平均よりちょっと大きめ（' + pct + '%）だよ。フードの量を見直してみてね。';
           } else {
-            msg = '📉 ' + name + 'は犬種平均よりやや小さめ（' + pct + '%）です。気になる場合は獣医さんに相談を。';
+            msg = '📉 ' + safeName + 'は犬種平均よりちょっと小さめ（' + pct + '%）だよ。気になったら獣医さんに相談してみてね。';
           }
           status.textContent = msg;
           status.style.display = 'block';
@@ -1776,8 +1822,14 @@ Error generating stack: `+n.message+`
             grid.appendChild(chip);
           });
 
+          // Medical disclaimer
+          var disclaimer = document.createElement('div');
+          disclaimer.style.cssText = 'font-size:11px;color:' + (isDark ? '#777' : '#aaa') + ';margin:8px 0 4px;line-height:1.5;';
+          disclaimer.textContent = '※ AIの回答は参考情報だよ。心配なときは獣医さんに相談してね。';
+
           textarea.parentNode.insertBefore(label, textarea);
           textarea.parentNode.insertBefore(grid, textarea);
+          textarea.parentNode.insertBefore(disclaimer, textarea);
         }, 200);
       };
       clearInterval(_aiReadyCheck);
@@ -1817,7 +1869,7 @@ Error generating stack: `+n.message+`
     var banner = document.createElement('div');
     banner.className = 'ux-pwa-banner';
     banner.innerHTML = '<div class="ux-pwa-banner-icon">🐾</div>' +
-      '<div class="ux-pwa-banner-text"><div class="ux-pwa-banner-title">ホーム画面に追加</div><div class="ux-pwa-banner-sub">ワンタップでいつでも日記が書けます</div></div>' +
+      '<div class="ux-pwa-banner-text"><div class="ux-pwa-banner-title">ホーム画面に追加しよう</div><div class="ux-pwa-banner-sub">いつでもサッと日記が書けるようになるよ</div></div>' +
       '<div class="ux-pwa-banner-actions"><button class="ux-pwa-dismiss-btn" id="pwa-dismiss">あとで</button><button class="ux-pwa-install-btn" id="pwa-install">追加する</button></div>';
 
     document.body.appendChild(banner);
@@ -1832,7 +1884,7 @@ Error generating stack: `+n.message+`
             if (an && an.logEvent) an.logEvent('pwa_install', { outcome: 'accepted' });
           }
           _deferredPrompt = null;
-        });
+        }).catch(function() { _deferredPrompt = null; });
       }
       banner.remove();
     });
@@ -1849,7 +1901,7 @@ Error generating stack: `+n.message+`
   }
 
   // Also show a subtle install hint in the menu for iOS (which doesn't support beforeinstallprompt)
-  if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.matchMedia('(display-mode: standalone)').matches) {
+  if ((/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) && !window.matchMedia('(display-mode: standalone)').matches) {
     var btnPWA = document.createElement('button');
     btnPWA.textContent = '📲 ホーム画面に追加';
     btnPWA.addEventListener('click', function() {

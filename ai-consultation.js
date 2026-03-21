@@ -197,7 +197,8 @@ function _localFallback(question) {
     answer = 'ご相談ありがとうございます。\n\nお伝えいただいた内容について、一般的なアドバイスをさせていただきます。わんちゃんの体調で気になることがある場合は、症状の経過（いつから・どのくらいの頻度か）を記録して、かかりつけの動物病院に相談されることをおすすめします。\n\nこのアプリの日記機能で症状を記録しておくと、獣医さんに伝えやすくなりますよ。\n\n※この回答はAIによる参考情報です。心配な場合は獣医師にご相談ください。';
   }
 
-  incrementUsage();
+  // Don't consume free quota for fallback responses (endpoint not configured)
+  // incrementUsage(); — disabled until real AI endpoint is connected
   saveToHistory(question, answer);
   _trackEvent('ai_consultation', { question_length: question.length, fallback: true });
 
