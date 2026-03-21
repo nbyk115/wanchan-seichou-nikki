@@ -174,22 +174,22 @@ body.ux-dark-on .ux-milestone-card .ux-ms-title{color:#e0e0e0;}
 .ux-onboard-overlay .ux-ob-sub{font-size:15px;color:#888;line-height:1.8;margin-bottom:40px;max-width:300px;}
 .ux-onboard-overlay .ux-ob-start{background:#FF7B9C;color:#fff;border:none;padding:16px 48px;border-radius:18px;font-size:16px;font-weight:900;cursor:pointer;font-family:inherit;box-shadow:0 8px 24px rgba(255,123,156,.4);transition:transform .2s;}
 .ux-onboard-overlay .ux-ob-start:active{transform:scale(.96);}
-.ux-onboard-overlay .ux-ob-skip{margin-top:16px;background:none;border:none;color:#bbb;font-size:13px;cursor:pointer;font-family:inherit;}
+.ux-onboard-overlay .ux-ob-skip{margin-top:16px;background:none;border:none;color:#888;font-size:13px;cursor:pointer;font-family:inherit;min-height:44px;}
 
 /* Footprint / Visitor Log */
 .ux-footprint-panel{position:fixed;bottom:0;left:0;right:0;z-index:10001;background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -8px 40px rgba(0,0,0,.12);max-height:70vh;overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);padding:0 0 env(safe-area-inset-bottom,16px);}
 .ux-footprint-panel.ux-show{transform:translateY(0);}
 .ux-footprint-panel .ux-fp-header{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 12px;position:sticky;top:0;background:#fff;border-radius:24px 24px 0 0;border-bottom:1px solid #f0f0f0;}
 .ux-footprint-panel .ux-fp-title{font-size:17px;font-weight:900;color:#333;}
-.ux-footprint-panel .ux-fp-close{background:none;border:none;font-size:20px;cursor:pointer;padding:4px 8px;color:#999;}
+.ux-footprint-panel .ux-fp-close{background:none;border:none;font-size:20px;cursor:pointer;padding:10px 14px;min-width:44px;min-height:44px;color:#999;}
 .ux-fp-item{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid #f5f5f5;}
 .ux-fp-item:last-child{border-bottom:none;}
 .ux-fp-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#FFE8EC,#FF7B9C);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
 .ux-fp-info{flex:1;min-width:0;}
 .ux-fp-name{font-size:14px;font-weight:700;color:#333;}
-.ux-fp-time{font-size:12px;color:#aaa;margin-top:2px;}
+.ux-fp-time{font-size:12px;color:#888;margin-top:2px;}
 .ux-fp-action{font-size:12px;color:#FF7B9C;font-weight:600;margin-top:2px;}
-.ux-fp-empty{padding:40px 20px;text-align:center;color:#bbb;font-size:14px;}
+.ux-fp-empty{padding:40px 20px;text-align:center;color:#888;font-size:14px;}
 body.ux-dark-on .ux-footprint-panel{background:#2a2a3e;}
 body.ux-dark-on .ux-footprint-panel .ux-fp-header{background:#2a2a3e;border-color:#444;}
 body.ux-dark-on .ux-fp-name{color:#e0e0e0;}
@@ -200,13 +200,13 @@ body.ux-dark-on .ux-fp-item{border-color:#3a3a4e;}
 .ux-friend-panel.ux-show{transform:translateY(0);}
 .ux-friend-header{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 12px;position:sticky;top:0;background:#fff;border-radius:24px 24px 0 0;border-bottom:1px solid #f0f0f0;}
 .ux-friend-header .ux-fh-title{font-size:17px;font-weight:900;color:#333;}
-.ux-friend-header .ux-fh-close{background:none;border:none;font-size:20px;cursor:pointer;padding:4px 8px;color:#999;}
+.ux-friend-header .ux-fh-close{background:none;border:none;font-size:20px;cursor:pointer;padding:10px 14px;min-width:44px;min-height:44px;color:#999;}
 .ux-friend-card{padding:16px 20px;border-bottom:1px solid #f5f5f5;display:flex;align-items:center;gap:12px;}
 .ux-friend-card:last-child{border-bottom:none;}
 .ux-fc-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#E8F4FD,#7BC4FF);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
 .ux-fc-info{flex:1;min-width:0;}
 .ux-fc-name{font-size:15px;font-weight:700;color:#333;}
-.ux-fc-breed{font-size:12px;color:#aaa;margin-top:2px;}
+.ux-fc-breed{font-size:12px;color:#888;margin-top:2px;}
 .ux-fc-streak{font-size:11px;color:#FF7B9C;font-weight:600;margin-top:4px;}
 .ux-fc-actions{display:flex;gap:6px;}
 .ux-fc-actions button{padding:8px 12px;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
@@ -222,7 +222,7 @@ body.ux-dark-on .ux-friend-card{border-color:#3a3a4e;}
 .ux-dog-chip{display:flex;align-items:center;gap:4px;padding:6px 12px;border-radius:20px;background:#fff;border:2px solid #eee;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.06);color:#666;}
 .ux-dog-chip.ux-active{border-color:#FF7B9C;background:#FFF0F3;color:#FF7B9C;}
 .ux-dog-chip .ux-dc-emoji{font-size:14px;}
-.ux-dog-chip-add{width:28px;height:28px;border-radius:50%;background:#f5f5f5;border:2px dashed #ccc;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:#999;font-family:inherit;transition:all .2s;}
+.ux-dog-chip-add{width:44px;height:44px;border-radius:50%;background:#f5f5f5;border:2px dashed #ccc;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:#999;font-family:inherit;transition:all .2s;}
 .ux-dog-chip-add:hover{border-color:#FF7B9C;color:#FF7B9C;}
 body.ux-dark-on .ux-dog-chip{background:#2a2a3e;border-color:#444;color:#aaa;}
 body.ux-dark-on .ux-dog-chip.ux-active{border-color:#FF7B9C;background:#3a2a3e;color:#FF7B9C;}
@@ -230,7 +230,7 @@ body.ux-dark-on .ux-dog-chip-add{background:#3a3a4e;border-color:#555;}
 
 /* Reaction Quick Buttons */
 .ux-reaction-bar{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;}
-.ux-reaction-btn{padding:4px 10px;border-radius:16px;border:1.5px solid #eee;background:#fff;font-size:13px;cursor:pointer;transition:all .15s;font-family:inherit;}
+.ux-reaction-btn{padding:8px 12px;border-radius:16px;min-height:36px;border:1.5px solid #eee;background:#fff;font-size:13px;cursor:pointer;transition:all .15s;font-family:inherit;}
 .ux-reaction-btn:hover,.ux-reaction-btn.ux-reacted{border-color:#FF7B9C;background:#FFF0F3;}
 .ux-reaction-btn .ux-r-count{font-size:11px;color:#FF7B9C;font-weight:700;margin-left:2px;}
 </style>
@@ -265,6 +265,48 @@ Error generating stack: `+n.message+`
 <script>
 (function(){
   'use strict';
+
+  /* ==============================
+     0. UTILITIES
+     ============================== */
+  function safeSetItem(key, value) {
+    try { localStorage.setItem(key, value); return true; }
+    catch(e) { console.warn('localStorage quota exceeded for key:', key); return false; }
+  }
+
+  // Close any existing overlay/panel before opening a new one
+  function closeAllOverlays() {
+    ['.ux-share-overlay', '.ux-milestone-overlay', '.ux-onboard-overlay',
+     '.ux-footprint-panel.ux-show', '.ux-friend-panel.ux-show'].forEach(function(sel) {
+      var el = document.querySelector(sel);
+      if (el) { el.classList.remove('ux-show'); setTimeout(function() { el.remove(); }, 400); }
+    });
+  }
+
+  // Auto-focus first button in overlay after it opens
+  function autoFocusOverlay(overlay) {
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        overlay.classList.add('ux-show');
+        var btn = overlay.querySelector('button');
+        if (btn) setTimeout(function() { btn.focus(); }, 100);
+      });
+    });
+  }
+
+  // Trap focus inside overlay (Escape to close)
+  function trapFocus(overlay, onClose) {
+    overlay.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') { e.preventDefault(); onClose(); }
+      if (e.key === 'Tab') {
+        var focusable = overlay.querySelectorAll('button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])');
+        if (focusable.length === 0) return;
+        var first = focusable[0], last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    });
+  }
 
   /* ==============================
      1. TOAST SYSTEM (replaces alert)
@@ -496,7 +538,7 @@ Error generating stack: `+n.message+`
         clearTimeout(autoSaveTimers[key]);
         autoSaveTimers[key] = setTimeout(function() {
           if (ta.value.trim()) {
-            localStorage.setItem(key, ta.value);
+            safeSetItem(key, ta.value);
           } else {
             localStorage.removeItem(key);
           }
@@ -529,15 +571,6 @@ Error generating stack: `+n.message+`
   });
 
   /* ==============================
-     8. ENHANCED EMPTY STATES
-     ============================== */
-  // Empty states are handled by the app's own React components.
-  // We avoid modifying styles heuristically to prevent false positives.
-  function enhanceEmptyStates() {
-    // No-op: removed fragile heuristic that could misidentify content as empty states
-  }
-
-  /* ==============================
      9. SCROLL IMPROVEMENTS
      ============================== */
   // Add momentum scrolling to overflow containers
@@ -554,15 +587,18 @@ Error generating stack: `+n.message+`
      10. MUTATION OBSERVER - Apply enhancements on DOM changes
      ============================== */
   var debounceTimer;
+
+  function runAllEnhancements() {
+    enhanceAccessibility();
+    enableLazyLoading();
+    enableAutoSave();
+    enhanceScrolling();
+    if (typeof addReactionsToEntries === 'function') addReactionsToEntries();
+  }
+
   var observer = new MutationObserver(function() {
     clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(function() {
-      enhanceAccessibility();
-      enableLazyLoading();
-      enableAutoSave();
-      enhanceEmptyStates();
-      enhanceScrolling();
-    }, 150);
+    debounceTimer = setTimeout(runAllEnhancements, 150);
   });
 
   // Start observing when root is ready
@@ -571,11 +607,7 @@ Error generating stack: `+n.message+`
     if (root) {
       observer.observe(root, { childList: true, subtree: true });
       // Initial run
-      setTimeout(function() {
-        enhanceAccessibility();
-        enableLazyLoading();
-        enhanceScrolling();
-      }, 500);
+      setTimeout(runAllEnhancements, 500);
     } else {
       setTimeout(startObserving, 100);
     }
@@ -588,7 +620,6 @@ Error generating stack: `+n.message+`
   var ric = window.requestIdleCallback || function(cb) { setTimeout(cb, 200); };
   ric(function() {
     enableAutoSave();
-    enhanceEmptyStates();
   });
 
   /* ==============================
@@ -615,7 +646,7 @@ Error generating stack: `+n.message+`
     var modes = ['auto', 'on', 'off'];
     var current = localStorage.getItem('ux_dark_mode') || 'auto';
     var next = modes[(modes.indexOf(current) + 1) % modes.length];
-    localStorage.setItem('ux_dark_mode', next);
+    safeSetItem('ux_dark_mode', next);
     applyDarkMode();
     var labels = {auto: 'ダークモード: 自動', on: 'ダークモード: ON', off: 'ダークモード: OFF'};
     showToast(labels[next], 'info');
@@ -670,7 +701,7 @@ Error generating stack: `+n.message+`
           var count = 0;
           for (var key in data) {
             if (data.hasOwnProperty(key)) {
-              localStorage.setItem(key, data[key]);
+              safeSetItem(key, data[key]);
               count++;
             }
           }
@@ -748,7 +779,7 @@ Error generating stack: `+n.message+`
     data.lastDate = today;
     data.best = Math.max(data.best || 0, data.current);
     data.totalDays = (data.totalDays || 0) + 1;
-    localStorage.setItem('ux_streak', JSON.stringify(data));
+    safeSetItem('ux_streak', JSON.stringify(data));
     return data;
   }
 
@@ -797,8 +828,7 @@ Error generating stack: `+n.message+`
      15. SNS SHARE CARD (バイラルループ)
      ============================== */
   function showShareCard(streakData) {
-    var existing = document.querySelector('.ux-share-overlay');
-    if (existing) existing.remove();
+    closeAllOverlays();
 
     var overlay = document.createElement('div');
     overlay.className = 'ux-share-overlay';
@@ -890,16 +920,15 @@ Error generating stack: `+n.message+`
     document.body.appendChild(overlay);
 
     // Click outside to close
+    function closeShare() {
+      overlay.classList.remove('ux-show');
+      setTimeout(function() { overlay.remove(); }, 300);
+    }
     overlay.addEventListener('click', function(e) {
-      if (e.target === overlay) {
-        overlay.classList.remove('ux-show');
-        setTimeout(function() { overlay.remove(); }, 300);
-      }
+      if (e.target === overlay) closeShare();
     });
-
-    requestAnimationFrame(function() {
-      requestAnimationFrame(function() { overlay.classList.add('ux-show'); });
-    });
+    trapFocus(overlay, closeShare);
+    autoFocusOverlay(overlay);
   }
 
   /* ==============================
@@ -924,7 +953,7 @@ Error generating stack: `+n.message+`
       var ms = MILESTONES[i];
       if (data.current === ms.days && !shown[ms.days]) {
         shown[ms.days] = true;
-        localStorage.setItem('ux_milestones_shown', JSON.stringify(shown));
+        safeSetItem('ux_milestones_shown', JSON.stringify(shown));
         setTimeout(function() { showMilestone(ms, data); }, 800);
         return;
       }
@@ -969,9 +998,12 @@ Error generating stack: `+n.message+`
     overlay.appendChild(card);
     document.body.appendChild(overlay);
 
-    requestAnimationFrame(function() {
-      requestAnimationFrame(function() { overlay.classList.add('ux-show'); });
-    });
+    function closeMilestone() {
+      overlay.classList.remove('ux-show');
+      setTimeout(function() { overlay.remove(); }, 400);
+    }
+    trapFocus(overlay, closeMilestone);
+    autoFocusOverlay(overlay);
 
     // Haptic for celebration
     triggerHaptic('heavy');
@@ -1007,7 +1039,7 @@ Error generating stack: `+n.message+`
     skip.textContent = 'すでにデータがあります';
 
     function closeOnboard() {
-      localStorage.setItem('ux_onboarded', '1');
+      safeSetItem('ux_onboarded', '1');
       overlay.classList.remove('ux-show');
       setTimeout(function() { overlay.remove(); }, 500);
     }
@@ -1022,9 +1054,8 @@ Error generating stack: `+n.message+`
     overlay.appendChild(skip);
     document.body.appendChild(overlay);
 
-    requestAnimationFrame(function() {
-      requestAnimationFrame(function() { overlay.classList.add('ux-show'); });
-    });
+    trapFocus(overlay, closeOnboard);
+    autoFocusOverlay(overlay);
   }
 
   // Show onboarding after app is loaded
@@ -1065,7 +1096,7 @@ Error generating stack: `+n.message+`
       var anniversaries = [7, 30, 50, 100, 200, 365, 500, 730, 1000];
       for (var k = 0; k < anniversaries.length; k++) {
         if (diffDays === anniversaries[k] && lastAnniv !== today) {
-          localStorage.setItem('ux_last_anniversary', today);
+          safeSetItem('ux_last_anniversary', today);
           var dayLabel = diffDays >= 365 ? Math.floor(diffDays / 365) + '年' : diffDays + '日';
           showToast('🎉 わんちゃん日記を始めて' + dayLabel + '！おめでとう！', 'success');
           return;
@@ -1094,7 +1125,7 @@ Error generating stack: `+n.message+`
     });
     // Keep only last 50
     if (footprints.length > 50) footprints = footprints.slice(0, 50);
-    localStorage.setItem('ux_footprints', JSON.stringify(footprints));
+    safeSetItem('ux_footprints', JSON.stringify(footprints));
     return footprints;
   }
 
@@ -1112,6 +1143,9 @@ Error generating stack: `+n.message+`
   function showFootprintPanel() {
     var existing = document.querySelector('.ux-footprint-panel');
     if (existing) { existing.classList.toggle('ux-show'); return; }
+    // Close friend panel if open
+    var friendPanel = document.querySelector('.ux-friend-panel');
+    if (friendPanel) friendPanel.classList.remove('ux-show');
 
     var panel = document.createElement('div');
     panel.className = 'ux-footprint-panel';
@@ -1124,6 +1158,7 @@ Error generating stack: `+n.message+`
     var close = document.createElement('button');
     close.className = 'ux-fp-close';
     close.textContent = '✕';
+    close.setAttribute('aria-label', '閉じる');
     close.addEventListener('click', function() { panel.classList.remove('ux-show'); });
     header.appendChild(title);
     header.appendChild(close);
@@ -1196,13 +1231,16 @@ Error generating stack: `+n.message+`
       { id: 4, name: 'マルくん飼い主', breed: 'マルチーズ', emoji: '🦮', streak: 5, reactions: [] },
       { id: 5, name: 'モモの親', breed: 'ゴールデン', emoji: '🐕‍🦺', streak: 31, reactions: [] }
     ];
-    localStorage.setItem('ux_friends', JSON.stringify(friends));
+    safeSetItem('ux_friends', JSON.stringify(friends));
     return friends;
   }
 
   function showFriendPanel() {
     var existing = document.querySelector('.ux-friend-panel');
     if (existing) { existing.classList.toggle('ux-show'); return; }
+    // Close footprint panel if open
+    var fpPanel = document.querySelector('.ux-footprint-panel');
+    if (fpPanel) fpPanel.classList.remove('ux-show');
 
     var panel = document.createElement('div');
     panel.className = 'ux-friend-panel';
@@ -1215,6 +1253,7 @@ Error generating stack: `+n.message+`
     var close = document.createElement('button');
     close.className = 'ux-fh-close';
     close.textContent = '✕';
+    close.setAttribute('aria-label', '閉じる');
     close.addEventListener('click', function() { panel.classList.remove('ux-show'); });
     header.appendChild(title);
     header.appendChild(close);
@@ -1347,7 +1386,7 @@ Error generating stack: `+n.message+`
       chip.appendChild(nameSpan);
 
       chip.addEventListener('click', function() {
-        localStorage.setItem('ux_active_dog', dog.id);
+        safeSetItem('ux_active_dog', dog.id);
         showToast(dog.name + 'に切り替えました', 'info');
         triggerHaptic('light');
         renderDogSwitcher();
@@ -1396,17 +1435,23 @@ Error generating stack: `+n.message+`
         var btn = document.createElement('button');
         btn.className = 'ux-reaction-btn' + (entryReactions[r] ? ' ux-reacted' : '');
         var count = (entryReactions[r] || 0) + Math.floor(Math.random() * 3); // Simulate community
-        btn.innerHTML = r + (count > 0 ? '<span class="ux-r-count">' + count + '</span>' : '');
+        btn.textContent = r;
+        if (count > 0) {
+          var countSpan = document.createElement('span');
+          countSpan.className = 'ux-r-count';
+          countSpan.textContent = count;
+          btn.appendChild(countSpan);
+        }
 
         btn.addEventListener('click', function(e) {
           e.stopPropagation();
           if (!reactionData[entryId]) reactionData[entryId] = {};
           reactionData[entryId][r] = (reactionData[entryId][r] || 0) + 1;
-          localStorage.setItem('ux_reactions', JSON.stringify(reactionData));
+          safeSetItem('ux_reactions', JSON.stringify(reactionData));
           btn.classList.add('ux-reacted');
           var countEl = btn.querySelector('.ux-r-count');
           if (countEl) {
-            countEl.textContent = parseInt(countEl.textContent) + 1;
+            countEl.textContent = (parseInt(countEl.textContent, 10) || 0) + 1;
           } else {
             var s = document.createElement('span');
             s.className = 'ux-r-count';
@@ -1422,34 +1467,6 @@ Error generating stack: `+n.message+`
       card.appendChild(bar);
     });
   }
-
-  // Add to MutationObserver cycle
-  var origDebounceTimer = debounceTimer;
-  var origObserverCallback = observer.disconnect.bind(observer);
-
-  // Patch the observer to include reactions
-  observer.disconnect();
-  var enhancedObserver = new MutationObserver(function() {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(function() {
-      enhanceAccessibility();
-      enableLazyLoading();
-      enableAutoSave();
-      enhanceEmptyStates();
-      enhanceScrolling();
-      addReactionsToEntries();
-    }, 150);
-  });
-
-  function startObservingEnhanced() {
-    var root = document.getElementById('root');
-    if (root) {
-      enhancedObserver.observe(root, { childList: true, subtree: true });
-    } else {
-      setTimeout(startObservingEnhanced, 100);
-    }
-  }
-  startObservingEnhanced();
 
   // Add community buttons to backup FAB menu
   var btnFootprints = document.createElement('button');
