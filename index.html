@@ -1795,8 +1795,12 @@ Error generating stack: `+n.message+`
             var chip = document.createElement('button');
             chip.className = 'ux-symptom-chip';
             chip.innerHTML = symptom.icon + '<br>' + symptom.label;
+            chip.setAttribute('role', 'checkbox');
+            chip.setAttribute('aria-checked', 'false');
+            chip.setAttribute('aria-label', symptom.label);
             chip.addEventListener('click', function() {
-              chip.classList.toggle('ux-selected');
+              var isSelected = chip.classList.toggle('ux-selected');
+              chip.setAttribute('aria-checked', isSelected ? 'true' : 'false');
               var idx = selectedSymptoms.indexOf(symptom.label);
               if (idx > -1) {
                 selectedSymptoms.splice(idx, 1);
@@ -1804,18 +1808,18 @@ Error generating stack: `+n.message+`
                 selectedSymptoms.push(symptom.label);
               }
               // Update textarea with selected symptoms
-              if (selectedSymptoms.length > 0) {
-                var prefix = selectedSymptoms.join('、') + 'の症状があります。';
-                var current = textarea.value;
-                // Remove previous symptom prefix
-                current = current.replace(/^.+の症状があります。\s*/,'');
-                try {
-                  var nativeSet = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
-                  nativeSet.call(textarea, prefix + current);
-                  textarea.dispatchEvent(new Event('input', { bubbles: true }));
-                } catch(e) {
-                  textarea.value = prefix + current;
-                }
+              var current = textarea.value;
+              // Remove previous symptom prefix
+              current = current.replace(/^.+の症状があります。\s*/, '');
+              var newVal = selectedSymptoms.length > 0
+                ? selectedSymptoms.join('、') + 'の症状があります。' + current
+                : current;
+              try {
+                var nativeSet = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
+                nativeSet.call(textarea, newVal);
+                textarea.dispatchEvent(new Event('input', { bubbles: true }));
+              } catch(e) {
+                textarea.value = newVal;
               }
               triggerHaptic('light');
             });
