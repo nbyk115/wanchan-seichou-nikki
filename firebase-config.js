@@ -20,12 +20,12 @@ import { getFirestore, collection, doc, setDoc, getDoc, getDocs, addDoc,
 // TODO: Replace with your Firebase project config
 // ============================================================
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.firebasestorage.app",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDiQeQW9EgAI8BbZ9Z030ADJsLeA64VzAs",
+  authDomain: "wanchan-diary.firebaseapp.com",
+  projectId: "wanchan-diary",
+  storageBucket: "wanchan-diary.firebasestorage.app",
+  messagingSenderId: "151633084436",
+  appId: "1:151633084436:web:ac8ffa692e4ba1839a2701"
 };
 
 // Skip initialization if config is not set
