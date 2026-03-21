@@ -176,46 +176,6 @@ body.ux-dark-on .ux-milestone-card .ux-ms-title{color:#e0e0e0;}
 .ux-onboard-overlay .ux-ob-start:active{transform:scale(.96);}
 .ux-onboard-overlay .ux-ob-skip{margin-top:16px;background:none;border:none;color:#888;font-size:13px;cursor:pointer;font-family:inherit;min-height:44px;}
 
-/* Footprint / Visitor Log */
-.ux-footprint-panel{position:fixed;bottom:0;left:0;right:0;z-index:10001;background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -8px 40px rgba(0,0,0,.12);max-height:70vh;overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);padding:0 0 env(safe-area-inset-bottom,16px);}
-.ux-footprint-panel.ux-show{transform:translateY(0);}
-.ux-footprint-panel .ux-fp-header{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 12px;position:sticky;top:0;background:#fff;border-radius:24px 24px 0 0;border-bottom:1px solid #f0f0f0;}
-.ux-footprint-panel .ux-fp-title{font-size:17px;font-weight:900;color:#333;}
-.ux-footprint-panel .ux-fp-close{background:none;border:none;font-size:20px;cursor:pointer;padding:10px 14px;min-width:44px;min-height:44px;color:#999;}
-.ux-fp-item{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid #f5f5f5;}
-.ux-fp-item:last-child{border-bottom:none;}
-.ux-fp-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#FFE8EC,#FF7B9C);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
-.ux-fp-info{flex:1;min-width:0;}
-.ux-fp-name{font-size:14px;font-weight:700;color:#333;}
-.ux-fp-time{font-size:12px;color:#888;margin-top:2px;}
-.ux-fp-action{font-size:12px;color:#FF7B9C;font-weight:600;margin-top:2px;}
-.ux-fp-empty{padding:40px 20px;text-align:center;color:#888;font-size:14px;}
-body.ux-dark-on .ux-footprint-panel{background:#2a2a3e;}
-body.ux-dark-on .ux-footprint-panel .ux-fp-header{background:#2a2a3e;border-color:#444;}
-body.ux-dark-on .ux-fp-name{color:#e0e0e0;}
-body.ux-dark-on .ux-fp-item{border-color:#3a3a4e;}
-
-/* Friend Communication Panel */
-.ux-friend-panel{position:fixed;bottom:0;left:0;right:0;z-index:10001;background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -8px 40px rgba(0,0,0,.12);max-height:80vh;overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);padding:0 0 env(safe-area-inset-bottom,16px);}
-.ux-friend-panel.ux-show{transform:translateY(0);}
-.ux-friend-header{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 12px;position:sticky;top:0;background:#fff;border-radius:24px 24px 0 0;border-bottom:1px solid #f0f0f0;}
-.ux-friend-header .ux-fh-title{font-size:17px;font-weight:900;color:#333;}
-.ux-friend-header .ux-fh-close{background:none;border:none;font-size:20px;cursor:pointer;padding:10px 14px;min-width:44px;min-height:44px;color:#999;}
-.ux-friend-card{padding:16px 20px;border-bottom:1px solid #f5f5f5;display:flex;align-items:center;gap:12px;}
-.ux-friend-card:last-child{border-bottom:none;}
-.ux-fc-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#E8F4FD,#7BC4FF);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
-.ux-fc-info{flex:1;min-width:0;}
-.ux-fc-name{font-size:15px;font-weight:700;color:#333;}
-.ux-fc-breed{font-size:12px;color:#888;margin-top:2px;}
-.ux-fc-streak{font-size:11px;color:#FF7B9C;font-weight:600;margin-top:4px;}
-.ux-fc-actions{display:flex;gap:6px;}
-.ux-fc-actions button{padding:8px 12px;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
-.ux-fc-btn-paw{background:#FFE8EC;color:#FF7B9C;}
-.ux-fc-btn-msg{background:#E8F4FD;color:#4A9EDB;}
-body.ux-dark-on .ux-friend-panel{background:#2a2a3e;}
-body.ux-dark-on .ux-friend-header{background:#2a2a3e;border-color:#444;}
-body.ux-dark-on .ux-fc-name{color:#e0e0e0;}
-body.ux-dark-on .ux-friend-card{border-color:#3a3a4e;}
 
 /* Multi-Dog Quick Switcher */
 .ux-dog-switcher{position:fixed;top:env(safe-area-inset-top,12px);left:12px;z-index:9997;display:flex;gap:6px;align-items:center;}
@@ -228,11 +188,6 @@ body.ux-dark-on .ux-dog-chip{background:#2a2a3e;border-color:#444;color:#aaa;}
 body.ux-dark-on .ux-dog-chip.ux-active{border-color:#FF7B9C;background:#3a2a3e;color:#FF7B9C;}
 body.ux-dark-on .ux-dog-chip-add{background:#3a3a4e;border-color:#555;}
 
-/* Reaction Quick Buttons */
-.ux-reaction-bar{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;}
-.ux-reaction-btn{padding:8px 12px;border-radius:16px;min-height:36px;border:1.5px solid #eee;background:#fff;font-size:13px;cursor:pointer;transition:all .15s;font-family:inherit;}
-.ux-reaction-btn:hover,.ux-reaction-btn.ux-reacted{border-color:#FF7B9C;background:#FFF0F3;}
-.ux-reaction-btn .ux-r-count{font-size:11px;color:#FF7B9C;font-weight:700;margin-left:2px;}
 </style>
   <script type="module">(function(){const z=document.createElement("link").relList;if(z&&z.supports&&z.supports("modulepreload"))return;for(const S of document.querySelectorAll('link[rel="modulepreload"]'))o(S);new MutationObserver(S=>{for(const M of S)if(M.type==="childList")for(const q of M.addedNodes)q.tagName==="LINK"&&q.rel==="modulepreload"&&o(q)}).observe(document,{childList:!0,subtree:!0});function r(S){const M={};return S.integrity&&(M.integrity=S.integrity),S.referrerPolicy&&(M.referrerPolicy=S.referrerPolicy),S.crossOrigin==="use-credentials"?M.credentials="include":S.crossOrigin==="anonymous"?M.credentials="omit":M.credentials="same-origin",M}function o(S){if(S.ep)return;S.ep=!0;const M=r(S);fetch(S.href,M)}})();function c0(s){return s&&s.__esModule&&Object.prototype.hasOwnProperty.call(s,"default")?s.default:s}var hf={exports:{}},Aa={};var Tr;function f0(){if(Tr)return Aa;Tr=1;var s=Symbol.for("react.transitional.element"),z=Symbol.for("react.fragment");function r(o,S,M){var q=null;if(M!==void 0&&(q=""+M),S.key!==void 0&&(q=""+S.key),"key"in S){M={};for(var _ in S)_!=="key"&&(M[_]=S[_])}else M=S;return S=M.ref,{$$typeof:s,type:o,key:q,ref:S!==void 0?S:null,props:M}}return Aa.Fragment=z,Aa.jsx=r,Aa.jsxs=r,Aa}var Er;function s0(){return Er||(Er=1,hf.exports=f0()),hf.exports}var u=s0(),gf={exports:{}},tt={};var Ar;function o0(){if(Ar)return tt;Ar=1;var s=Symbol.for("react.transitional.element"),z=Symbol.for("react.portal"),r=Symbol.for("react.fragment"),o=Symbol.for("react.strict_mode"),S=Symbol.for("react.profiler"),M=Symbol.for("react.consumer"),q=Symbol.for("react.context"),_=Symbol.for("react.forward_ref"),x=Symbol.for("react.suspense"),y=Symbol.for("react.memo"),A=Symbol.for("react.lazy"),E=Symbol.for("react.activity"),b=Symbol.iterator;function Q(g){return g===null||typeof g!="object"?null:(g=b&&g[b]||g["@@iterator"],typeof g=="function"?g:null)}var G={isMounted:function(){return!1},enqueueForceUpdate:function(){},enqueueReplaceState:function(){},enqueueSetState:function(){}},U=Object.assign,X={};function Y(g,B,Z){this.props=g,this.context=B,this.refs=X,this.updater=Z||G}Y.prototype.isReactComponent={},Y.prototype.setState=function(g,B){if(typeof g!="object"&&typeof g!="function"&&g!=null)throw Error("takes an object of state variables to update or a function which returns an object of state variables.");this.updater.enqueueSetState(this,g,B,"setState")},Y.prototype.forceUpdate=function(g){this.updater.enqueueForceUpdate(this,g,"forceUpdate")};function J(){}J.prototype=Y.prototype;function lt(g,B,Z){this.props=g,this.context=B,this.refs=X,this.updater=Z||G}var gt=lt.prototype=new J;gt.constructor=lt,U(gt,Y.prototype),gt.isPureReactComponent=!0;var Dt=Array.isArray;function yt(){}var F={H:null,A:null,T:null,S:null},k=Object.prototype.hasOwnProperty;function N(g,B,Z){var V=Z.ref;return{$$typeof:s,type:g,key:B,ref:V!==void 0?V:null,props:Z}}function P(g,B){return N(g.type,B,g.props)}function it(g){return typeof g=="object"&&g!==null&&g.$$typeof===s}function ht(g){var B={"=":"=0",":":"=2"};return"$"+g.replace(/[=:]/g,function(Z){return B[Z]})}var xl=/\/+/g;function fl(g,B){return typeof g=="object"&&g!==null&&g.key!=null?ht(""+g.key):B.toString(36)}function Gt(g){switch(g.status){case"fulfilled":return g.value;case"rejected":throw g.reason;default:switch(typeof g.status=="string"?g.then(yt,yt):(g.status="pending",g.then(function(B){g.status==="pending"&&(g.status="fulfilled",g.value=B)},function(B){g.status==="pending"&&(g.status="rejected",g.reason=B)})),g.status){case"fulfilled":return g.value;case"rejected":throw g.reason}}throw g}function C(g,B,Z,V,et){var ct=typeof g;(ct==="undefined"||ct==="boolean")&&(g=null);var xt=!1;if(g===null)xt=!0;else switch(ct){case"bigint":case"string":case"number":xt=!0;break;case"object":switch(g.$$typeof){case s:case z:xt=!0;break;case A:return xt=g._init,C(xt(g._payload),B,Z,V,et)}}if(xt)return et=et(g),xt=V===""?"."+fl(g,0):V,Dt(et)?(Z="",xt!=null&&(Z=xt.replace(xl,"$&/")+"/"),C(et,B,Z,"",function(Bn){return Bn})):et!=null&&(it(et)&&(et=P(et,Z+(et.key==null||g&&g.key===et.key?"":(""+et.key).replace(xl,"$&/")+"/")+xt)),B.push(et)),1;xt=0;var $t=V===""?".":V+":";if(Dt(g))for(var Bt=0;Bt<g.length;Bt++)V=g[Bt],ct=$t+fl(V,Bt),xt+=C(V,B,Z,ct,et);else if(Bt=Q(g),typeof Bt=="function")for(g=Bt.call(g),Bt=0;!(V=g.next()).done;)V=V.value,ct=$t+fl(V,Bt++),xt+=C(V,B,Z,ct,et);else if(ct==="object"){if(typeof g.then=="function")return C(Gt(g),B,Z,V,et);throw B=String(g),Error("Objects are not valid as a React child (found: "+(B==="[object Object]"?"object with keys {"+Object.keys(g).join(", ")+"}":B)+"). If you meant to render a collection of children, use an array instead.")}return xt}function H(g,B,Z){if(g==null)return g;var V=[],et=0;return C(g,V,"","",function(ct){return B.call(Z,ct,et++)}),V}function w(g){if(g._status===-1){var B=g._result;B=B(),B.then(function(Z){(g._status===0||g._status===-1)&&(g._status=1,g._result=Z)},function(Z){(g._status===0||g._status===-1)&&(g._status=2,g._result=Z)}),g._status===-1&&(g._status=0,g._result=B)}if(g._status===1)return g._result.default;throw g._result}var ut=typeof reportError=="function"?reportError:function(g){if(typeof window=="object"&&typeof window.ErrorEvent=="function"){var B=new window.ErrorEvent("error",{bubbles:!0,cancelable:!0,message:typeof g=="object"&&g!==null&&typeof g.message=="string"?String(g.message):String(g),error:g});if(!window.dispatchEvent(B))return}else if(typeof process=="object"&&typeof process.emit=="function"){process.emit("uncaughtException",g);return}console.error(g)},bt={map:H,forEach:function(g,B,Z){H(g,function(){B.apply(this,arguments)},Z)},count:function(g){var B=0;return H(g,function(){B++}),B},toArray:function(g){return H(g,function(B){return B})||[]},only:function(g){if(!it(g))throw Error("React.Children.only expected to receive a single React element child.");return g}};return tt.Activity=E,tt.Children=bt,tt.Component=Y,tt.Fragment=r,tt.Profiler=S,tt.PureComponent=lt,tt.StrictMode=o,tt.Suspense=x,tt.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE=F,tt.__COMPILER_RUNTIME={__proto__:null,c:function(g){return F.H.useMemoCache(g)}},tt.cache=function(g){return function(){return g.apply(null,arguments)}},tt.cacheSignal=function(){return null},tt.cloneElement=function(g,B,Z){if(g==null)throw Error("The argument must be a React element, but you passed "+g+".");var V=U({},g.props),et=g.key;if(B!=null)for(ct in B.key!==void 0&&(et=""+B.key),B)!k.call(B,ct)||ct==="key"||ct==="__self"||ct==="__source"||ct==="ref"&&B.ref===void 0||(V[ct]=B[ct]);var ct=arguments.length-2;if(ct===1)V.children=Z;else if(1<ct){for(var xt=Array(ct),$t=0;$t<ct;$t++)xt[$t]=arguments[$t+2];V.children=xt}return N(g.type,et,V)},tt.createContext=function(g){return g={$$typeof:q,_currentValue:g,_currentValue2:g,_threadCount:0,Provider:null,Consumer:null},g.Provider=g,g.Consumer={$$typeof:M,_context:g},g},tt.createElement=function(g,B,Z){var V,et={},ct=null;if(B!=null)for(V in B.key!==void 0&&(ct=""+B.key),B)k.call(B,V)&&V!=="key"&&V!=="__self"&&V!=="__source"&&(et[V]=B[V]);var xt=arguments.length-2;if(xt===1)et.children=Z;else if(1<xt){for(var $t=Array(xt),Bt=0;Bt<xt;Bt++)$t[Bt]=arguments[Bt+2];et.children=$t}if(g&&g.defaultProps)for(V in xt=g.defaultProps,xt)et[V]===void 0&&(et[V]=xt[V]);return N(g,ct,et)},tt.createRef=function(){return{current:null}},tt.forwardRef=function(g){return{$$typeof:_,render:g}},tt.isValidElement=it,tt.lazy=function(g){return{$$typeof:A,_payload:{_status:-1,_result:g},_init:w}},tt.memo=function(g,B){return{$$typeof:y,type:g,compare:B===void 0?null:B}},tt.startTransition=function(g){var B=F.T,Z={};F.T=Z;try{var V=g(),et=F.S;et!==null&&et(Z,V),typeof V=="object"&&V!==null&&typeof V.then=="function"&&V.then(yt,ut)}catch(ct){ut(ct)}finally{B!==null&&Z.types!==null&&(B.types=Z.types),F.T=B}},tt.unstable_useCacheRefresh=function(){return F.H.useCacheRefresh()},tt.use=function(g){return F.H.use(g)},tt.useActionState=function(g,B,Z){return F.H.useActionState(g,B,Z)},tt.useCallback=function(g,B){return F.H.useCallback(g,B)},tt.useContext=function(g){return F.H.useContext(g)},tt.useDebugValue=function(){},tt.useDeferredValue=function(g,B){return F.H.useDeferredValue(g,B)},tt.useEffect=function(g,B){return F.H.useEffect(g,B)},tt.useEffectEvent=function(g){return F.H.useEffectEvent(g)},tt.useId=function(){return F.H.useId()},tt.useImperativeHandle=function(g,B,Z){return F.H.useImperativeHandle(g,B,Z)},tt.useInsertionEffect=function(g,B){return F.H.useInsertionEffect(g,B)},tt.useLayoutEffect=function(g,B){return F.H.useLayoutEffect(g,B)},tt.useMemo=function(g,B){return F.H.useMemo(g,B)},tt.useOptimistic=function(g,B){return F.H.useOptimistic(g,B)},tt.useReducer=function(g,B,Z){return F.H.useReducer(g,B,Z)},tt.useRef=function(g){return F.H.useRef(g)},tt.useState=function(g){return F.H.useState(g)},tt.useSyncExternalStore=function(g,B,Z){return F.H.useSyncExternalStore(g,B,Z)},tt.useTransition=function(){return F.H.useTransition()},tt.version="19.2.4",tt}var Dr;function Sf(){return Dr||(Dr=1,gf.exports=o0()),gf.exports}var W=Sf(),yf={exports:{}},Da={},mf={exports:{}},pf={};var Cr;function d0(){return Cr||(Cr=1,(function(s){function z(C,H){var w=C.length;C.push(H);t:for(;0<w;){var ut=w-1>>>1,bt=C[ut];if(0<S(bt,H))C[ut]=H,C[w]=bt,w=ut;else break t}}function r(C){return C.length===0?null:C[0]}function o(C){if(C.length===0)return null;var H=C[0],w=C.pop();if(w!==H){C[0]=w;t:for(var ut=0,bt=C.length,g=bt>>>1;ut<g;){var B=2*(ut+1)-1,Z=C[B],V=B+1,et=C[V];if(0>S(Z,w))V<bt&&0>S(et,Z)?(C[ut]=et,C[V]=w,ut=V):(C[ut]=Z,C[B]=w,ut=B);else if(V<bt&&0>S(et,w))C[ut]=et,C[V]=w,ut=V;else break t}}return H}function S(C,H){var w=C.sortIndex-H.sortIndex;return w!==0?w:C.id-H.id}if(s.unstable_now=void 0,typeof performance=="object"&&typeof performance.now=="function"){var M=performance;s.unstable_now=function(){return M.now()}}else{var q=Date,_=q.now();s.unstable_now=function(){return q.now()-_}}var x=[],y=[],A=1,E=null,b=3,Q=!1,G=!1,U=!1,X=!1,Y=typeof setTimeout=="function"?setTimeout:null,J=typeof clearTimeout=="function"?clearTimeout:null,lt=typeof setImmediate<"u"?setImmediate:null;function gt(C){for(var H=r(y);H!==null;){if(H.callback===null)o(y);else if(H.startTime<=C)o(y),H.sortIndex=H.expirationTime,z(x,H);else break;H=r(y)}}function Dt(C){if(U=!1,gt(C),!G)if(r(x)!==null)G=!0,yt||(yt=!0,ht());else{var H=r(y);H!==null&&Gt(Dt,H.startTime-C)}}var yt=!1,F=-1,k=5,N=-1;function P(){return X?!0:!(s.unstable_now()-N<k)}function it(){if(X=!1,yt){var C=s.unstable_now();N=C;var H=!0;try{t:{G=!1,U&&(U=!1,J(F),F=-1),Q=!0;var w=b;try{l:{for(gt(C),E=r(x);E!==null&&!(E.expirationTime>C&&P());){var ut=E.callback;if(typeof ut=="function"){E.callback=null,b=E.priorityLevel;var bt=ut(E.expirationTime<=C);if(C=s.unstable_now(),typeof bt=="function"){E.callback=bt,gt(C),H=!0;break l}E===r(x)&&o(x),gt(C)}else o(x);E=r(x)}if(E!==null)H=!0;else{var g=r(y);g!==null&&Gt(Dt,g.startTime-C),H=!1}}break t}finally{E=null,b=w,Q=!1}H=void 0}}finally{H?ht():yt=!1}}}var ht;if(typeof lt=="function")ht=function(){lt(it)};else if(typeof MessageChannel<"u"){var xl=new MessageChannel,fl=xl.port2;xl.port1.onmessage=it,ht=function(){fl.postMessage(null)}}else ht=function(){Y(it,0)};function Gt(C,H){F=Y(function(){C(s.unstable_now())},H)}s.unstable_IdlePriority=5,s.unstable_ImmediatePriority=1,s.unstable_LowPriority=4,s.unstable_NormalPriority=3,s.unstable_Profiling=null,s.unstable_UserBlockingPriority=2,s.unstable_cancelCallback=function(C){C.callback=null},s.unstable_forceFrameRate=function(C){0>C||125<C?console.error("forceFrameRate takes a positive int between 0 and 125, forcing frame rates higher than 125 fps is not supported"):k=0<C?Math.floor(1e3/C):5},s.unstable_getCurrentPriorityLevel=function(){return b},s.unstable_next=function(C){switch(b){case 1:case 2:case 3:var H=3;break;default:H=b}var w=b;b=H;try{return C()}finally{b=w}},s.unstable_requestPaint=function(){X=!0},s.unstable_runWithPriority=function(C,H){switch(C){case 1:case 2:case 3:case 4:case 5:break;default:C=3}var w=b;b=C;try{return H()}finally{b=w}},s.unstable_scheduleCallback=function(C,H,w){var ut=s.unstable_now();switch(typeof w=="object"&&w!==null?(w=w.delay,w=typeof w=="number"&&0<w?ut+w:ut):w=ut,C){case 1:var bt=-1;break;case 2:bt=250;break;case 5:bt=1073741823;break;case 4:bt=1e4;break;default:bt=5e3}return bt=w+bt,C={id:A++,callback:H,priorityLevel:C,startTime:w,expirationTime:bt,sortIndex:-1},w>ut?(C.sortIndex=w,z(y,C),r(x)===null&&C===r(y)&&(U?(J(F),F=-1):U=!0,Gt(Dt,w-ut))):(C.sortIndex=bt,z(x,C),G||Q||(G=!0,yt||(yt=!0,ht()))),C},s.unstable_shouldYield=P,s.unstable_wrapCallback=function(C){var H=b;return function(){var w=b;b=H;try{return C.apply(this,arguments)}finally{b=w}}}})(pf)),pf}var Mr;function r0(){return Mr||(Mr=1,mf.exports=d0()),mf.exports}var vf={exports:{}},Ft={};var Or;function h0(){if(Or)return Ft;Or=1;var s=Sf();function z(x){var y="https://react.dev/errors/"+x;if(1<arguments.length){y+="?args[]="+encodeURIComponent(arguments[1]);for(var A=2;A<arguments.length;A++)y+="&args[]="+encodeURIComponent(arguments[A])}return"Minified React error #"+x+"; visit "+y+" for the full message or use the non-minified dev environment for full errors and additional helpful warnings."}function r(){}var o={d:{f:r,r:function(){throw Error(z(522))},D:r,C:r,L:r,m:r,X:r,S:r,M:r},p:0,findDOMNode:null},S=Symbol.for("react.portal");function M(x,y,A){var E=3<arguments.length&&arguments[3]!==void 0?arguments[3]:null;return{$$typeof:S,key:E==null?null:""+E,children:x,containerInfo:y,implementation:A}}var q=s.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE;function _(x,y){if(x==="font")return"";if(typeof y=="string")return y==="use-credentials"?y:""}return Ft.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE=o,Ft.createPortal=function(x,y){var A=2<arguments.length&&arguments[2]!==void 0?arguments[2]:null;if(!y||y.nodeType!==1&&y.nodeType!==9&&y.nodeType!==11)throw Error(z(299));return M(x,y,null,A)},Ft.flushSync=function(x){var y=q.T,A=o.p;try{if(q.T=null,o.p=2,x)return x()}finally{q.T=y,o.p=A,o.d.f()}},Ft.preconnect=function(x,y){typeof x=="string"&&(y?(y=y.crossOrigin,y=typeof y=="string"?y==="use-credentials"?y:"":void 0):y=null,o.d.C(x,y))},Ft.prefetchDNS=function(x){typeof x=="string"&&o.d.D(x)},Ft.preinit=function(x,y){if(typeof x=="string"&&y&&typeof y.as=="string"){var A=y.as,E=_(A,y.crossOrigin),b=typeof y.integrity=="string"?y.integrity:void 0,Q=typeof y.fetchPriority=="string"?y.fetchPriority:void 0;A==="style"?o.d.S(x,typeof y.precedence=="string"?y.precedence:void 0,{crossOrigin:E,integrity:b,fetchPriority:Q}):A==="script"&&o.d.X(x,{crossOrigin:E,integrity:b,fetchPriority:Q,nonce:typeof y.nonce=="string"?y.nonce:void 0})}},Ft.preinitModule=function(x,y){if(typeof x=="string")if(typeof y=="object"&&y!==null){if(y.as==null||y.as==="script"){var A=_(y.as,y.crossOrigin);o.d.M(x,{crossOrigin:A,integrity:typeof y.integrity=="string"?y.integrity:void 0,nonce:typeof y.nonce=="string"?y.nonce:void 0})}}else y==null&&o.d.M(x)},Ft.preload=function(x,y){if(typeof x=="string"&&typeof y=="object"&&y!==null&&typeof y.as=="string"){var A=y.as,E=_(A,y.crossOrigin);o.d.L(x,A,{crossOrigin:E,integrity:typeof y.integrity=="string"?y.integrity:void 0,nonce:typeof y.nonce=="string"?y.nonce:void 0,type:typeof y.type=="string"?y.type:void 0,fetchPriority:typeof y.fetchPriority=="string"?y.fetchPriority:void 0,referrerPolicy:typeof y.referrerPolicy=="string"?y.referrerPolicy:void 0,imageSrcSet:typeof y.imageSrcSet=="string"?y.imageSrcSet:void 0,imageSizes:typeof y.imageSizes=="string"?y.imageSizes:void 0,media:typeof y.media=="string"?y.media:void 0})}},Ft.preloadModule=function(x,y){if(typeof x=="string")if(y){var A=_(y.as,y.crossOrigin);o.d.m(x,{as:typeof y.as=="string"&&y.as!=="script"?y.as:void 0,crossOrigin:A,integrity:typeof y.integrity=="string"?y.integrity:void 0})}else o.d.m(x)},Ft.requestFormReset=function(x){o.d.r(x)},Ft.unstable_batchedUpdates=function(x,y){return x(y)},Ft.useFormState=function(x,y,A){return q.H.useFormState(x,y,A)},Ft.useFormStatus=function(){return q.H.useHostTransitionStatus()},Ft.version="19.2.4",Ft}var Rr;function g0(){if(Rr)return vf.exports;Rr=1;function s(){if(!(typeof __REACT_DEVTOOLS_GLOBAL_HOOK__>"u"||typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE!="function"))try{__REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE(s)}catch(z){console.error(z)}}return s(),vf.exports=h0(),vf.exports}var _r;function y0(){if(_r)return Da;_r=1;var s=r0(),z=Sf(),r=g0();function o(t){var l="https://react.dev/errors/"+t;if(1<arguments.length){l+="?args[]="+encodeURIComponent(arguments[1]);for(var e=2;e<arguments.length;e++)l+="&args[]="+encodeURIComponent(arguments[e])}return"Minified React error #"+t+"; visit "+l+" for the full message or use the non-minified dev environment for full errors and additional helpful warnings."}function S(t){return!(!t||t.nodeType!==1&&t.nodeType!==9&&t.nodeType!==11)}function M(t){var l=t,e=t;if(t.alternate)for(;l.return;)l=l.return;else{t=l;do l=t,(l.flags&4098)!==0&&(e=l.return),t=l.return;while(t)}return l.tag===3?e:null}function q(t){if(t.tag===13){var l=t.memoizedState;if(l===null&&(t=t.alternate,t!==null&&(l=t.memoizedState)),l!==null)return l.dehydrated}return null}function _(t){if(t.tag===31){var l=t.memoizedState;if(l===null&&(t=t.alternate,t!==null&&(l=t.memoizedState)),l!==null)return l.dehydrated}return null}function x(t){if(M(t)!==t)throw Error(o(188))}function y(t){var l=t.alternate;if(!l){if(l=M(t),l===null)throw Error(o(188));return l!==t?null:t}for(var e=t,n=l;;){var a=e.return;if(a===null)break;var i=a.alternate;if(i===null){if(n=a.return,n!==null){e=n;continue}break}if(a.child===i.child){for(i=a.child;i;){if(i===e)return x(a),t;if(i===n)return x(a),l;i=i.sibling}throw Error(o(188))}if(e.return!==n.return)e=a,n=i;else{for(var c=!1,f=a.child;f;){if(f===e){c=!0,e=a,n=i;break}if(f===n){c=!0,n=a,e=i;break}f=f.sibling}if(!c){for(f=i.child;f;){if(f===e){c=!0,e=i,n=a;break}if(f===n){c=!0,n=i,e=a;break}f=f.sibling}if(!c)throw Error(o(189))}}if(e.alternate!==n)throw Error(o(190))}if(e.tag!==3)throw Error(o(188));return e.stateNode.current===e?t:l}function A(t){var l=t.tag;if(l===5||l===26||l===27||l===6)return t;for(t=t.child;t!==null;){if(l=A(t),l!==null)return l;t=t.sibling}return null}var E=Object.assign,b=Symbol.for("react.element"),Q=Symbol.for("react.transitional.element"),G=Symbol.for("react.portal"),U=Symbol.for("react.fragment"),X=Symbol.for("react.strict_mode"),Y=Symbol.for("react.profiler"),J=Symbol.for("react.consumer"),lt=Symbol.for("react.context"),gt=Symbol.for("react.forward_ref"),Dt=Symbol.for("react.suspense"),yt=Symbol.for("react.suspense_list"),F=Symbol.for("react.memo"),k=Symbol.for("react.lazy"),N=Symbol.for("react.activity"),P=Symbol.for("react.memo_cache_sentinel"),it=Symbol.iterator;function ht(t){return t===null||typeof t!="object"?null:(t=it&&t[it]||t["@@iterator"],typeof t=="function"?t:null)}var xl=Symbol.for("react.client.reference");function fl(t){if(t==null)return null;if(typeof t=="function")return t.$$typeof===xl?null:t.displayName||t.name||null;if(typeof t=="string")return t;switch(t){case U:return"Fragment";case Y:return"Profiler";case X:return"StrictMode";case Dt:return"Suspense";case yt:return"SuspenseList";case N:return"Activity"}if(typeof t=="object")switch(t.$$typeof){case G:return"Portal";case lt:return t.displayName||"Context";case J:return(t._context.displayName||"Context")+".Consumer";case gt:var l=t.render;return t=t.displayName,t||(t=l.displayName||l.name||"",t=t!==""?"ForwardRef("+t+")":"ForwardRef"),t;case F:return l=t.displayName||null,l!==null?l:fl(t.type)||"Memo";case k:l=t._payload,t=t._init;try{return fl(t(l))}catch{}}return null}var Gt=Array.isArray,C=z.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE,H=r.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE,w={pending:!1,data:null,method:null,action:null},ut=[],bt=-1;function g(t){return{current:t}}function B(t){0>bt||(t.current=ut[bt],ut[bt]=null,bt--)}function Z(t,l){bt++,ut[bt]=t.current,t.current=l}var V=g(null),et=g(null),ct=g(null),xt=g(null);function $t(t,l){switch(Z(ct,l),Z(et,t),Z(V,null),l.nodeType){case 9:case 11:t=(t=l.documentElement)&&(t=t.namespaceURI)?Kd(t):0;break;default:if(t=l.tagName,l=l.namespaceURI)l=Kd(l),t=Jd(l,t);else switch(t){case"svg":t=1;break;case"math":t=2;break;default:t=0}}B(V),Z(V,t)}function Bt(){B(V),B(et),B(ct)}function Bn(t){t.memoizedState!==null&&Z(xt,t);var l=V.current,e=Jd(l,t.type);l!==e&&(Z(et,t),Z(V,e))}function Ma(t){et.current===t&&(B(V),B(et)),xt.current===t&&(B(xt),ja._currentValue=w)}var Ji,jf;function Ce(t){if(Ji===void 0)try{throw Error()}catch(e){var l=e.stack.trim().match(/\n( *(at )?)/);Ji=l&&l[1]||"",jf=-1<e.stack.indexOf(`
     at`)?" (<anonymous>)":-1<e.stack.indexOf("@")?"@unknown:0:0":""}return`
@@ -274,10 +229,9 @@ Error generating stack: `+n.message+`
     catch(e) { console.warn('localStorage quota exceeded for key:', key); return false; }
   }
 
-  // Close any existing overlay/panel before opening a new one
+  // Close any existing overlay before opening a new one
   function closeAllOverlays() {
-    ['.ux-share-overlay', '.ux-milestone-overlay', '.ux-onboard-overlay',
-     '.ux-footprint-panel.ux-show', '.ux-friend-panel.ux-show'].forEach(function(sel) {
+    ['.ux-share-overlay', '.ux-milestone-overlay', '.ux-onboard-overlay'].forEach(function(sel) {
       var el = document.querySelector(sel);
       if (el) { el.classList.remove('ux-show'); setTimeout(function() { el.remove(); }, 400); }
     });
@@ -593,7 +547,6 @@ Error generating stack: `+n.message+`
     enableLazyLoading();
     enableAutoSave();
     enhanceScrolling();
-    if (typeof addReactionsToEntries === 'function') addReactionsToEntries();
   }
 
   var observer = new MutationObserver(function() {
@@ -719,9 +672,9 @@ Error generating stack: `+n.message+`
   // Backup FAB (floating action button)
   var backupFab = document.createElement('button');
   backupFab.className = 'ux-backup-fab';
-  backupFab.textContent = '💾';
-  backupFab.setAttribute('aria-label', 'データ管理');
-  backupFab.title = 'データ管理';
+  backupFab.textContent = '⚙️';
+  backupFab.setAttribute('aria-label', '設定');
+  backupFab.title = '設定';
   document.body.appendChild(backupFab);
 
   var backupMenu = document.createElement('div');
@@ -1108,229 +1061,7 @@ Error generating stack: `+n.message+`
   setTimeout(checkAnniversary, 2000);
 
   /* ==============================
-     19. FOOTPRINT SYSTEM (あしあと)
-     ============================== */
-  function getFootprints() {
-    try { return JSON.parse(localStorage.getItem('ux_footprints') || '[]'); } catch(e) { return []; }
-  }
-
-  function addFootprint(name, action) {
-    var footprints = getFootprints();
-    footprints.unshift({
-      id: Date.now(),
-      name: name,
-      action: action,
-      time: new Date().toISOString(),
-      avatar: ['🐕','🐩','🦮','🐕‍🦺','🐶','🐾'][Math.floor(Math.random()*6)]
-    });
-    // Keep only last 50
-    if (footprints.length > 50) footprints = footprints.slice(0, 50);
-    safeSetItem('ux_footprints', JSON.stringify(footprints));
-    return footprints;
-  }
-
-  function timeAgo(isoString) {
-    var diff = Date.now() - new Date(isoString).getTime();
-    var mins = Math.floor(diff / 60000);
-    if (mins < 1) return 'たった今';
-    if (mins < 60) return mins + '分前';
-    var hours = Math.floor(mins / 60);
-    if (hours < 24) return hours + '時間前';
-    var days = Math.floor(hours / 24);
-    return days + '日前';
-  }
-
-  function showFootprintPanel() {
-    var existing = document.querySelector('.ux-footprint-panel');
-    if (existing) { existing.classList.toggle('ux-show'); return; }
-    // Close friend panel if open
-    var friendPanel = document.querySelector('.ux-friend-panel');
-    if (friendPanel) friendPanel.classList.remove('ux-show');
-
-    var panel = document.createElement('div');
-    panel.className = 'ux-footprint-panel';
-
-    var header = document.createElement('div');
-    header.className = 'ux-fp-header';
-    var title = document.createElement('div');
-    title.className = 'ux-fp-title';
-    title.textContent = '🐾 あしあと';
-    var close = document.createElement('button');
-    close.className = 'ux-fp-close';
-    close.textContent = '✕';
-    close.setAttribute('aria-label', '閉じる');
-    close.addEventListener('click', function() { panel.classList.remove('ux-show'); });
-    header.appendChild(title);
-    header.appendChild(close);
-    panel.appendChild(header);
-
-    var footprints = getFootprints();
-    if (footprints.length === 0) {
-      // Generate demo footprints for engagement
-      var demoNames = ['ポチのママ', 'コロ助パパ', 'ハナちゃん家', 'マルくん飼い主', 'モモの親'];
-      var demoActions = ['日記を見ました', 'いいね！しました', 'アルバムを見ました', '体重記録を見ました', '応援しています！'];
-      for (var d = 0; d < 5; d++) {
-        addFootprint(demoNames[d], demoActions[d]);
-      }
-      footprints = getFootprints();
-    }
-
-    footprints.forEach(function(fp) {
-      var item = document.createElement('div');
-      item.className = 'ux-fp-item';
-
-      var avatar = document.createElement('div');
-      avatar.className = 'ux-fp-avatar';
-      avatar.textContent = fp.avatar || '🐾';
-
-      var info = document.createElement('div');
-      info.className = 'ux-fp-info';
-      var name = document.createElement('div');
-      name.className = 'ux-fp-name';
-      name.textContent = fp.name;
-      var action = document.createElement('div');
-      action.className = 'ux-fp-action';
-      action.textContent = fp.action;
-      var time = document.createElement('div');
-      time.className = 'ux-fp-time';
-      time.textContent = timeAgo(fp.time);
-      info.appendChild(name);
-      info.appendChild(action);
-      info.appendChild(time);
-
-      item.appendChild(avatar);
-      item.appendChild(info);
-      panel.appendChild(item);
-    });
-
-    document.body.appendChild(panel);
-    // Close on backdrop tap
-    panel.addEventListener('click', function(e) { if (e.target === panel) panel.classList.remove('ux-show'); });
-    requestAnimationFrame(function() {
-      requestAnimationFrame(function() { panel.classList.add('ux-show'); });
-    });
-  }
-
-  // Expose globally for React integration
-  window.__uxShowFootprints = showFootprintPanel;
-
-  /* ==============================
-     20. FRIEND COMMUNICATION PANEL
-     ============================== */
-  function getFriends() {
-    try { return JSON.parse(localStorage.getItem('ux_friends') || '[]'); } catch(e) { return []; }
-  }
-
-  function initDemoFriends() {
-    var friends = getFriends();
-    if (friends.length > 0) return friends;
-    friends = [
-      { id: 1, name: 'ポチのママ', breed: 'トイプードル', emoji: '🐩', streak: 12, reactions: [] },
-      { id: 2, name: 'コロ助パパ', breed: '柴犬', emoji: '🐕', streak: 7, reactions: [] },
-      { id: 3, name: 'ハナちゃん家', breed: 'チワワ', emoji: '🐶', streak: 23, reactions: [] },
-      { id: 4, name: 'マルくん飼い主', breed: 'マルチーズ', emoji: '🦮', streak: 5, reactions: [] },
-      { id: 5, name: 'モモの親', breed: 'ゴールデン', emoji: '🐕‍🦺', streak: 31, reactions: [] }
-    ];
-    safeSetItem('ux_friends', JSON.stringify(friends));
-    return friends;
-  }
-
-  function showFriendPanel() {
-    var existing = document.querySelector('.ux-friend-panel');
-    if (existing) { existing.classList.toggle('ux-show'); return; }
-    // Close footprint panel if open
-    var fpPanel = document.querySelector('.ux-footprint-panel');
-    if (fpPanel) fpPanel.classList.remove('ux-show');
-
-    var panel = document.createElement('div');
-    panel.className = 'ux-friend-panel';
-
-    var header = document.createElement('div');
-    header.className = 'ux-friend-header';
-    var title = document.createElement('div');
-    title.className = 'ux-fh-title';
-    title.textContent = '🐶 犬友';
-    var close = document.createElement('button');
-    close.className = 'ux-fh-close';
-    close.textContent = '✕';
-    close.setAttribute('aria-label', '閉じる');
-    close.addEventListener('click', function() { panel.classList.remove('ux-show'); });
-    header.appendChild(title);
-    header.appendChild(close);
-    panel.appendChild(header);
-
-    var friends = initDemoFriends();
-    friends.forEach(function(fr) {
-      var card = document.createElement('div');
-      card.className = 'ux-friend-card';
-
-      var avatar = document.createElement('div');
-      avatar.className = 'ux-fc-avatar';
-      avatar.textContent = fr.emoji;
-
-      var info = document.createElement('div');
-      info.className = 'ux-fc-info';
-      var name = document.createElement('div');
-      name.className = 'ux-fc-name';
-      name.textContent = fr.name;
-      var breed = document.createElement('div');
-      breed.className = 'ux-fc-breed';
-      breed.textContent = fr.breed;
-      var streak = document.createElement('div');
-      streak.className = 'ux-fc-streak';
-      streak.textContent = '🔥 ' + fr.streak + '日連続記録中';
-      info.appendChild(name);
-      info.appendChild(breed);
-      info.appendChild(streak);
-
-      var actions = document.createElement('div');
-      actions.className = 'ux-fc-actions';
-
-      var pawBtn = document.createElement('button');
-      pawBtn.className = 'ux-fc-btn-paw';
-      pawBtn.textContent = '🐾 なでなで';
-      pawBtn.addEventListener('click', function() {
-        addFootprint('あなた', fr.name + 'をなでなでしました');
-        showToast(fr.name + 'をなでなでしました！🐾', 'success');
-        triggerHaptic('medium');
-      });
-
-      var msgBtn = document.createElement('button');
-      msgBtn.className = 'ux-fc-btn-msg';
-      msgBtn.textContent = '💬 応援';
-      msgBtn.addEventListener('click', function() {
-        var msgs = [
-          'がんばれ〜！🎉',
-          'うちの子も応援してるよ！🐶',
-          'すごい！一緒にがんばろう💪',
-          'かわいい〜！😍',
-          'また遊ぼうね！🐾'
-        ];
-        var msg = msgs[Math.floor(Math.random() * msgs.length)];
-        addFootprint('あなた', fr.name + 'に「' + msg + '」を送りました');
-        showToast(fr.name + 'に応援メッセージを送りました！', 'success');
-        triggerHaptic('light');
-      });
-
-      actions.appendChild(pawBtn);
-      actions.appendChild(msgBtn);
-
-      card.appendChild(avatar);
-      card.appendChild(info);
-      card.appendChild(actions);
-      panel.appendChild(card);
-    });
-
-    document.body.appendChild(panel);
-    requestAnimationFrame(function() {
-      requestAnimationFrame(function() { panel.classList.add('ux-show'); });
-    });
-  }
-
-  window.__uxShowFriends = showFriendPanel;
-
-  /* ==============================
-     21. MULTI-DOG QUICK SWITCHER (多頭飼い対応)
+     19. MULTI-DOG QUICK SWITCHER (多頭飼い対応)
      ============================== */
   function getDogProfiles() {
     // Try to find dog data in localStorage
@@ -1406,83 +1137,7 @@ Error generating stack: `+n.message+`
   window.addEventListener('storage', function() { setTimeout(renderDogSwitcher, 500); });
 
   /* ==============================
-     22. REACTION SYSTEM (リアクション)
-     ============================== */
-  var REACTIONS = ['🐾', '❤️', '😍', '🎉', '💪', '🥺'];
-
-  function addReactionsToEntries() {
-    // Find diary entry containers (cards with date-like content)
-    var cards = document.querySelectorAll('#root div[style*="border-radius"]');
-    cards.forEach(function(card) {
-      if (card._uxReactions) return;
-      // Heuristic: diary cards typically have text content with dates and are larger
-      var text = card.textContent;
-      if (!text || card.offsetHeight < 80) return;
-      // Look for date patterns (YYYY/MM/DD or MM月DD日)
-      if (!/\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2}|\d{1,2}月\d{1,2}日/.test(text)) return;
-      if (card.querySelector('.ux-reaction-bar')) return;
-
-      card._uxReactions = true;
-      var bar = document.createElement('div');
-      bar.className = 'ux-reaction-bar';
-
-      var entryId = card.textContent.substring(0, 30).replace(/\s/g, '');
-      var reactionData = {};
-      try { reactionData = JSON.parse(localStorage.getItem('ux_reactions') || '{}'); } catch(e) {}
-      var entryReactions = reactionData[entryId] || {};
-
-      REACTIONS.forEach(function(r) {
-        var btn = document.createElement('button');
-        btn.className = 'ux-reaction-btn' + (entryReactions[r] ? ' ux-reacted' : '');
-        var count = (entryReactions[r] || 0) + Math.floor(Math.random() * 3); // Simulate community
-        btn.textContent = r;
-        if (count > 0) {
-          var countSpan = document.createElement('span');
-          countSpan.className = 'ux-r-count';
-          countSpan.textContent = count;
-          btn.appendChild(countSpan);
-        }
-
-        btn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          if (!reactionData[entryId]) reactionData[entryId] = {};
-          reactionData[entryId][r] = (reactionData[entryId][r] || 0) + 1;
-          safeSetItem('ux_reactions', JSON.stringify(reactionData));
-          btn.classList.add('ux-reacted');
-          var countEl = btn.querySelector('.ux-r-count');
-          if (countEl) {
-            countEl.textContent = (parseInt(countEl.textContent, 10) || 0) + 1;
-          } else {
-            var s = document.createElement('span');
-            s.className = 'ux-r-count';
-            s.textContent = '1';
-            btn.appendChild(s);
-          }
-          triggerHaptic('light');
-        });
-
-        bar.appendChild(btn);
-      });
-
-      card.appendChild(bar);
-    });
-  }
-
-  // Add community buttons to backup FAB menu
-  var btnFootprints = document.createElement('button');
-  btnFootprints.textContent = '🐾 あしあと';
-  btnFootprints.addEventListener('click', function() { backupMenu.classList.remove('ux-show'); showFootprintPanel(); });
-
-  var btnFriends = document.createElement('button');
-  btnFriends.textContent = '🐶 犬友';
-  btnFriends.addEventListener('click', function() { backupMenu.classList.remove('ux-show'); showFriendPanel(); });
-
-  // Insert before export button
-  backupMenu.insertBefore(btnFootprints, backupMenu.firstChild);
-  backupMenu.insertBefore(btnFriends, btnFootprints.nextSibling);
-
-  /* ==============================
-     23. SW UPDATE NOTIFICATION
+     20. SW UPDATE NOTIFICATION
      ============================== */
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.ready.then(function(reg) {
