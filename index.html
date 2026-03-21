@@ -20,6 +20,7 @@
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="icon-192.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&family=Kosugi+Maru&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet"/>
+<script type="module" src="firebase-config.js"></script>
 <title>わんちゃん日記</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -655,6 +656,44 @@ Error generating stack: `+n.message+`
   btnDark.textContent = '🌙 ダークモード切替';
   btnDark.addEventListener('click', function() { backupMenu.classList.remove('ux-show'); window.__wanchan.toggleDarkMode(); });
 
+  // Login/logout button (appears when Firebase is configured)
+  var btnAuth = document.createElement('button');
+  btnAuth.textContent = '🔑 ログイン';
+  btnAuth.style.display = 'none'; // Hidden until Firebase is ready
+  btnAuth.addEventListener('click', function() {
+    backupMenu.classList.remove('ux-show');
+    var fb = window.__wanchan && window.__wanchan.firebase;
+    if (!fb || !fb.isConfigured) {
+      showToast('Firebase未設定です', 'error');
+      return;
+    }
+    fb.onAuth(function(user) {
+      if (user) {
+        fb.logout().then(function() { showToast('ログアウトしました', 'info'); updateAuthButton(null); });
+      } else {
+        fb.login().then(function(u) { if (u) updateAuthButton(u); });
+      }
+    });
+  });
+
+  function updateAuthButton(user) {
+    if (user) {
+      btnAuth.textContent = '👋 ログアウト（' + (user.displayName || '').split(' ')[0] + '）';
+    } else {
+      btnAuth.textContent = '🔑 ログイン';
+    }
+  }
+
+  // Show auth button once Firebase module loads
+  setTimeout(function() {
+    var fb = window.__wanchan && window.__wanchan.firebase;
+    if (fb && fb.isConfigured) {
+      btnAuth.style.display = '';
+      fb.onAuth(updateAuthButton);
+    }
+  }, 1000);
+
+  backupMenu.appendChild(btnAuth);
   backupMenu.appendChild(btnExport);
   backupMenu.appendChild(btnImport);
   backupMenu.appendChild(btnDark);

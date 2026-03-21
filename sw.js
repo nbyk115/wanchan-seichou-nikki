@@ -1,7 +1,8 @@
-const CACHE_NAME = 'wanchan-v3';
+const CACHE_NAME = 'wanchan-v4';
 const ASSETS = [
   '/wanchan-seichou-nikki/',
   '/wanchan-seichou-nikki/index.html',
+  '/wanchan-seichou-nikki/firebase-config.js',
   '/wanchan-seichou-nikki/icon-192.png',
   '/wanchan-seichou-nikki/icon-512.png',
   '/wanchan-seichou-nikki/og-image.png',
@@ -58,8 +59,11 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
 
-  // Skip cross-origin API requests (e.g. Anthropic API)
+  // Skip cross-origin API requests
   if (e.request.url.includes('api.anthropic.com')) return;
+  if (e.request.url.includes('firebaseapp.com')) return;
+  if (e.request.url.includes('googleapis.com/identitytoolkit')) return;
+  if (e.request.url.includes('firestore.googleapis.com')) return;
 
   // For navigation requests, network-first with offline fallback
   if (e.request.mode === 'navigate') {
