@@ -707,10 +707,17 @@ Error generating stack: `+n.message+`
   var debounceTimer;
 
   function runAllEnhancements() {
-    enhanceAccessibility();
-    enableLazyLoading();
-    enableAutoSave();
-    enhanceScrolling();
+    // Guard: skip if #root is empty or detached (e.g., during browser back/bfcache restore)
+    var root = document.getElementById('root');
+    if (!root || !root.firstElementChild) return;
+    try {
+      enhanceAccessibility();
+      enableLazyLoading();
+      enableAutoSave();
+      enhanceScrolling();
+    } catch(e) {
+      // Swallow errors from stale DOM references during navigation
+    }
   }
 
   var observer = new MutationObserver(function() {
@@ -1312,8 +1319,14 @@ Error generating stack: `+n.message+`
     overlay.appendChild(panel);
     document.body.appendChild(overlay);
 
-    function closeNotifPanel() { overlay.remove(); document.removeEventListener('keydown', notifEscHandler); }
+    function closeNotifPanel() {
+      overlay.remove();
+      document.removeEventListener('keydown', notifEscHandler);
+      unregisterOverlayCleanup(notifCleanup);
+    }
     function notifEscHandler(e) { if (e.key === 'Escape') closeNotifPanel(); }
+    function notifCleanup() { document.removeEventListener('keydown', notifEscHandler); }
+    registerOverlayCleanup(notifCleanup);
     overlay.setAttribute('role', 'dialog');
     overlay.setAttribute('aria-modal', 'true');
     overlay.setAttribute('aria-label', 'お知らせ');
@@ -1768,8 +1781,14 @@ Error generating stack: `+n.message+`
     overlay.appendChild(panel);
     document.body.appendChild(overlay);
 
-    function closeCurveModal() { overlay.remove(); document.removeEventListener('keydown', curveEscHandler); }
+    function closeCurveModal() {
+      overlay.remove();
+      document.removeEventListener('keydown', curveEscHandler);
+      unregisterOverlayCleanup(curveCleanup);
+    }
     function curveEscHandler(e) { if (e.key === 'Escape') closeCurveModal(); }
+    function curveCleanup() { document.removeEventListener('keydown', curveEscHandler); }
+    registerOverlayCleanup(curveCleanup);
     overlay.addEventListener('click', function(e) { if (e.target === overlay) closeCurveModal(); });
     document.getElementById('breed-curve-close').addEventListener('click', closeCurveModal);
     document.addEventListener('keydown', curveEscHandler);
