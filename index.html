@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="theme-color" content="#FFF8F5"/>
@@ -24,7 +24,7 @@
 <script type="module" src="analytics.js"></script>
 <script type="module" src="ai-consultation.js"></script>
 <!-- komoju-payment.js removed: premium features disabled -->
-<title>わんちゃん日記</title>
+<title>わんちゃん成長日記</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Zen Maru Gothic','Hiragino Sans',sans-serif;-webkit-font-smoothing:antialiased;overscroll-behavior:none;}
@@ -127,6 +127,11 @@ body.ux-dark-on .ux-toast{background:rgba(50,50,70,.95) !important;}
 body.ux-dark-on .ux-backup-menu{background:#2a2a3e;}
 body.ux-dark-on .ux-backup-menu button{color:#e0e0e0;}
 body.ux-dark-on .ux-backup-menu button:hover,body.ux-dark-on .ux-backup-menu button:focus{background:#3a3a4e;}
+@media (prefers-color-scheme: dark) {
+  body.ux-dark-auto .ux-backup-menu{background:#2a2a3e;}
+  body.ux-dark-auto .ux-backup-menu button{color:#e0e0e0;}
+  body.ux-dark-auto .ux-backup-menu button:hover,body.ux-dark-auto .ux-backup-menu button:focus{background:#3a3a4e;}
+}
 
 /* Onboarding */
 .ux-onboard-overlay{position:fixed;inset:0;z-index:10003;background:linear-gradient(180deg,#FFF8F5 0%,#FFE8EC 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;opacity:0;transition:opacity .5s;pointer-events:none;text-align:center;}
@@ -152,7 +157,7 @@ body.ux-dark-on .ux-offline-banner{background:#991B1B;}
 
 
 /* Multi-Dog Quick Switcher */
-.ux-dog-switcher{position:fixed;top:env(safe-area-inset-top,12px);left:12px;z-index:9997;display:flex;gap:6px;align-items:center;}
+.ux-dog-switcher{position:fixed;top:env(safe-area-inset-top,12px);left:12px;z-index:9997;display:flex;gap:6px;align-items:center;max-width:calc(100vw - 80px);overflow-x:auto;}
 .ux-dog-chip{display:flex;align-items:center;gap:4px;padding:6px 12px;border-radius:20px;background:#fff;border:2px solid #eee;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.06);color:#666;}
 .ux-dog-chip.ux-active{border-color:#FF7B9C;background:#FFF0F3;color:#FF7B9C;}
 .ux-dog-chip .ux-dc-emoji{font-size:14px;}
@@ -161,6 +166,11 @@ body.ux-dark-on .ux-offline-banner{background:#991B1B;}
 body.ux-dark-on .ux-dog-chip{background:#2a2a3e;border-color:#444;color:#aaa;}
 body.ux-dark-on .ux-dog-chip.ux-active{border-color:#FF7B9C;background:#3a2a3e;color:#FF7B9C;}
 body.ux-dark-on .ux-dog-chip-add{background:#3a3a4e;border-color:#555;}
+@media (prefers-color-scheme: dark) {
+  body.ux-dark-auto .ux-dog-chip{background:#2a2a3e;border-color:#444;color:#aaa;}
+  body.ux-dark-auto .ux-dog-chip.ux-active{border-color:#FF7B9C;background:#3a2a3e;color:#FF7B9C;}
+  body.ux-dark-auto .ux-dog-chip-add{background:#3a3a4e;border-color:#555;}
+}
 
 /* Dark mode: main content overrides */
 body.ux-dark-on{background:#121212 !important;color:#F0F0F0 !important;}
@@ -722,7 +732,7 @@ Error generating stack: `+n.message+`
           st.dark = d ? 1 : 0;
           localStorage.setItem('wc2', JSON.stringify(st));
           window.dispatchEvent(new StorageEvent('storage', { key: 'wc2', newValue: JSON.stringify(st) }));
-          setTimeout(function() { window.location.reload(); }, 500);
+          applyDarkMode();
         }
       }
     } catch(e) {}
@@ -1094,7 +1104,7 @@ Error generating stack: `+n.message+`
         navigator.clipboard.writeText(url).then(function() {
           showToast('リンクをコピーしました', 'success');
         }).catch(function() {
-          showToast('コピーに失敗しました', 'error');
+          showToast('コピーがうまくいきませんでした。もう一度試してみてね', 'error');
         });
         // Track
         var a = window.__wanchan && window.__wanchan.analytics;
@@ -1154,8 +1164,14 @@ Error generating stack: `+n.message+`
     overlay.appendChild(sheet);
     document.body.appendChild(overlay);
 
-    overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
-    document.getElementById('share-cancel').addEventListener('click', function() { overlay.remove(); });
+    function closeShareSheet() { overlay.remove(); document.removeEventListener('keydown', shareEscHandler); }
+    function shareEscHandler(e) { if (e.key === 'Escape') closeShareSheet(); }
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', 'シェアする');
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) closeShareSheet(); });
+    document.addEventListener('keydown', shareEscHandler);
+    document.getElementById('share-cancel').addEventListener('click', closeShareSheet);
     document.getElementById('share-x').addEventListener('click', function() { overlay.remove(); shareToSNS('x', text, url); });
     document.getElementById('share-line').addEventListener('click', function() { overlay.remove(); shareToSNS('line', text, url); });
     document.getElementById('share-copy').addEventListener('click', function() { overlay.remove(); shareToSNS('copy', text, url); });
@@ -1189,19 +1205,24 @@ Error generating stack: `+n.message+`
     overlay.appendChild(panel);
     document.body.appendChild(overlay);
 
-    overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
-    document.getElementById('notif-close').addEventListener('click', function() { overlay.remove(); });
+    function closeNotifPanel() { overlay.remove(); document.removeEventListener('keydown', notifEscHandler); }
+    function notifEscHandler(e) { if (e.key === 'Escape') closeNotifPanel(); }
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', 'お知らせ');
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) closeNotifPanel(); });
+    document.addEventListener('keydown', notifEscHandler);
+    document.getElementById('notif-close').addEventListener('click', closeNotifPanel);
 
     // 足あとを取得して表示
     var fb = window.__wanchan && window.__wanchan.firebase;
     if (fb && fb.isConfigured && fb.getFootprints) {
-      // onAuthでユーザーUIDを取得
-      fb.onAuth(function(user) {
-        if (!user) {
-          var nc = document.getElementById('notif-content');
-          if (nc) nc.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">ログインするとお知らせが届きます</div>';
-          return;
-        }
+      // _currentUser を直接参照（onAuth リスナー蓄積を回避）
+      var user = _currentUser;
+      if (!user) {
+        var nc = document.getElementById('notif-content');
+        if (nc) nc.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">ログインするとお知らせが届きます</div>';
+      } else {
         fb.getFootprints(user.uid, 20).then(function(footprints) {
           var content = document.getElementById('notif-content');
           if (!content) return;
@@ -1222,12 +1243,12 @@ Error generating stack: `+n.message+`
 
             html += '<div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;margin-bottom:6px;background:' + (isNew ? (isDark ? '#2a2a3e' : '#FFF8F0') : 'transparent') + ';">';
             if (fp.fromPhoto) {
-              html += '<img src="' + fp.fromPhoto + '" style="width:40px;height:40px;border-radius:50%;object-fit:cover;" alt="">';
+              html += '<img src="' + _escHtml(fp.fromPhoto) + '" style="width:40px;height:40px;border-radius:50%;object-fit:cover;" alt="' + _escHtml(fp.fromName || '訪問者') + 'のアイコン">';
             } else {
               html += '<div style="width:40px;height:40px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:20px;">🐾</div>';
             }
             html += '<div style="flex:1;">';
-            html += '<div style="font-size:14px;font-weight:' + (isNew ? '700' : '400') + ';color:' + (isDark ? '#e0e0e0' : '#333') + ';">' + (fp.fromName || '誰か') + 'が遊びに来ました</div>';
+            html += '<div style="font-size:14px;font-weight:' + (isNew ? '700' : '400') + ';color:' + (isDark ? '#e0e0e0' : '#333') + ';">' + _escHtml(fp.fromName || '誰か') + 'が遊びに来ました</div>';
             html += '<div style="font-size:12px;color:#888;">' + timeStr + '</div>';
             html += '</div>';
             if (isNew) {
@@ -1242,13 +1263,13 @@ Error generating stack: `+n.message+`
           _updateNotifBadge(0);
         }).catch(function() {
           var content = document.getElementById('notif-content');
-          if (content) content.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">お知らせの取得に失敗しました</div>';
+          if (content) content.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">お知らせの取得がうまくいきませんでした</div>';
         });
 
         // Track
         var an = window.__wanchan && window.__wanchan.analytics;
         if (an && an.trackFootprintView) an.trackFootprintView();
-      });
+      }
     } else {
       var ncFb = document.getElementById('notif-content');
       if (ncFb) ncFb.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">ログインするとお知らせが届きます</div>';
@@ -1277,21 +1298,20 @@ Error generating stack: `+n.message+`
     var fb = window.__wanchan && window.__wanchan.firebase;
     if (!fb || !fb.isConfigured) return;
 
-    fb.onAuth(function(user) {
-      if (!user) return;
-      fb.getFootprints(user.uid, 10).then(function(footprints) {
-        var lastCheck = parseInt(localStorage.getItem('ux_notif_last_check') || '0', 10);
-        var newCount = 0;
-        footprints.forEach(function(fp) {
-          var ts = fp.createdAt ? (fp.createdAt.seconds ? fp.createdAt.seconds * 1000 : fp.createdAt) : 0;
-          if (ts > lastCheck) newCount++;
-        });
-        if (newCount > 0) {
-          _updateNotifBadge(newCount);
-          btnNotif.style.display = '';
-        }
-      }).catch(function() {});
-    });
+    var user = _currentUser;
+    if (!user) return;
+    fb.getFootprints(user.uid, 10).then(function(footprints) {
+      var lastCheck = parseInt(localStorage.getItem('ux_notif_last_check') || '0', 10);
+      var newCount = 0;
+      footprints.forEach(function(fp) {
+        var ts = fp.createdAt ? (fp.createdAt.seconds ? fp.createdAt.seconds * 1000 : fp.createdAt) : 0;
+        if (ts > lastCheck) newCount++;
+      });
+      if (newCount > 0) {
+        _updateNotifBadge(newCount);
+        btnNotif.style.display = '';
+      }
+    }).catch(function() {});
   }
 
   // Show notification button for logged-in users & check for new notifications
@@ -1911,7 +1931,7 @@ Error generating stack: `+n.message+`
     btnPWA.textContent = '📲 ホーム画面に追加';
     btnPWA.addEventListener('click', function() {
       backupMenu.classList.remove('ux-show');
-      showToast('Safari の「共有」ボタン → 「ホーム画面に追加」をタップしてください', 'info');
+      showToast('Safari の「共有」ボタン → 「ホーム画面に追加」をタップしてね', 'info');
     });
     backupMenu.appendChild(btnPWA);
   }

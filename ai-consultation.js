@@ -121,12 +121,12 @@ const SYSTEM_PROMPT = `あなたは犬の健康に詳しい優しいアドバイ
 
 async function askAI(question) {
   if (!question || !question.trim()) {
-    return { error: '質問を入力してください' };
+    return { error: '質問を入力してね' };
   }
 
   if (!canUseAI()) {
     return {
-      error: '今月の無料相談回数（' + AI_CONFIG.freeLimit + '回）を使い切りました。\nプレミアムプランにアップグレードすると無制限でご利用いただけます。',
+      error: '今月の無料相談回数（' + AI_CONFIG.freeLimit + '回）を使い切りました。\nプレミアムにアップグレードすると無制限で使えるよ',
       limitReached: true
     };
   }
@@ -142,15 +142,19 @@ async function askAI(question) {
   }
 
   try {
+    var controller = new AbortController();
+    var timeoutId = setTimeout(function() { controller.abort(); }, 15000);
     var res = await fetch(AI_CONFIG.endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
       body: JSON.stringify({
         message: userMessage,
         systemPrompt: SYSTEM_PROMPT,
         model: AI_CONFIG.model
       })
     });
+    clearTimeout(timeoutId);
 
     if (!res.ok) {
       throw new Error('API error: ' + res.status);
@@ -256,17 +260,17 @@ function showConsultationModal() {
     html += '<span style="color:#16A34A;font-weight:700;">★ プレミアム — 無制限</span>';
   } else {
     html += '<span>今月の残り回数</span>';
-    html += '<span style="font-weight:900;color:' + (remaining <= 1 ? '#EF4444' : '#F59E0B') + ';">' + remaining + ' / ' + AI_CONFIG.freeLimit + ' 回</span>';
+    html += '<span id="ai-remaining-count" style="font-weight:900;color:' + (remaining <= 1 ? '#EF4444' : '#F59E0B') + ';">' + remaining + ' / ' + AI_CONFIG.freeLimit + ' 回</span>';
   }
   html += '</div>';
 
   // よくある相談（クイックボタン）
   html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">';
   var quickQuestions = [
-    { label: '🤢 吐いた', q: 'うちの犬が吐いてしまいました。どうしたらいいですか？' },
-    { label: '💩 下痢', q: 'うちの犬が下痢をしています。対処法を教えてください。' },
-    { label: '🍽 食欲がない', q: 'うちの犬が食欲がありません。考えられる原因は？' },
-    { label: '🦴 皮膚が荒れた', q: 'うちの犬の皮膚が荒れています。何が原因でしょうか？' }
+    { label: '🤮 吐いた', q: 'うちの子が吐いてしまいました。どうしたらいいですか？' },
+    { label: '💩 下痢', q: 'うちの子が下痢をしています。対処法を教えてください。' },
+    { label: '🍽️ 食欲がない', q: 'うちの子が食欲がありません。考えられる原因は？' },
+    { label: '🐾 皮膚が気になる', q: 'うちの子の皮膚が荒れています。何が原因でしょうか？' }
   ];
   quickQuestions.forEach(function(qq, i) {
     html += '<button id="qq-' + i + '" style="padding:8px 14px;border-radius:20px;border:1.5px solid ' + (isDark ? '#444' : '#e0e0e0') + ';background:' + (isDark ? '#2a2a3e' : '#fff') + ';font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:' + (isDark ? '#ccc' : '#555') + ';">' + qq.label + '</button>';
@@ -384,13 +388,14 @@ function showConsultationModal() {
     } else {
       // 残り回数を更新
       var newRemaining = getRemainingCount();
-      var modal = answerArea.closest('#wanchan-ai-modal');
-      var countEl = modal ? modal.querySelector('[style*="今月の残り"]') : null;
+      var countEl = document.getElementById('ai-remaining-count');
       if (countEl) {
-        countEl.parentElement.innerHTML = '<span>今月の残り回数</span><span style="font-weight:900;color:' + (newRemaining <= 1 ? '#EF4444' : '#F59E0B') + ';">' + newRemaining + ' / ' + AI_CONFIG.freeLimit + ' 回</span>';
+        countEl.style.color = newRemaining <= 1 ? '#EF4444' : '#F59E0B';
+        countEl.textContent = newRemaining + ' / ' + AI_CONFIG.freeLimit + ' 回';
       }
 
-      answerArea.innerHTML = '<div style="padding:16px;background:' + (isDark ? '#1a2a1a' : '#F0FFF4') + ';border-radius:16px;font-size:14px;line-height:1.8;color:' + (isDark ? '#a7f3d0' : '#166534') + ';white-space:pre-wrap;">' + _escapeHtml(result.answer) + '</div>';
+      answerArea.innerHTML = '<div style="padding:16px;background:' + (isDark ? '#1a2a1a' : '#F0FFF4') + ';border-radius:16px;font-size:14px;line-height:1.8;color:' + (isDark ? '#a7f3d0' : '#166534') + ';white-space:pre-wrap;">' + _escapeHtml(result.answer) + '</div>' +
+        '<div style="margin-top:8px;padding:8px 12px;font-size:11px;color:#999;text-align:center;">※ AIの回答は参考情報です。診断・治療は獣医師にご相談ください。</div>';
     }
 
     input.focus();
