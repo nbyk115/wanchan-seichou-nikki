@@ -1594,7 +1594,7 @@ Error generating stack: `+n.message+`
     var panel = document.createElement('div');
     panel.style.cssText = 'background:' + (isDark ? '#1e1e2e' : '#fff') + ';border-radius:20px 20px 0 0;max-width:500px;width:100%;padding:24px 20px env(safe-area-inset-bottom,20px);max-height:70vh;overflow-y:auto;';
 
-    panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div style="font-size:18px;font-weight:900;color:' + (isDark ? '#e0e0e0' : '#333') + ';">🔔 お知らせ</div><div id="notif-close" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:' + (isDark ? '#333' : '#f0f0f0') + ';cursor:pointer;font-size:14px;">✕</div></div><div id="notif-content" style="text-align:center;padding:20px;"><div class="ux-spinner" style="width:24px;height:24px;border-width:2.5px;color:#FF7B9C;margin:0 auto;"></div></div>';
+    panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div style="font-size:18px;font-weight:900;color:' + (isDark ? '#e0e0e0' : '#333') + ';">🔔 お知らせ</div><div id="notif-close" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:' + (isDark ? '#333' : '#f0f0f0') + ';cursor:pointer;font-size:14px;">✕</div></div><div id="notif-content" style="text-align:center;padding:20px;"><div class="ux-spinner" style="width:24px;height:24px;border-width:2.5px;color:#FF7B9C;margin:0 auto;"></div></div>';
 
     overlay.appendChild(panel);
     document.body.appendChild(overlay);
@@ -1684,8 +1684,7 @@ Error generating stack: `+n.message+`
       if (!badge) {
         badge = document.createElement('span');
         badge.className = 'ux-notif-badge';
-        badge.style.cssText = 'position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#EF4444;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;';
-        backupFab.style.position = 'relative';
+        badge.style.cssText = 'position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#EF4444;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;pointer-events:none;';
         backupFab.appendChild(badge);
       }
       badge.textContent = count > 9 ? '9+' : count;
