@@ -46,7 +46,7 @@ async function trimCache(cacheName, maxItems) {
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
 });
 
@@ -133,7 +133,7 @@ self.addEventListener('fetch', (e) => {
 
 // Listen for messages from the app
 self.addEventListener('message', (e) => {
-  if (e.data === 'skipWaiting') {
+  if (e.data === 'skipWaiting' || (e.data && e.data.type === 'SKIP_WAITING')) {
     self.skipWaiting();
   }
 });
