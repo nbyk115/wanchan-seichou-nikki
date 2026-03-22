@@ -394,6 +394,9 @@ function showConsultationModal() {
 
     var result = await askAI(question);
 
+    // Guard: modal may have been removed by browser back during async call
+    if (!document.getElementById('wanchan-ai-modal')) return;
+
     sendBtn.disabled = false;
     sendBtn.style.opacity = '1';
     input.disabled = false;
