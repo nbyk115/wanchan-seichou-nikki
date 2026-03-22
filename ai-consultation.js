@@ -289,7 +289,7 @@ function showConsultationModal() {
   html += '<span style="font-size:28px;">🩺</span>';
   html += '<div>';
   html += '<div style="font-size:18px;font-weight:900;">AI健康相談</div>';
-  html += '<div style="font-size:12px;color:#888;">わんちゃんの気になることを聞いてみよう</div>';
+  html += '<div style="font-size:12px;color:#636363;">わんちゃんの気になることを聞いてみよう</div>';
   html += '</div>';
   html += '</div>';
   html += '<div id="ai-close" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:' + (isDark ? '#333' : '#f0f0f0') + ';cursor:pointer;font-size:16px;">✕</div>';
@@ -330,7 +330,7 @@ function showConsultationModal() {
   // 過去の相談履歴リンク
   var history = getHistory();
   if (history.length > 0) {
-    html += '<div id="ai-history-toggle" style="text-align:center;margin-top:12px;font-size:12px;color:#888;cursor:pointer;text-decoration:underline;">過去の相談履歴を見る（' + history.length + '件）</div>';
+    html += '<div id="ai-history-toggle" style="text-align:center;margin-top:12px;font-size:12px;color:#636363;cursor:pointer;text-decoration:underline;">過去の相談履歴を見る（' + history.length + '件）</div>';
   }
 
   modal.innerHTML = html;
@@ -398,7 +398,7 @@ function showConsultationModal() {
     if (!question) return;
 
     // Show loading
-    answerArea.innerHTML = '<div style="text-align:center;padding:24px;"><div class="ux-spinner" style="width:32px;height:32px;border-width:3px;color:#FF7B9C;margin:0 auto 12px;"></div><div style="font-size:13px;color:#888;">考え中...</div></div>';
+    answerArea.innerHTML = '<div style="text-align:center;padding:24px;"><div class="ux-spinner" style="width:32px;height:32px;border-width:3px;color:#FF7B9C;margin:0 auto 12px;"></div><div style="font-size:13px;color:#636363;">考え中...</div></div>';
     sendBtn.disabled = true;
     sendBtn.style.opacity = '0.5';
     input.disabled = true;
@@ -448,7 +448,7 @@ function showConsultationModal() {
       var fallbackMsg = result.timeoutWarning
         ? result.timeoutWarning
         : result.fallback
-          ? '※ 現在AI機能に接続できないため、定型文での回答です。'
+          ? '※ AIには接続されていません。以下は「よくある回答例」です（定型文）。'
           : '';
       var fallbackNotice = fallbackMsg
         ? '<div style="margin-bottom:8px;padding:8px 12px;border-radius:10px;background:' + (isDark ? '#2a2a1a' : '#FFFBEB') + ';font-size:11px;color:' + (isDark ? '#fcd34d' : '#92400E') + ';text-align:center;">' + _escapeHtml(fallbackMsg) + '</div>'
@@ -465,7 +465,7 @@ function showConsultationModal() {
 function _showHistory(container, isDark) {
   var history = getHistory();
   if (history.length === 0) {
-    container.innerHTML = '<div style="text-align:center;padding:20px;color:#888;font-size:13px;">まだ相談履歴がありません</div>';
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:#636363;font-size:13px;">まだ相談履歴がありません</div>';
     return;
   }
 
@@ -473,7 +473,7 @@ function _showHistory(container, isDark) {
   history.slice(0, 10).forEach(function(item) {
     var date = new Date(item.ts).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     html += '<div style="border-radius:12px;padding:12px;margin-bottom:8px;background:' + (isDark ? '#2a2a3e' : '#f8f8f8') + ';">';
-    html += '<div style="font-size:12px;color:#888;margin-bottom:4px;">' + date + '</div>';
+    html += '<div style="font-size:12px;color:#636363;margin-bottom:4px;">' + date + '</div>';
     html += '<div style="font-size:13px;font-weight:600;margin-bottom:6px;">' + _escapeHtml(item.q.substring(0, 60)) + (item.q.length > 60 ? '...' : '') + '</div>';
     html += '<div style="font-size:12px;color:' + (isDark ? '#aaa' : '#666') + ';line-height:1.5;">' + _escapeHtml(item.a.substring(0, 100)) + (item.a.length > 100 ? '...' : '') + '</div>';
     html += '</div>';

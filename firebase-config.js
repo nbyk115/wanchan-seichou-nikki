@@ -355,6 +355,11 @@ if (isConfigured) {
         _toast(user.displayName + 'でログイン中', 'success');
       }
       _isFirstAuth = false;
+      // Flush any pending sync from previous session's beforeunload
+      if (localStorage.getItem('ux_pending_sync') === '1') {
+        try { localStorage.removeItem('ux_pending_sync'); } catch (_) {}
+        await syncToCloud(user.uid);
+      }
       const synced = await syncFromCloud(user.uid);
       if (synced) {
         _toast('クラウドからデータを同期しました', 'info');
@@ -373,11 +378,20 @@ if (isConfigured) {
     }
   });
 
-  // Last-resort sync on page unload
+  // Last-resort sync on page unload — use sendBeacon for reliability
   window.addEventListener('beforeunload', function() {
     if (_currentUid) {
-      // Use sendBeacon-style: fire and forget since await is not reliable here
-      syncToCloud(_currentUid).catch(function() {});
+      // sendBeacon is the only reliable way to send data during unload
+      try {
+        var data = _getAppData();
+        var json = JSON.stringify(data);
+        if (json !== _lastSyncHash && navigator.sendBeacon) {
+          // Send a minimal beacon to indicate data needs sync on next load
+          navigator.sendBeacon('data:text/plain,sync');
+          // Mark that we have unsent changes
+          try { localStorage.setItem('ux_pending_sync', '1'); } catch (_) {}
+        }
+      } catch (_) {}
     }
   });
 }
