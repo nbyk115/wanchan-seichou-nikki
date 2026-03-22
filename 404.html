@@ -741,6 +741,62 @@ Error generating stack: `+n.message+`
   startObserving();
 
   /* ==============================
+     10b. HISTORY API INTEGRATION (スワイプバック対応)
+     ============================== */
+  (function() {
+    var _lastScreen = '';
+    var _popInProgress = false;
+
+    // Detect screen changes by observing bottom nav active state
+    function detectCurrentScreen() {
+      var activeNav = document.querySelector('[data-page].active, nav [style*="color: rgb(255, 123, 156)"], nav [style*="#FF7B9C"]');
+      if (!activeNav) return '';
+      return activeNav.getAttribute('data-page') || activeNav.textContent.trim() || '';
+    }
+
+    // Sync React navigation with History API
+    var screenObserver = new MutationObserver(function() {
+      if (_popInProgress) return;
+      var screen = detectCurrentScreen();
+      if (screen && screen !== _lastScreen) {
+        if (_lastScreen === '') {
+          window.history.replaceState({ screen: screen }, '');
+        } else {
+          window.history.pushState({ screen: screen }, '');
+        }
+        _lastScreen = screen;
+      }
+    });
+
+    // Observe root for navigation changes
+    function startScreenObserver() {
+      var root = document.getElementById('root');
+      if (root) {
+        screenObserver.observe(root, { childList: true, subtree: true });
+      } else {
+        setTimeout(startScreenObserver, 500);
+      }
+    }
+    setTimeout(startScreenObserver, 1000);
+
+    // Handle browser back (swipe back / back button)
+    window.addEventListener('popstate', function(e) {
+      _popInProgress = true;
+      // Find and click the app's back button
+      var backBtn = document.querySelector('[aria-label="戻る"], [style*="cursor"] svg');
+      if (backBtn) {
+        backBtn.click();
+      } else {
+        // If on a sub-page, click the home nav
+        var homeNav = document.querySelector('[data-page="home"], nav button:first-child');
+        if (homeNav) homeNav.click();
+      }
+      _lastScreen = (e.state && e.state.screen) || '';
+      setTimeout(function() { _popInProgress = false; }, 100);
+    });
+  })();
+
+  /* ==============================
      11. PERFORMANCE: requestIdleCallback for non-critical work
      ============================== */
   var ric = window.requestIdleCallback || function(cb) { setTimeout(cb, 200); };
