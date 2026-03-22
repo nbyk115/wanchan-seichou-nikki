@@ -43,7 +43,11 @@ function getUsageCount() {
 function incrementUsage() {
   var key = _getUsageKey();
   var count = getUsageCount() + 1;
-  localStorage.setItem(key, String(count));
+  try {
+    localStorage.setItem(key, String(count));
+  } catch (e) {
+    console.warn('Usage count save failed:', e);
+  }
   return count;
 }
 
@@ -83,7 +87,20 @@ function saveToHistory(question, answer) {
   });
   // 最新50件のみ保持
   if (history.length > 50) history = history.slice(0, 50);
-  localStorage.setItem('wanchan_ai_history', JSON.stringify(history));
+  try {
+    localStorage.setItem('wanchan_ai_history', JSON.stringify(history));
+  } catch (e) {
+    // QuotaExceededError: 古い履歴を半分削除してリトライ
+    if (e.name === 'QuotaExceededError' || e.code === 22) {
+      history = history.slice(0, 25);
+      try {
+        localStorage.setItem('wanchan_ai_history', JSON.stringify(history));
+      } catch (_e) {
+        // それでも失敗する場合は諦める（メモリ上のみ）
+        console.warn('AI history save failed: storage full');
+      }
+    }
+  }
 }
 
 // ============================================================

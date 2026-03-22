@@ -12,6 +12,8 @@ const ASSETS = [
 ];
 
 const MAX_CACHE_SIZE = 100;
+let _lastTrimTime = 0;
+const TRIM_INTERVAL = 60000; // 60秒に1回まで
 
 const OFFLINE_PAGE = `<!DOCTYPE html>
 <html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -113,11 +115,15 @@ self.addEventListener('fetch', (e) => {
           const clone = res.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(e.request, clone);
-            trimCache(CACHE_NAME, MAX_CACHE_SIZE);
+            const now = Date.now();
+            if (now - _lastTrimTime > TRIM_INTERVAL) {
+              _lastTrimTime = now;
+              trimCache(CACHE_NAME, MAX_CACHE_SIZE);
+            }
           });
         }
         return res;
-      }).catch(() => cached);
+      }).catch(() => cached || new Response('', { status: 408, statusText: 'Offline' }));
       return cached || fetched;
     })
   );
