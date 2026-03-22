@@ -166,6 +166,40 @@ body.ux-dark-on .ux-offline-banner{background:#991B1B;}
 .ux-dog-chip .ux-dc-emoji{font-size:14px;}
 .ux-dog-chip-add{width:44px;height:44px;border-radius:50%;background:#f5f5f5;border:2px dashed #ccc;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:#999;font-family:inherit;transition:all .2s;}
 .ux-dog-chip-add:hover{border-color:#FF7B9C;color:#FF7B9C;}
+/* Add Dog Modal */
+.ux-add-dog-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10002;display:flex;align-items:flex-end;justify-content:center;animation:ux-fade-in .2s ease;}
+.ux-add-dog-panel{background:#fff;border-radius:20px 20px 0 0;max-width:430px;width:100%;padding:20px 20px calc(20px + env(safe-area-inset-bottom, 0px));animation:ux-slide-up .3s ease;}
+.ux-add-dog-title{font-size:18px;font-weight:900;text-align:center;margin-bottom:16px;}
+.ux-add-dog-input{width:100%;padding:12px 16px;border-radius:14px;border:2px solid #eee;font-size:16px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:12px;transition:border-color .2s;}
+.ux-add-dog-input:focus{border-color:#FF7B9C;}
+.ux-add-dog-label{font-size:13px;font-weight:700;color:#888;margin-bottom:6px;}
+/* Drum Picker */
+.ux-drum-picker{position:relative;height:180px;overflow:hidden;border-radius:14px;border:2px solid #eee;margin-bottom:12px;background:#fafafa;}
+.ux-drum-picker-list{position:absolute;width:100%;transition:transform .3s cubic-bezier(.23,1,.32,1);will-change:transform;}
+.ux-drum-picker-item{height:36px;display:flex;align-items:center;justify-content:center;font-size:15px;color:#999;cursor:pointer;transition:all .2s;user-select:none;}
+.ux-drum-picker-item.ux-selected{font-size:18px;font-weight:700;color:#333;}
+.ux-drum-picker-highlight{position:absolute;top:50%;left:8px;right:8px;height:36px;transform:translateY(-50%);border-radius:10px;background:rgba(255,123,156,.08);border:1.5px solid rgba(255,123,156,.3);pointer-events:none;}
+.ux-add-dog-actions{display:flex;gap:10px;margin-top:16px;}
+.ux-add-dog-actions button{flex:1;padding:14px;border-radius:14px;border:none;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;}
+.ux-add-dog-cancel{background:#f0f0f0;color:#888;}
+.ux-add-dog-submit{background:#FF7B9C;color:#fff;}
+.ux-add-dog-submit:disabled{opacity:.4;cursor:not-allowed;}
+body.ux-dark-on .ux-add-dog-panel{background:#1e1e2e;color:#e0e0e0;}
+body.ux-dark-on .ux-add-dog-input{background:#2a2a3e;border-color:#444;color:#e0e0e0;}
+body.ux-dark-on .ux-drum-picker{background:#252535;border-color:#444;}
+body.ux-dark-on .ux-drum-picker-item{color:#777;}
+body.ux-dark-on .ux-drum-picker-item.ux-selected{color:#e0e0e0;}
+body.ux-dark-on .ux-drum-picker-highlight{background:rgba(255,123,156,.12);border-color:rgba(255,123,156,.3);}
+body.ux-dark-on .ux-add-dog-cancel{background:#333;color:#aaa;}
+@media(prefers-color-scheme:dark){
+  body.ux-dark-auto .ux-add-dog-panel{background:#1e1e2e;color:#e0e0e0;}
+  body.ux-dark-auto .ux-add-dog-input{background:#2a2a3e;border-color:#444;color:#e0e0e0;}
+  body.ux-dark-auto .ux-drum-picker{background:#252535;border-color:#444;}
+  body.ux-dark-auto .ux-drum-picker-item{color:#777;}
+  body.ux-dark-auto .ux-drum-picker-item.ux-selected{color:#e0e0e0;}
+  body.ux-dark-auto .ux-drum-picker-highlight{background:rgba(255,123,156,.12);border-color:rgba(255,123,156,.3);}
+  body.ux-dark-auto .ux-add-dog-cancel{background:#333;color:#aaa;}
+}
 body.ux-dark-on .ux-dog-chip{background:#2a2a3e;border-color:#444;color:#aaa;}
 body.ux-dark-on .ux-dog-chip.ux-active{border-color:#FF7B9C;background:#3a2a3e;color:#FF7B9C;}
 body.ux-dark-on .ux-dog-chip-add{background:#3a3a4e;border-color:#555;}
@@ -359,6 +393,7 @@ Error generating stack: `+n.message+`
       '#wanchan-notif-panel',
       '#wanchan-ai-modal',
       '.ux-breed-curve-modal',
+      '.ux-add-dog-modal',
       '.ux-onboard-overlay',
       '.ux-dog-switcher',
       '.ux-pwa-banner'
@@ -1203,7 +1238,20 @@ Error generating stack: `+n.message+`
   btnAddDog.addEventListener('click', function() {
     backupMenu.classList.remove('ux-show');
     backupFab.setAttribute('aria-expanded', 'false');
-    navigateToAddDog();
+    showAddDogModal(function(name, breed) {
+      try {
+        var wcData = JSON.parse(localStorage.getItem('wc2') || '{}');
+        var pets = wcData.pets || [];
+        pets.push({ id: 'pet' + Date.now(), name: name, breed: breed, avi: null, sfx: 'ちゃん' });
+        wcData.pets = pets;
+        safeSetItem('wc2', JSON.stringify(wcData));
+        showToast(name + 'ちゃんを追加しました！', 'success');
+        window.dispatchEvent(new StorageEvent('storage', { key: 'wc2' }));
+        setTimeout(function() { location.reload(); }, 300);
+      } catch(err) {
+        showToast('追加に失敗しました', 'error');
+      }
+    });
   });
 
   backupMenu.appendChild(btnAddDog);
@@ -1454,25 +1502,249 @@ Error generating stack: `+n.message+`
       switcher.appendChild(chip);
     });
 
-    // Always show "+" button to add a new dog
-    var addBtn = document.createElement('button');
-    addBtn.className = 'ux-dog-chip-add';
-    addBtn.textContent = '+';
-    addBtn.setAttribute('aria-label', 'わんちゃんを追加');
-    addBtn.title = 'わんちゃんを追加';
-    addBtn.addEventListener('click', function() {
-      triggerHaptic('light');
-      navigateToAddDog();
-    });
-    switcher.appendChild(addBtn);
-
     document.body.appendChild(switcher);
+
+    // Show hint for multi-dog switching on first time
+    if (dogs.length > 1 && !localStorage.getItem('ux_switch_hint_shown')) {
+      safeSetItem('ux_switch_hint_shown', '1');
+      setTimeout(function() {
+        showToast('左上のチップをタップしてわんちゃんを切り替えられるよ', 'info');
+      }, 1500);
+    }
   }
 
   // Render switcher after React is loaded
   setTimeout(renderDogSwitcher, 1000);
   // Re-check when data changes
   window.addEventListener('storage', function() { _dogProfileCache = null; _dogProfileCacheKey = ''; setTimeout(renderDogSwitcher, 500); });
+
+  /* ==============================
+     15b. ADD DOG MODAL WITH DRUM PICKER (わんちゃん追加モーダル)
+     ============================== */
+  var ADD_DOG_BREEDS = ["トイプードル","チワワ","柴犬","ダックス","ポメラニアン","フレブル","マルチーズ","ゴールデン","コーギー","パグ","ビーグル","ハスキー","ラブラドール","ヨークシャーテリア","シーズー","ボーダーコリー","秋田犬","MIX","その他"];
+
+  function showAddDogModal(callback) {
+    var existing = document.querySelector('.ux-add-dog-modal');
+    if (existing) existing.remove();
+
+    var isDark = document.body.classList.contains('ux-dark-on') ||
+      (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+    var selectedBreedIndex = 0;
+    var dogName = '';
+
+    var overlay = document.createElement('div');
+    overlay.className = 'ux-add-dog-modal';
+
+    var panel = document.createElement('div');
+    panel.className = 'ux-add-dog-panel';
+    panel.addEventListener('click', function(e) { e.stopPropagation(); });
+
+    // Title
+    var title = document.createElement('div');
+    title.className = 'ux-add-dog-title';
+    title.textContent = '🐾 わんちゃんを追加';
+    panel.appendChild(title);
+
+    // Name input
+    var nameLabel = document.createElement('div');
+    nameLabel.className = 'ux-add-dog-label';
+    nameLabel.textContent = '名前';
+    panel.appendChild(nameLabel);
+
+    var nameInput = document.createElement('input');
+    nameInput.className = 'ux-add-dog-input';
+    nameInput.type = 'text';
+    nameInput.placeholder = 'わんちゃんの名前を入れてね';
+    nameInput.addEventListener('input', function() {
+      dogName = nameInput.value.trim();
+      submitBtn.disabled = !dogName;
+    });
+    panel.appendChild(nameInput);
+
+    // Breed label
+    var breedLabel = document.createElement('div');
+    breedLabel.className = 'ux-add-dog-label';
+    breedLabel.textContent = '犬種';
+    panel.appendChild(breedLabel);
+
+    // Drum picker
+    var picker = document.createElement('div');
+    picker.className = 'ux-drum-picker';
+
+    var highlight = document.createElement('div');
+    highlight.className = 'ux-drum-picker-highlight';
+    picker.appendChild(highlight);
+
+    var list = document.createElement('div');
+    list.className = 'ux-drum-picker-list';
+
+    var ITEM_HEIGHT = 36;
+    var VISIBLE_ITEMS = 5;
+    var CENTER_OFFSET = Math.floor(VISIBLE_ITEMS / 2);
+
+    // Add padding items
+    for (var p = 0; p < CENTER_OFFSET; p++) {
+      var pad = document.createElement('div');
+      pad.className = 'ux-drum-picker-item';
+      pad.textContent = '';
+      list.appendChild(pad);
+    }
+    ADD_DOG_BREEDS.forEach(function(breed, i) {
+      var item = document.createElement('div');
+      item.className = 'ux-drum-picker-item' + (i === 0 ? ' ux-selected' : '');
+      item.textContent = breed;
+      item.setAttribute('data-index', i);
+      item.addEventListener('click', function() { scrollToIndex(i); });
+      list.appendChild(item);
+    });
+    for (var p2 = 0; p2 < CENTER_OFFSET; p2++) {
+      var pad2 = document.createElement('div');
+      pad2.className = 'ux-drum-picker-item';
+      pad2.textContent = '';
+      list.appendChild(pad2);
+    }
+    picker.appendChild(list);
+    panel.appendChild(picker);
+
+    function scrollToIndex(idx) {
+      selectedBreedIndex = Math.max(0, Math.min(ADD_DOG_BREEDS.length - 1, idx));
+      list.style.transform = 'translateY(' + (-selectedBreedIndex * ITEM_HEIGHT) + 'px)';
+      var items = list.querySelectorAll('[data-index]');
+      items.forEach(function(el) {
+        var elIdx = parseInt(el.getAttribute('data-index'));
+        el.classList.toggle('ux-selected', elIdx === selectedBreedIndex);
+      });
+    }
+
+    // Touch/mouse drag for drum picker
+    var startY = 0, startTranslate = 0, isDragging = false;
+    function onDragStart(e) {
+      isDragging = true;
+      startY = e.touches ? e.touches[0].clientY : e.clientY;
+      startTranslate = -selectedBreedIndex * ITEM_HEIGHT;
+      list.style.transition = 'none';
+    }
+    function onDragMove(e) {
+      if (!isDragging) return;
+      e.preventDefault();
+      var currentY = e.touches ? e.touches[0].clientY : e.clientY;
+      var diff = currentY - startY;
+      list.style.transform = 'translateY(' + (startTranslate + diff) + 'px)';
+    }
+    function onDragEnd(e) {
+      if (!isDragging) return;
+      isDragging = false;
+      list.style.transition = 'transform .3s cubic-bezier(.23,1,.32,1)';
+      var currentY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+      var diff = currentY - startY;
+      var newIndex = Math.round((-startTranslate - diff) / ITEM_HEIGHT);
+      scrollToIndex(newIndex);
+    }
+    picker.addEventListener('touchstart', onDragStart, { passive: true });
+    picker.addEventListener('touchmove', onDragMove, { passive: false });
+    picker.addEventListener('touchend', onDragEnd);
+    picker.addEventListener('mousedown', onDragStart);
+    picker.addEventListener('mousemove', onDragMove);
+    picker.addEventListener('mouseup', onDragEnd);
+    picker.addEventListener('mouseleave', function() { if (isDragging) onDragEnd({ clientY: startY }); });
+
+    // Action buttons
+    var actions = document.createElement('div');
+    actions.className = 'ux-add-dog-actions';
+
+    var cancelBtn = document.createElement('button');
+    cancelBtn.className = 'ux-add-dog-cancel';
+    cancelBtn.textContent = 'やめる';
+    cancelBtn.addEventListener('click', closeModal);
+
+    var submitBtn = document.createElement('button');
+    submitBtn.className = 'ux-add-dog-submit';
+    submitBtn.textContent = '追加する';
+    submitBtn.disabled = true;
+    submitBtn.addEventListener('click', function() {
+      if (!dogName) return;
+      var breed = ADD_DOG_BREEDS[selectedBreedIndex];
+      closeModal();
+      if (callback) callback(dogName, breed);
+    });
+
+    actions.appendChild(cancelBtn);
+    actions.appendChild(submitBtn);
+    panel.appendChild(actions);
+
+    overlay.appendChild(panel);
+    overlay.addEventListener('click', closeModal);
+    document.body.appendChild(overlay);
+
+    // Focus name input
+    setTimeout(function() { nameInput.focus(); }, 100);
+    triggerHaptic('light');
+
+    function closeModal() {
+      overlay.remove();
+    }
+
+    // Trap focus
+    trapFocus(overlay, closeModal);
+  }
+
+  // Override browser prompt() to intercept React's "新しいわんちゃんの名前は？" prompt
+  var _origPrompt = window.prompt;
+  var _addDogState = { phase: 0, name: '', breed: '' };
+
+  window.prompt = function(msg, defaultVal) {
+    if (msg && msg.includes('新しいわんちゃんの名前')) {
+      // Intercept: show our custom modal instead
+      // We need to handle this asynchronously, so we'll use a different approach
+      // Find the React "＋ わんちゃんを追加" button and override its click
+      _addDogState.phase = 1;
+      return null; // Cancel the prompt - we'll handle it via mutation observer
+    }
+    if (msg && msg.includes('犬種は')) {
+      // This shouldn't be reached if we intercept the name prompt
+      return _addDogState.breed || 'ミックス';
+    }
+    return _origPrompt.call(window, msg, defaultVal);
+  };
+
+  // Watch for React's add-dog button and replace its behavior
+  function hookAddDogButton() {
+    var observer = new MutationObserver(function() {
+      // Find the "＋ わんちゃんを追加" button in React settings
+      var allDivs = document.querySelectorAll('#root div[style*="cursor"]');
+      allDivs.forEach(function(div) {
+        if (div.textContent.trim() === '＋ わんちゃんを追加' && !div._uxHooked) {
+          div._uxHooked = true;
+          div.addEventListener('click', function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            showAddDogModal(function(name, breed) {
+              // Trigger React state update by finding the app's update function
+              // We'll simulate by storing data and triggering the original flow
+              try {
+                var wcData = JSON.parse(localStorage.getItem('wc2') || '{}');
+                var pets = wcData.pets || [];
+                pets.push({ id: 'pet' + Date.now(), name: name, breed: breed, avi: null, sfx: 'ちゃん' });
+                wcData.pets = pets;
+                safeSetItem('wc2', JSON.stringify(wcData));
+                showToast(name + 'ちゃんを追加しました！', 'success');
+                // Trigger React re-render
+                window.dispatchEvent(new StorageEvent('storage', { key: 'wc2' }));
+                // Force page reload for React to pick up changes
+                setTimeout(function() { location.reload(); }, 300);
+              } catch(err) {
+                console.error('Add dog error:', err);
+                showToast('追加に失敗しました', 'error');
+              }
+            });
+          }, true); // Use capture phase to intercept before React
+        }
+      });
+    });
+    observer.observe(document.getElementById('root') || document.body, { childList: true, subtree: true });
+  }
+  setTimeout(hookAddDogButton, 1000);
 
   /* ==============================
      16. SNS SHARE (シェア機能)
