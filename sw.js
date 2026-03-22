@@ -1,8 +1,10 @@
-const CACHE_NAME = 'wanchan-v8';
+const CACHE_NAME = 'wanchan-v9';
 const ASSETS = [
   '/wanchan-seichou-nikki/',
   '/wanchan-seichou-nikki/index.html',
   '/wanchan-seichou-nikki/firebase-config.js',
+  '/wanchan-seichou-nikki/analytics.js',
+  '/wanchan-seichou-nikki/ai-consultation.js',
   '/wanchan-seichou-nikki/icon-192.png',
   '/wanchan-seichou-nikki/icon-512.png',
   '/wanchan-seichou-nikki/og-image.png',
@@ -10,6 +12,8 @@ const ASSETS = [
 ];
 
 const MAX_CACHE_SIZE = 100;
+let _lastTrimTime = 0;
+const TRIM_INTERVAL = 60000; // 60秒に1回まで
 
 const OFFLINE_PAGE = `<!DOCTYPE html>
 <html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -42,9 +46,8 @@ async function trimCache(cacheName, maxItems) {
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)).then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
 self.addEventListener('activate', (e) => {
@@ -112,11 +115,15 @@ self.addEventListener('fetch', (e) => {
           const clone = res.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(e.request, clone);
-            trimCache(CACHE_NAME, MAX_CACHE_SIZE);
+            const now = Date.now();
+            if (now - _lastTrimTime > TRIM_INTERVAL) {
+              _lastTrimTime = now;
+              trimCache(CACHE_NAME, MAX_CACHE_SIZE);
+            }
           });
         }
         return res;
-      }).catch(() => cached);
+      }).catch(() => cached || new Response('', { status: 408, statusText: 'Offline' }));
       return cached || fetched;
     })
   );

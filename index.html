@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="theme-color" content="#FFF8F5"/>
@@ -19,10 +19,14 @@
 <meta name="twitter:image" content="https://nbyk115.github.io/wanchan-seichou-nikki/og-image.png"/>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="icon-192.png"/>
-<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&family=Kosugi+Maru&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&family=Kosugi+Maru&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
 <script type="module" src="firebase-config.js"></script>
+<script type="module" src="analytics.js"></script>
+<script type="module" src="ai-consultation.js"></script>
 <!-- komoju-payment.js removed: premium features disabled -->
-<title>わんちゃん日記</title>
+<title>わんちゃん成長日記</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Zen Maru Gothic','Hiragino Sans',sans-serif;-webkit-font-smoothing:antialiased;overscroll-behavior:none;}
@@ -125,6 +129,11 @@ body.ux-dark-on .ux-toast{background:rgba(50,50,70,.95) !important;}
 body.ux-dark-on .ux-backup-menu{background:#2a2a3e;}
 body.ux-dark-on .ux-backup-menu button{color:#e0e0e0;}
 body.ux-dark-on .ux-backup-menu button:hover,body.ux-dark-on .ux-backup-menu button:focus{background:#3a3a4e;}
+@media (prefers-color-scheme: dark) {
+  body.ux-dark-auto .ux-backup-menu{background:#2a2a3e;}
+  body.ux-dark-auto .ux-backup-menu button{color:#e0e0e0;}
+  body.ux-dark-auto .ux-backup-menu button:hover,body.ux-dark-auto .ux-backup-menu button:focus{background:#3a3a4e;}
+}
 
 /* Onboarding */
 .ux-onboard-overlay{position:fixed;inset:0;z-index:10003;background:linear-gradient(180deg,#FFF8F5 0%,#FFE8EC 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;opacity:0;transition:opacity .5s;pointer-events:none;text-align:center;}
@@ -150,7 +159,7 @@ body.ux-dark-on .ux-offline-banner{background:#991B1B;}
 
 
 /* Multi-Dog Quick Switcher */
-.ux-dog-switcher{position:fixed;top:env(safe-area-inset-top,12px);left:12px;z-index:9997;display:flex;gap:6px;align-items:center;}
+.ux-dog-switcher{position:fixed;top:env(safe-area-inset-top,12px);left:12px;z-index:9997;display:flex;gap:6px;align-items:center;max-width:calc(100vw - 80px);overflow-x:auto;}
 .ux-dog-chip{display:flex;align-items:center;gap:4px;padding:6px 12px;border-radius:20px;background:#fff;border:2px solid #eee;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.06);color:#666;}
 .ux-dog-chip.ux-active{border-color:#FF7B9C;background:#FFF0F3;color:#FF7B9C;}
 .ux-dog-chip .ux-dc-emoji{font-size:14px;}
@@ -159,6 +168,11 @@ body.ux-dark-on .ux-offline-banner{background:#991B1B;}
 body.ux-dark-on .ux-dog-chip{background:#2a2a3e;border-color:#444;color:#aaa;}
 body.ux-dark-on .ux-dog-chip.ux-active{border-color:#FF7B9C;background:#3a2a3e;color:#FF7B9C;}
 body.ux-dark-on .ux-dog-chip-add{background:#3a3a4e;border-color:#555;}
+@media (prefers-color-scheme: dark) {
+  body.ux-dark-auto .ux-dog-chip{background:#2a2a3e;border-color:#444;color:#aaa;}
+  body.ux-dark-auto .ux-dog-chip.ux-active{border-color:#FF7B9C;background:#3a2a3e;color:#FF7B9C;}
+  body.ux-dark-auto .ux-dog-chip-add{background:#3a3a4e;border-color:#555;}
+}
 
 /* Dark mode: main content overrides */
 body.ux-dark-on{background:#121212 !important;color:#F0F0F0 !important;}
@@ -184,6 +198,94 @@ body.ux-dark-on [style*="background: rgb(22, 163, 106)"],body.ux-dark-on [style*
   body.ux-dark-auto [style*="color: rgb(239, 68, 68)"],body.ux-dark-auto [style*="color:#EF4444"]{color:#FCA5A5 !important;}
   body.ux-dark-auto [style*="background: rgb(239, 68, 68)"],body.ux-dark-auto [style*="background:#EF4444"]{background:#991B1B !important;}
   body.ux-dark-auto [style*="background: rgb(22, 163, 106)"],body.ux-dark-auto [style*="background:#16A34A"]{background:#065F46 !important;}
+}
+
+/* Growth Summary Card */
+.ux-growth-card{position:relative;margin:16px;border-radius:20px;background:linear-gradient(135deg,#FFF8F5 0%,#FFE8EC 50%,#E8F4FD 100%);padding:24px 20px;box-shadow:0 4px 20px rgba(255,123,156,.15);overflow:hidden;}
+.ux-growth-card::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:rgba(255,123,156,.1);}
+.ux-growth-card-title{font-size:16px;font-weight:900;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.ux-growth-card-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;}
+.ux-growth-stat{text-align:center;padding:12px 8px;border-radius:14px;background:rgba(255,255,255,.7);}
+.ux-growth-stat-value{font-size:24px;font-weight:900;color:#FF7B9C;}
+.ux-growth-stat-label{font-size:11px;color:#888;margin-top:4px;}
+.ux-growth-card-milestone{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.8);font-size:13px;font-weight:600;}
+.ux-growth-share{margin-top:12px;text-align:center;}
+.ux-growth-share button{padding:10px 24px;border-radius:14px;border:none;background:#FF7B9C;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(255,123,156,.3);}
+body.ux-dark-on .ux-growth-card{background:linear-gradient(135deg,#1a1a2e 0%,#2a1a2e 50%,#1a2a3e 100%);}
+body.ux-dark-on .ux-growth-stat{background:rgba(255,255,255,.08);}
+body.ux-dark-on .ux-growth-stat-label{color:#aaa;}
+body.ux-dark-on .ux-growth-stat-value{color:#FF9BB5;}
+body.ux-dark-on .ux-growth-card-milestone{background:rgba(255,255,255,.06);}
+@media (prefers-color-scheme:dark){
+  body.ux-dark-auto .ux-growth-card{background:linear-gradient(135deg,#1a1a2e 0%,#2a1a2e 50%,#1a2a3e 100%);}
+  body.ux-dark-auto .ux-growth-stat{background:rgba(255,255,255,.08);}
+  body.ux-dark-auto .ux-growth-stat-label{color:#aaa;}
+  body.ux-dark-auto .ux-growth-stat-value{color:#FF9BB5;}
+  body.ux-dark-auto .ux-growth-card-milestone{background:rgba(255,255,255,.06);}
+}
+
+/* Anniversary Reminder */
+.ux-anniversary-banner{position:fixed;top:env(safe-area-inset-top,12px);left:50%;transform:translateX(-50%);z-index:9999;max-width:380px;width:calc(100% - 32px);padding:16px 20px;border-radius:18px;background:linear-gradient(135deg,#FF7B9C,#FF9B6A);color:#fff;box-shadow:0 8px 24px rgba(255,123,156,.35);animation:ux-toast-in .35s cubic-bezier(.175,.885,.32,1.275);display:flex;align-items:center;gap:12px;cursor:pointer;}
+.ux-anniversary-banner .ux-anniv-icon{font-size:28px;flex-shrink:0;}
+.ux-anniversary-banner .ux-anniv-text{flex:1;font-size:14px;font-weight:700;line-height:1.5;}
+.ux-anniversary-banner .ux-anniv-close{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;border:none;color:#fff;cursor:pointer;font-family:inherit;}
+
+/* Breed Growth Curve */
+.ux-breed-curve-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10001;display:flex;align-items:center;justify-content:center;animation:ux-fade-in .2s ease;padding:16px;}
+.ux-breed-curve-panel{background:#fff;border-radius:20px;max-width:500px;width:100%;padding:24px 20px;max-height:85vh;overflow-y:auto;}
+.ux-breed-curve-chart{position:relative;width:100%;height:200px;border-radius:12px;background:#f8f8f8;margin:16px 0;overflow:hidden;}
+.ux-breed-curve-bar{position:absolute;bottom:0;border-radius:6px 6px 0 0;transition:height .3s ease;}
+.ux-breed-curve-label{font-size:10px;text-align:center;color:#888;margin-top:4px;}
+.ux-breed-curve-legend{display:flex;gap:16px;justify-content:center;margin-top:12px;font-size:12px;}
+.ux-breed-curve-legend span{display:flex;align-items:center;gap:4px;}
+.ux-breed-curve-legend .dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
+body.ux-dark-on .ux-breed-curve-panel{background:#1e1e2e;color:#e0e0e0;}
+body.ux-dark-on .ux-breed-curve-chart{background:#252535;}
+body.ux-dark-on .ux-breed-curve-label{color:#aaa;}
+body.ux-dark-on .ux-breed-curve-legend{color:#ccc;}
+@media (prefers-color-scheme:dark){
+  body.ux-dark-auto .ux-breed-curve-panel{background:#1e1e2e;color:#e0e0e0;}
+  body.ux-dark-auto .ux-breed-curve-chart{background:#252535;}
+  body.ux-dark-auto .ux-breed-curve-label{color:#aaa;}
+  body.ux-dark-auto .ux-breed-curve-legend{color:#ccc;}
+}
+
+/* Symptom Checker */
+.ux-symptom-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0;}
+.ux-symptom-chip{padding:10px 8px;border-radius:12px;border:2px solid #eee;background:#fff;text-align:center;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;}
+.ux-symptom-chip.ux-selected{border-color:#FF7B9C;background:#FFF0F3;color:#FF7B9C;}
+body.ux-dark-on .ux-symptom-chip{background:#2a2a3e;border-color:#444;color:#ccc;}
+body.ux-dark-on .ux-symptom-chip.ux-selected{border-color:#FF7B9C;background:#3a2a3e;color:#FF7B9C;}
+@media (prefers-color-scheme:dark){
+  body.ux-dark-auto .ux-symptom-chip{background:#2a2a3e;border-color:#444;color:#ccc;}
+  body.ux-dark-auto .ux-symptom-chip.ux-selected{border-color:#FF7B9C;background:#3a2a3e;color:#FF7B9C;}
+}
+@media (max-width:359px){
+  .ux-symptom-grid{grid-template-columns:repeat(2,1fr);}
+  .ux-growth-card-stats{grid-template-columns:1fr 1fr;gap:8px;}
+  .ux-growth-stat-value{font-size:20px;}
+}
+
+/* PWA Install Banner */
+.ux-pwa-banner{position:fixed;bottom:0;left:0;right:0;z-index:9999;padding:16px 20px env(safe-area-inset-bottom,16px);background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -4px 24px rgba(0,0,0,.1);animation:ux-slide-up .3s ease;display:flex;align-items:center;gap:14px;}
+.ux-pwa-banner-icon{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#FF7B9C,#FF9B6A);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.ux-pwa-banner-text{flex:1;}
+.ux-pwa-banner-title{font-size:14px;font-weight:900;margin-bottom:2px;}
+.ux-pwa-banner-sub{font-size:12px;color:#888;}
+.ux-pwa-banner-actions{display:flex;gap:8px;flex-shrink:0;}
+.ux-pwa-banner-actions button{padding:10px 16px;border-radius:12px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+.ux-pwa-install-btn{background:#FF7B9C;color:#fff;}
+.ux-pwa-dismiss-btn{background:#f0f0f0;color:#888;}
+@keyframes ux-slide-up{from{transform:translateY(100%);}to{transform:translateY(0);}}
+body.ux-dark-on .ux-pwa-banner{background:#1e1e2e;}
+body.ux-dark-on .ux-pwa-banner-title{color:#F0F0F0;}
+body.ux-dark-on .ux-pwa-banner-sub{color:#aaa;}
+body.ux-dark-on .ux-pwa-dismiss-btn{background:#333;color:#aaa;}
+@media (prefers-color-scheme:dark){
+  body.ux-dark-auto .ux-pwa-banner{background:#1e1e2e;}
+  body.ux-dark-auto .ux-pwa-banner-title{color:#F0F0F0;}
+  body.ux-dark-auto .ux-pwa-banner-sub{color:#aaa;}
+  body.ux-dark-auto .ux-pwa-dismiss-btn{background:#333;color:#aaa;}
 }
 
 </style>
@@ -225,6 +327,19 @@ Error generating stack: `+n.message+`
   function safeSetItem(key, value) {
     try { localStorage.setItem(key, value); return true; }
     catch(e) { console.warn('localStorage quota exceeded for key:', key); return false; }
+  }
+
+  // HTML escape helper (prevent XSS from user-input like dog names)
+  function _escHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // Dark mode detection helper (DRY)
+  function _isDark() {
+    return document.body.classList.contains('ux-dark-on') ||
+      (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
   }
 
   // Close any existing overlay before opening a new one
@@ -604,7 +719,7 @@ Error generating stack: `+n.message+`
       localStorage.setItem('wp', JSON.stringify({on: true, exp: "2099-12-31T00:00:00.000Z"}));
     }
   } catch(e) {
-    localStorage.setItem('wp', JSON.stringify({on: true, exp: "2099-12-31T00:00:00.000Z"}));
+    try { localStorage.setItem('wp', JSON.stringify({on: true, exp: "2099-12-31T00:00:00.000Z"})); } catch(_) {}
   }
   // Sync React dark flag on page load
   try {
@@ -628,7 +743,7 @@ Error generating stack: `+n.message+`
           st.dark = d ? 1 : 0;
           localStorage.setItem('wc2', JSON.stringify(st));
           window.dispatchEvent(new StorageEvent('storage', { key: 'wc2', newValue: JSON.stringify(st) }));
-          setTimeout(function() { window.location.reload(); }, 500);
+          applyDarkMode();
         }
       }
     } catch(e) {}
@@ -781,17 +896,58 @@ Error generating stack: `+n.message+`
       clearInterval(_fbCheck);
       btnAuth.style.display = '';
       fb.onAuth(updateAuthButton);
-    } else if (_fbTries > 50) {
+    } else if (_fbTries > 150) {
       clearInterval(_fbCheck);
     }
   }, 200);
 
+  // AI健康相談ボタン
+  var btnAI = document.createElement('button');
+  btnAI.textContent = '🩺 AI健康相談';
+  btnAI.addEventListener('click', function() {
+    backupMenu.classList.remove('ux-show');
+    var _aiCheck = setInterval(function() {
+      var ai = window.__wanchan && window.__wanchan.ai;
+      if (ai && ai.showConsultation) {
+        clearInterval(_aiCheck);
+        ai.showConsultation();
+      }
+    }, 100);
+    // Timeout after 3s
+    setTimeout(function() { clearInterval(_aiCheck); }, 3000);
+  });
+
+  // 通知ボタン（足あと・コメント）
+  var btnNotif = document.createElement('button');
+  btnNotif.textContent = '🔔 お知らせ';
+  btnNotif.style.display = 'none';
+  btnNotif.addEventListener('click', function() {
+    backupMenu.classList.remove('ux-show');
+    showNotificationsPanel();
+  });
+
   backupMenu.appendChild(btnAuth);
+  backupMenu.appendChild(btnAI);
+  backupMenu.appendChild(btnNotif);
   backupMenu.appendChild(btnDark);
   document.body.appendChild(backupMenu);
 
+  backupMenu.setAttribute('role', 'menu');
+  backupFab.setAttribute('aria-expanded', 'false');
+  backupFab.setAttribute('aria-haspopup', 'true');
   backupFab.addEventListener('click', function() {
-    backupMenu.classList.toggle('ux-show');
+    var isOpen = backupMenu.classList.toggle('ux-show');
+    backupFab.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    if (isOpen && backupMenu.firstElementChild) backupMenu.firstElementChild.focus();
+  });
+
+  // Close menu with Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && backupMenu.classList.contains('ux-show')) {
+      backupMenu.classList.remove('ux-show');
+      backupFab.setAttribute('aria-expanded', 'false');
+      backupFab.focus();
+    }
   });
 
   // Close menu when clicking outside
@@ -956,7 +1112,859 @@ Error generating stack: `+n.message+`
   window.addEventListener('storage', function() { _dogProfileCache = null; _dogProfileCacheKey = ''; setTimeout(renderDogSwitcher, 500); });
 
   /* ==============================
-     20. SW UPDATE NOTIFICATION
+     16. SNS SHARE (シェア機能)
+     ============================== */
+  function shareToSNS(platform, text, url) {
+    url = url || window.location.href;
+    text = text || 'わんちゃん成長日記で記録中！';
+    var shareUrl = '';
+    switch (platform) {
+      case 'x':
+        shareUrl = 'https://x.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(url);
+        break;
+      case 'line':
+        shareUrl = 'https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(text);
+        break;
+      case 'copy':
+        navigator.clipboard.writeText(url).then(function() {
+          showToast('リンクをコピーしました', 'success');
+        }).catch(function() {
+          showToast('コピーがうまくいきませんでした。もう一度試してみてね', 'error');
+        });
+        // Track
+        var a = window.__wanchan && window.__wanchan.analytics;
+        if (a && a.trackShare) a.trackShare('clipboard', 'link');
+        return;
+    }
+    if (shareUrl) {
+      window.open(shareUrl, '_blank', 'width=600,height=400');
+      var an = window.__wanchan && window.__wanchan.analytics;
+      if (an && an.trackShare) an.trackShare(platform, 'diary');
+    }
+  }
+
+  function showShareSheet(text, url) {
+    // Web Share API 対応ブラウザ
+    if (navigator.share) {
+      navigator.share({
+        title: 'わんちゃん成長日記',
+        text: text || 'うちの子の成長記録を見てね！',
+        url: url || window.location.href
+      }).catch(function() {});
+      return;
+    }
+
+    // フォールバック: シェアシート
+    var existing = document.getElementById('wanchan-share-sheet');
+    if (existing) existing.remove();
+
+    var isDark = document.body.classList.contains('ux-dark-on') ||
+      (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+    var overlay = document.createElement('div');
+    overlay.id = 'wanchan-share-sheet';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10001;display:flex;align-items:flex-end;justify-content:center;animation:ux-fade-in .2s ease;';
+
+    var sheet = document.createElement('div');
+    sheet.style.cssText = 'background:' + (isDark ? '#1e1e2e' : '#fff') + ';border-radius:20px 20px 0 0;max-width:500px;width:100%;padding:24px 20px env(safe-area-inset-bottom,20px);';
+
+    var html = '<div style="font-size:16px;font-weight:700;margin-bottom:16px;color:' + (isDark ? '#e0e0e0' : '#333') + ';">シェアする</div>';
+    html += '<div style="display:flex;gap:16px;justify-content:center;margin-bottom:20px;">';
+
+    var buttons = [
+      { id: 'share-x', icon: '𝕏', label: 'X', color: '#000' },
+      { id: 'share-line', icon: '💬', label: 'LINE', color: '#06C755' },
+      { id: 'share-copy', icon: '🔗', label: 'コピー', color: '#888' }
+    ];
+    buttons.forEach(function(b) {
+      html += '<div id="' + b.id + '" style="text-align:center;cursor:pointer;">';
+      html += '<div style="width:56px;height:56px;border-radius:50%;background:' + b.color + ';display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;margin:0 auto 6px;">' + b.icon + '</div>';
+      html += '<div style="font-size:11px;color:' + (isDark ? '#aaa' : '#888') + ';">' + b.label + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+    html += '<button id="share-cancel" style="width:100%;padding:14px;border:none;border-radius:14px;background:' + (isDark ? '#333' : '#f0f0f0') + ';color:' + (isDark ? '#ccc' : '#888') + ';font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">キャンセル</button>';
+
+    sheet.innerHTML = html;
+    overlay.appendChild(sheet);
+    document.body.appendChild(overlay);
+
+    function closeShareSheet() { overlay.remove(); document.removeEventListener('keydown', shareEscHandler); }
+    function shareEscHandler(e) { if (e.key === 'Escape') closeShareSheet(); }
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', 'シェアする');
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) closeShareSheet(); });
+    document.addEventListener('keydown', shareEscHandler);
+    document.getElementById('share-cancel').addEventListener('click', closeShareSheet);
+    document.getElementById('share-x').addEventListener('click', function() { overlay.remove(); shareToSNS('x', text, url); });
+    document.getElementById('share-line').addEventListener('click', function() { overlay.remove(); shareToSNS('line', text, url); });
+    document.getElementById('share-copy').addEventListener('click', function() { overlay.remove(); shareToSNS('copy', text, url); });
+  }
+
+  window.__wanchan.shareToSNS = shareToSNS;
+  window.__wanchan.showShareSheet = showShareSheet;
+  window.__wanchan.showToast = showToast;
+
+  /* ==============================
+     17. NOTIFICATIONS PANEL (お知らせ)
+     ============================== */
+  var _notifCache = { footprints: [], lastCheck: 0 };
+
+  function showNotificationsPanel() {
+    var existing = document.getElementById('wanchan-notif-panel');
+    if (existing) existing.remove();
+
+    var isDark = document.body.classList.contains('ux-dark-on') ||
+      (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+    var overlay = document.createElement('div');
+    overlay.id = 'wanchan-notif-panel';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10001;display:flex;align-items:flex-end;justify-content:center;animation:ux-fade-in .2s ease;';
+
+    var panel = document.createElement('div');
+    panel.style.cssText = 'background:' + (isDark ? '#1e1e2e' : '#fff') + ';border-radius:20px 20px 0 0;max-width:500px;width:100%;padding:24px 20px env(safe-area-inset-bottom,20px);max-height:70vh;overflow-y:auto;';
+
+    panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div style="font-size:18px;font-weight:900;color:' + (isDark ? '#e0e0e0' : '#333') + ';">🔔 お知らせ</div><div id="notif-close" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:' + (isDark ? '#333' : '#f0f0f0') + ';cursor:pointer;font-size:14px;">✕</div></div><div id="notif-content" style="text-align:center;padding:20px;"><div class="ux-spinner" style="width:24px;height:24px;border-width:2.5px;color:#FF7B9C;margin:0 auto;"></div></div>';
+
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
+
+    function closeNotifPanel() { overlay.remove(); document.removeEventListener('keydown', notifEscHandler); }
+    function notifEscHandler(e) { if (e.key === 'Escape') closeNotifPanel(); }
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', 'お知らせ');
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) closeNotifPanel(); });
+    document.addEventListener('keydown', notifEscHandler);
+    document.getElementById('notif-close').addEventListener('click', closeNotifPanel);
+
+    // 足あとを取得して表示
+    var fb = window.__wanchan && window.__wanchan.firebase;
+    if (fb && fb.isConfigured && fb.getFootprints) {
+      // _currentUser を直接参照（onAuth リスナー蓄積を回避）
+      var user = _currentUser;
+      if (!user) {
+        var nc = document.getElementById('notif-content');
+        if (nc) nc.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">ログインするとお知らせが届きます</div>';
+      } else {
+        fb.getFootprints(user.uid, 20).then(function(footprints) {
+          var content = document.getElementById('notif-content');
+          if (!content) return;
+
+          if (footprints.length === 0) {
+            content.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;line-height:1.7;">まだお知らせはありません<br><span style="font-size:12px;">犬友ができると足あとが届きます</span></div>';
+            return;
+          }
+
+          var html = '';
+          var lastCheckTs = parseInt(localStorage.getItem('ux_notif_last_check') || '0', 10);
+
+          footprints.forEach(function(fp) {
+            var ts = fp.createdAt ? (fp.createdAt.seconds ? fp.createdAt.seconds * 1000 : fp.createdAt) : 0;
+            var isNew = ts > lastCheckTs;
+            var date = ts ? new Date(ts) : new Date();
+            var timeStr = date.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+            html += '<div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;margin-bottom:6px;background:' + (isNew ? (isDark ? '#2a2a3e' : '#FFF8F0') : 'transparent') + ';">';
+            if (fp.fromPhoto) {
+              html += '<img src="' + _escHtml(fp.fromPhoto) + '" style="width:40px;height:40px;border-radius:50%;object-fit:cover;" alt="' + _escHtml(fp.fromName || '訪問者') + 'のアイコン">';
+            } else {
+              html += '<div style="width:40px;height:40px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:20px;">🐾</div>';
+            }
+            html += '<div style="flex:1;">';
+            html += '<div style="font-size:14px;font-weight:' + (isNew ? '700' : '400') + ';color:' + (isDark ? '#e0e0e0' : '#333') + ';">' + _escHtml(fp.fromName || '誰か') + 'が遊びに来ました</div>';
+            html += '<div style="font-size:12px;color:#888;">' + timeStr + '</div>';
+            html += '</div>';
+            if (isNew) {
+              html += '<div style="width:8px;height:8px;border-radius:50%;background:#FF7B9C;flex-shrink:0;"></div>';
+            }
+            html += '</div>';
+          });
+
+          content.innerHTML = html;
+          // Mark as checked
+          try { localStorage.setItem('ux_notif_last_check', String(Date.now())); } catch(_) {}
+          _updateNotifBadge(0);
+        }).catch(function() {
+          var content = document.getElementById('notif-content');
+          if (content) content.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">お知らせの取得がうまくいきませんでした</div>';
+        });
+
+        // Track
+        var an = window.__wanchan && window.__wanchan.analytics;
+        if (an && an.trackFootprintView) an.trackFootprintView();
+      }
+    } else {
+      var ncFb = document.getElementById('notif-content');
+      if (ncFb) ncFb.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">ログインするとお知らせが届きます</div>';
+    }
+  }
+
+  // Notification badge on settings button
+  function _updateNotifBadge(count) {
+    var badge = document.querySelector('.ux-notif-badge');
+    if (count > 0) {
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'ux-notif-badge';
+        badge.style.cssText = 'position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#EF4444;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;';
+        backupFab.style.position = 'relative';
+        backupFab.appendChild(badge);
+      }
+      badge.textContent = count > 9 ? '9+' : count;
+    } else if (badge) {
+      badge.remove();
+    }
+  }
+
+  // Check for new notifications periodically
+  function _checkNewNotifications() {
+    var fb = window.__wanchan && window.__wanchan.firebase;
+    if (!fb || !fb.isConfigured) return;
+
+    var user = _currentUser;
+    if (!user) return;
+    fb.getFootprints(user.uid, 10).then(function(footprints) {
+      var lastCheck = parseInt(localStorage.getItem('ux_notif_last_check') || '0', 10);
+      var newCount = 0;
+      footprints.forEach(function(fp) {
+        var ts = fp.createdAt ? (fp.createdAt.seconds ? fp.createdAt.seconds * 1000 : fp.createdAt) : 0;
+        if (ts > lastCheck) newCount++;
+      });
+      if (newCount > 0) {
+        _updateNotifBadge(newCount);
+        btnNotif.style.display = '';
+      }
+    }).catch(function() {});
+  }
+
+  // Show notification button for logged-in users & check for new notifications
+  var _notifTries = 0;
+  var _notifCheck = setInterval(function() {
+    _notifTries++;
+    var fb = window.__wanchan && window.__wanchan.firebase;
+    if (fb && fb.isConfigured) {
+      clearInterval(_notifCheck);
+      btnNotif.style.display = '';
+      _checkNewNotifications();
+      // Re-check every 2 minutes
+      setInterval(_checkNewNotifications, 120000);
+    } else if (_notifTries > 150) {
+      clearInterval(_notifCheck);
+    }
+  }, 200);
+
+  /* ==============================
+     18. SHARE CTA ON DIARY ENTRIES
+     ============================== */
+  // Observe DOM for diary entries and add share buttons
+  function addShareButtons() {
+    // Look for diary entry containers (typically have date + content)
+    var entries = document.querySelectorAll('#root [data-entry-id]:not([data-share-added])');
+    entries.forEach(function(entry) {
+      entry.setAttribute('data-share-added', '1');
+      var shareBtn = document.createElement('div');
+      shareBtn.style.cssText = 'display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:12px;background:transparent;cursor:pointer;font-size:12px;color:#888;margin-top:4px;';
+      shareBtn.textContent = '📤 シェア';
+      shareBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var text = 'わんちゃん成長日記で記録中！ #わんちゃん成長日記';
+        showShareSheet(text);
+      });
+      entry.appendChild(shareBtn);
+    });
+  }
+
+  // Add share buttons on DOM changes (via existing MutationObserver)
+  var _origRunAll = runAllEnhancements;
+  runAllEnhancements = function() {
+    _origRunAll();
+    addShareButtons();
+  };
+
+  /* ==============================
+     20. GROWTH SUMMARY CARD (成長まとめカード) - Feature A
+     ============================== */
+  function getGrowthData() {
+    try {
+      var data = JSON.parse(localStorage.getItem('wc2') || '{}');
+      var diaries = data.diaries || [];
+      var weights = data.weights || [];
+      var name = data.name || 'わんちゃん';
+      var birthday = data.birthday || '';
+      var breed = data.breed || '';
+
+      // Calculate age
+      var ageText = '';
+      var ageDays = 0;
+      if (birthday) {
+        var bDate = new Date(birthday);
+        if (isNaN(bDate.getTime())) return null; // Invalid date guard
+        var now = new Date();
+        ageDays = Math.floor((now - bDate) / (1000 * 60 * 60 * 24));
+        var years = Math.floor(ageDays / 365);
+        var months = Math.floor((ageDays % 365) / 30);
+        if (years > 0) {
+          ageText = years + '歳' + (months > 0 ? months + 'ヶ月' : '');
+        } else if (months > 0) {
+          ageText = months + 'ヶ月';
+        } else {
+          ageText = ageDays + '日';
+        }
+      }
+
+      // Weight change
+      var latestWeight = weights.length > 0 ? weights[weights.length - 1] : null;
+      var firstWeight = weights.length > 1 ? weights[0] : null;
+      var weightChange = '';
+      if (latestWeight && firstWeight) {
+        var lw = parseFloat(latestWeight.weight || latestWeight.w || 0);
+        var fw = parseFloat(firstWeight.weight || firstWeight.w || 0);
+        var diff = lw - fw;
+        weightChange = (diff >= 0 ? '+' : '') + diff.toFixed(1) + 'kg';
+      }
+
+      // Milestone detection
+      var milestone = '';
+      if (ageDays === 0) milestone = '🎉 今日が記念すべき初日！';
+      else if (ageDays === 100) milestone = '🎊 100日おめでとう！';
+      else if (ageDays === 365) milestone = '🎂 1歳のお誕生日！';
+      else if (ageDays === 730) milestone = '🎂 2歳のお誕生日！';
+      else if (ageDays === 1095) milestone = '🎂 3歳のお誕生日！';
+      else if (diaries.length === 1) milestone = '📝 はじめての日記！';
+      else if (diaries.length === 10) milestone = '📝 日記10回達成！';
+      else if (diaries.length === 50) milestone = '📝 日記50回達成！';
+      else if (diaries.length === 100) milestone = '🏆 日記100回達成！';
+
+      return {
+        name: name,
+        breed: breed,
+        ageText: ageText,
+        ageDays: ageDays,
+        diaryCount: diaries.length,
+        weightCount: weights.length,
+        latestWeight: latestWeight ? parseFloat(latestWeight.weight || latestWeight.w || 0).toFixed(1) : '-',
+        weightChange: weightChange,
+        milestone: milestone
+      };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function renderGrowthCard() {
+    var existing = document.querySelector('.ux-growth-card');
+    if (existing) existing.remove();
+
+    var data = getGrowthData();
+    if (!data || (!data.ageText && data.diaryCount === 0)) return;
+
+    var isDark = document.body.classList.contains('ux-dark-on') ||
+      (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+    var card = document.createElement('div');
+    card.className = 'ux-growth-card';
+    card.setAttribute('role', 'region');
+    card.setAttribute('aria-label', '成長まとめ');
+
+    var safeName = _escHtml(data.name);
+    var html = '<div class="ux-growth-card-title">📊 ' + safeName + 'の成長まとめ</div>';
+    html += '<div class="ux-growth-card-stats">';
+    html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + (data.ageText || '-') + '</div><div class="ux-growth-stat-label">年齢</div></div>';
+    html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + data.latestWeight + '<span style="font-size:12px;">kg</span></div><div class="ux-growth-stat-label">現在の体重' + (data.weightChange ? ' (' + data.weightChange + ')' : '') + '</div></div>';
+    html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + data.diaryCount + '</div><div class="ux-growth-stat-label">日記数</div></div>';
+    html += '</div>';
+
+    if (data.milestone) {
+      html += '<div class="ux-growth-card-milestone" style="color:' + (isDark ? '#FFD700' : '#B45309') + ';">' + data.milestone + '</div>';
+    }
+
+    html += '<div class="ux-growth-share"><button id="ux-growth-share-btn">📤 成長をみんなにシェアしてね</button></div>';
+
+    card.innerHTML = html;
+
+    // Share button — use event listener to avoid XSS via data.name
+    var shareBtn = card.querySelector('#ux-growth-share-btn');
+    if (shareBtn) {
+      shareBtn.addEventListener('click', function() {
+        var shareText = data.name + 'は' + (data.ageText || '') + '！ #わんちゃん成長日記';
+        window.__wanchan.showShareSheet(shareText);
+      });
+    }
+
+    // Insert after the header area
+    var root = document.getElementById('root');
+    if (root && root.firstElementChild) {
+      var target = root.firstElementChild.querySelector('h1, h2, [style*="font-size: 2"]');
+      if (target && target.parentNode) {
+        target.parentNode.insertBefore(card, target.nextSibling);
+      } else {
+        root.firstElementChild.insertBefore(card, root.firstElementChild.children[1] || null);
+      }
+    }
+
+    // Track
+    var an = window.__wanchan && window.__wanchan.analytics;
+    if (an && an.logEvent) an.logEvent('growth_card_view', { diary_count: data.diaryCount });
+  }
+
+  // Render after React loads
+  setTimeout(renderGrowthCard, 1500);
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'wc2') setTimeout(renderGrowthCard, 500);
+  });
+
+  /* ==============================
+     21. ANNIVERSARY REMINDER (記念日リマインダー) - Feature C
+     ============================== */
+  function checkAnniversary() {
+    try {
+      var data = JSON.parse(localStorage.getItem('wc2') || '{}');
+      if (!data.birthday) return;
+
+      var birthday = new Date(data.birthday);
+      if (isNaN(birthday.getTime())) return; // Invalid date guard
+      var now = new Date();
+      var dogName = _escHtml(data.name || 'わんちゃん');
+      var todayStr = (now.getMonth() + 1) + '-' + now.getDate();
+      var bdayStr = (birthday.getMonth() + 1) + '-' + birthday.getDate();
+
+      // Check if today is birthday
+      if (todayStr === bdayStr) {
+        var years = now.getFullYear() - birthday.getFullYear();
+        showAnniversaryBanner('🎂', dogName + 'の' + years + '歳のお誕生日おめでとう！');
+        return;
+      }
+
+      // Check milestone days
+      var ageDays = Math.floor((now - birthday) / (1000 * 60 * 60 * 24));
+      var milestones = {
+        7: '1週間',
+        30: '1ヶ月',
+        100: '100日',
+        200: '200日',
+        365: '1年',
+        500: '500日',
+        730: '2年',
+        1000: '1000日',
+        1095: '3年'
+      };
+
+      if (milestones[ageDays]) {
+        showAnniversaryBanner('🎉', dogName + 'と出会って' + milestones[ageDays] + '記念日！');
+        return;
+      }
+
+      // Birthday approaching (3 days before)
+      var nextBirthday = new Date(now.getFullYear(), birthday.getMonth(), birthday.getDate());
+      if (nextBirthday < now) nextBirthday.setFullYear(nextBirthday.getFullYear() + 1);
+      var daysUntilBday = Math.ceil((nextBirthday - now) / (1000 * 60 * 60 * 24));
+      if (daysUntilBday > 0 && daysUntilBday <= 3) {
+        showAnniversaryBanner('🎁', dogName + 'のお誕生日まであと' + daysUntilBday + '日！');
+      }
+    } catch (e) {}
+  }
+
+  function showAnniversaryBanner(icon, text) {
+    var dismissed = localStorage.getItem('ux_anniv_dismissed');
+    var today = new Date().toISOString().slice(0, 10);
+    if (dismissed === today) return;
+
+    var banner = document.createElement('div');
+    banner.className = 'ux-anniversary-banner';
+    banner.setAttribute('role', 'alert');
+    banner.setAttribute('aria-live', 'polite');
+    banner.innerHTML = '<div class="ux-anniv-icon">' + icon + '</div><div class="ux-anniv-text">' + text + '</div><button class="ux-anniv-close" aria-label="閉じる">✕</button>';
+
+    document.body.appendChild(banner);
+
+    banner.querySelector('.ux-anniv-close').addEventListener('click', function(e) {
+      e.stopPropagation();
+      safeSetItem('ux_anniv_dismissed', today);
+      banner.style.opacity = '0';
+      banner.style.transform = 'translateX(-50%) translateY(-20px)';
+      setTimeout(function() { banner.remove(); }, 300);
+    });
+
+    // Auto-dismiss after 8s
+    setTimeout(function() {
+      if (banner.parentNode) {
+        banner.style.opacity = '0';
+        banner.style.transform = 'translateX(-50%) translateY(-20px)';
+        setTimeout(function() { banner.remove(); }, 300);
+      }
+    }, 8000);
+
+    // Track
+    var an = window.__wanchan && window.__wanchan.analytics;
+    if (an && an.logEvent) an.logEvent('anniversary_shown', { text: text });
+  }
+
+  setTimeout(checkAnniversary, 2000);
+
+  /* ==============================
+     22. BREED GROWTH CURVE (犬種別成長曲線) - Feature B
+     ============================== */
+  var BREED_CURVES = {
+    'チワワ':        { m: [0.2, 0.4, 0.8, 1.2, 1.6, 1.9, 2.1, 2.3, 2.4, 2.5, 2.6, 2.7], max: 3.5 },
+    'トイプードル':  { m: [0.3, 0.8, 1.5, 2.2, 2.8, 3.2, 3.5, 3.7, 3.8, 3.9, 4.0, 4.0], max: 5 },
+    'ミニチュアダックスフンド': { m: [0.4, 0.9, 1.6, 2.4, 3.0, 3.5, 3.9, 4.2, 4.4, 4.5, 4.6, 4.8], max: 6 },
+    'ポメラニアン':  { m: [0.2, 0.5, 1.0, 1.5, 1.9, 2.2, 2.5, 2.7, 2.8, 2.9, 3.0, 3.1], max: 4 },
+    '柴犬':          { m: [0.5, 1.5, 3.0, 4.5, 5.5, 6.5, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0], max: 13 },
+    'フレンチブルドッグ': { m: [0.5, 1.5, 3.0, 4.5, 6.0, 7.5, 8.5, 9.5, 10.0, 10.5, 11.0, 11.5], max: 14 },
+    'ゴールデンレトリバー': { m: [1.0, 3.0, 6.0, 10.0, 14.0, 18.0, 22.0, 25.0, 27.0, 29.0, 30.0, 31.0], max: 36 },
+    'ラブラドールレトリバー': { m: [1.0, 3.0, 6.5, 10.5, 15.0, 19.0, 23.0, 26.0, 28.0, 30.0, 31.0, 32.0], max: 36 },
+    'ヨークシャーテリア': { m: [0.2, 0.4, 0.7, 1.0, 1.3, 1.6, 1.8, 2.0, 2.2, 2.3, 2.4, 2.5], max: 3.5 },
+    'シーズー':      { m: [0.3, 0.7, 1.3, 2.0, 2.8, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5], max: 8 },
+    'パグ':          { m: [0.3, 0.8, 1.5, 2.5, 3.5, 4.5, 5.0, 5.5, 6.0, 6.5, 6.8, 7.0], max: 9 },
+    'マルチーズ':    { m: [0.2, 0.4, 0.8, 1.2, 1.6, 1.9, 2.1, 2.3, 2.5, 2.7, 2.8, 3.0], max: 4 },
+    'ミニチュアシュナウザー': { m: [0.3, 0.8, 1.5, 2.5, 3.5, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5], max: 9 }
+  };
+
+  function showBreedCurveModal() {
+    var existing = document.querySelector('.ux-breed-curve-modal');
+    if (existing) existing.remove();
+
+    var isDark = document.body.classList.contains('ux-dark-on') ||
+      (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+    var data;
+    try { data = JSON.parse(localStorage.getItem('wc2') || '{}'); } catch(e) { data = {}; }
+    var breed = data.breed || '';
+    var weights = data.weights || [];
+    var birthday = data.birthday || '';
+    var name = data.name || 'わんちゃん';
+
+    var overlay = document.createElement('div');
+    overlay.className = 'ux-breed-curve-modal';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', name + 'の成長曲線');
+
+    var panel = document.createElement('div');
+    panel.className = 'ux-breed-curve-panel';
+
+    var safeName = _escHtml(name);
+    var html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">';
+    html += '<div style="font-size:18px;font-weight:900;">📈 ' + safeName + 'の成長曲線</div>';
+    html += '<button id="breed-curve-close" aria-label="閉じる" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:' + (isDark ? '#333' : '#f0f0f0') + ';cursor:pointer;font-size:14px;border:none;font-family:inherit;">✕</button>';
+    html += '</div>';
+
+    // Breed selector
+    html += '<div style="margin-bottom:12px;"><select id="breed-curve-select" style="width:100%;padding:10px 14px;border-radius:12px;border:2px solid ' + (isDark ? '#444' : '#eee') + ';font-size:14px;font-family:inherit;background:' + (isDark ? '#252535' : '#fff') + ';color:' + (isDark ? '#e0e0e0' : '#333') + ';">';
+    html += '<option value="">犬種を選んでね</option>';
+    Object.keys(BREED_CURVES).forEach(function(b) {
+      html += '<option value="' + b + '"' + (b === breed ? ' selected' : '') + '>' + b + '</option>';
+    });
+    html += '</select></div>';
+
+    // Chart area
+    html += '<div id="breed-curve-chart" class="ux-breed-curve-chart"></div>';
+    html += '<div class="ux-breed-curve-legend">';
+    html += '<span><span class="dot" style="background:#FF7B9C;"></span> ' + safeName + 'の体重</span>';
+    html += '<span><span class="dot" style="background:rgba(59,130,246,.5);"></span> 犬種平均</span>';
+    html += '</div>';
+
+    // Status message
+    html += '<div id="breed-curve-status" style="margin-top:12px;padding:12px;border-radius:12px;background:' + (isDark ? '#1a2a1a' : '#F0FFF4') + ';font-size:13px;color:' + (isDark ? '#a7f3d0' : '#166534') + ';line-height:1.6;display:none;"></div>';
+
+    panel.innerHTML = html;
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
+
+    function closeCurveModal() { overlay.remove(); document.removeEventListener('keydown', curveEscHandler); }
+    function curveEscHandler(e) { if (e.key === 'Escape') closeCurveModal(); }
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) closeCurveModal(); });
+    document.getElementById('breed-curve-close').addEventListener('click', closeCurveModal);
+    document.addEventListener('keydown', curveEscHandler);
+
+    function renderChart(selectedBreed) {
+      var chart = document.getElementById('breed-curve-chart');
+      var status = document.getElementById('breed-curve-status');
+      if (!chart) return;
+      chart.innerHTML = '';
+
+      var curve = BREED_CURVES[selectedBreed];
+      if (!curve) {
+        chart.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#888;font-size:14px;">犬種を選ぶと成長の目安がわかるよ</div>';
+        if (status) status.style.display = 'none';
+        return;
+      }
+
+      var maxW = curve.max;
+      var months = curve.m;
+      var barWidth = Math.floor((chart.offsetWidth - 24) / 12) - 4;
+      if (barWidth < 16) barWidth = 16;
+
+      // Get user's weights mapped to months
+      var userWeightsByMonth = {};
+      if (birthday && weights.length > 0) {
+        var bDate = new Date(birthday);
+        if (!isNaN(bDate.getTime())) weights.forEach(function(w) {
+          var wDate = new Date(w.date || w.d);
+          if (isNaN(wDate.getTime())) return;
+          var monthAge = Math.round((wDate - bDate) / (1000 * 60 * 60 * 24 * 30));
+          if (monthAge >= 0 && monthAge < 12) {
+            userWeightsByMonth[monthAge] = parseFloat(w.weight || w.w || 0);
+          }
+        });
+      }
+
+      for (var i = 0; i < 12; i++) {
+        var x = 12 + i * (barWidth + 4);
+
+        // Breed average bar
+        var avgH = (months[i] / maxW) * 170;
+        var avgBar = document.createElement('div');
+        avgBar.className = 'ux-breed-curve-bar';
+        avgBar.style.cssText = 'left:' + x + 'px;width:' + (barWidth / 2 - 1) + 'px;height:' + avgH + 'px;background:rgba(59,130,246,.3);';
+        chart.appendChild(avgBar);
+
+        // User weight bar
+        if (userWeightsByMonth[i] !== undefined) {
+          var userH = (userWeightsByMonth[i] / maxW) * 170;
+          var userBar = document.createElement('div');
+          userBar.className = 'ux-breed-curve-bar';
+          userBar.style.cssText = 'left:' + (x + barWidth / 2 + 1) + 'px;width:' + (barWidth / 2 - 1) + 'px;height:' + Math.min(userH, 170) + 'px;background:#FF7B9C;';
+          chart.appendChild(userBar);
+        }
+
+        // Month label
+        var label = document.createElement('div');
+        label.className = 'ux-breed-curve-label';
+        label.style.cssText = 'position:absolute;bottom:-18px;left:' + x + 'px;width:' + barWidth + 'px;';
+        label.textContent = (i + 1) + 'M';
+        chart.appendChild(label);
+      }
+
+      chart.style.height = '220px';
+
+      // Status message
+      if (status) {
+        var lastUserMonth = -1;
+        var lastUserWeight = 0;
+        Object.keys(userWeightsByMonth).forEach(function(m) {
+          var mi = parseInt(m);
+          if (mi > lastUserMonth) { lastUserMonth = mi; lastUserWeight = userWeightsByMonth[mi]; }
+        });
+
+        if (lastUserMonth >= 0 && lastUserMonth < 12) {
+          var expected = months[lastUserMonth];
+          if (expected <= 0) { status.style.display = 'none'; return; } // zero division guard
+          var pct = ((lastUserWeight / expected) * 100).toFixed(0);
+          var msg = '';
+          if (pct >= 90 && pct <= 110) {
+            msg = '✅ ' + safeName + 'は犬種平均とほぼ同じペースで育っているよ（' + pct + '%）。順調だね！';
+          } else if (pct > 110) {
+            msg = '📈 ' + safeName + 'は犬種平均よりちょっと大きめ（' + pct + '%）だよ。フードの量を見直してみてね。';
+          } else {
+            msg = '📉 ' + safeName + 'は犬種平均よりちょっと小さめ（' + pct + '%）だよ。気になったら獣医さんに相談してみてね。';
+          }
+          status.textContent = msg;
+          status.style.display = 'block';
+        } else {
+          status.style.display = 'none';
+        }
+      }
+    }
+
+    var select = document.getElementById('breed-curve-select');
+    if (select) {
+      select.addEventListener('change', function() { renderChart(select.value); });
+      if (breed && BREED_CURVES[breed]) {
+        renderChart(breed);
+      } else {
+        renderChart('');
+      }
+    }
+
+    // Track
+    var an = window.__wanchan && window.__wanchan.analytics;
+    if (an && an.logEvent) an.logEvent('breed_curve_view', { breed: breed });
+  }
+
+  // Add breed curve button to menu
+  var btnBreedCurve = document.createElement('button');
+  btnBreedCurve.textContent = '📈 成長曲線';
+  btnBreedCurve.addEventListener('click', function() {
+    backupMenu.classList.remove('ux-show');
+    showBreedCurveModal();
+  });
+  backupMenu.insertBefore(btnBreedCurve, btnAI);
+
+  window.__wanchan.showBreedCurve = showBreedCurveModal;
+
+  /* ==============================
+     23. SYMPTOM × AI ENHANCEMENT (症状×AI強化) - Feature D
+     ============================== */
+  var SYMPTOM_LIST = [
+    { icon: '🤮', label: '嘔吐' },
+    { icon: '💩', label: '下痢' },
+    { icon: '😴', label: '元気がない' },
+    { icon: '🍽️', label: '食欲不振' },
+    { icon: '🤧', label: 'くしゃみ・鼻水' },
+    { icon: '👀', label: '目の異常' },
+    { icon: '🦶', label: '足を引きずる' },
+    { icon: '🐾', label: '皮膚の異常' },
+    { icon: '💧', label: '水を飲みすぎる' }
+  ];
+
+  // Override AI consultation to add symptom chips
+  var _origShowConsultation = null;
+  var _aiReadyCheck = setInterval(function() {
+    var ai = window.__wanchan && window.__wanchan.ai;
+    if (ai && ai.showConsultation && !_origShowConsultation) {
+      _origShowConsultation = ai.showConsultation;
+      ai.showConsultation = function() {
+        _origShowConsultation();
+        // Wait for modal to appear, then inject symptom chips
+        setTimeout(function() {
+          var modal = document.getElementById('wanchan-ai-modal');
+          if (!modal) return;
+          var textarea = modal.querySelector('textarea');
+          if (!textarea || textarea.parentNode.querySelector('.ux-symptom-grid')) return;
+
+          var isDark = document.body.classList.contains('ux-dark-on') ||
+            (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+          var label = document.createElement('div');
+          label.style.cssText = 'font-size:12px;color:' + (isDark ? '#aaa' : '#888') + ';margin-bottom:6px;font-weight:600;';
+          label.textContent = '💡 症状から選ぶ:';
+
+          var grid = document.createElement('div');
+          grid.className = 'ux-symptom-grid';
+          grid.setAttribute('role', 'group');
+          grid.setAttribute('aria-label', '症状を選択');
+
+          var selectedSymptoms = [];
+
+          SYMPTOM_LIST.forEach(function(symptom) {
+            var chip = document.createElement('button');
+            chip.className = 'ux-symptom-chip';
+            chip.innerHTML = symptom.icon + '<br>' + symptom.label;
+            chip.setAttribute('role', 'checkbox');
+            chip.setAttribute('aria-checked', 'false');
+            chip.setAttribute('aria-label', symptom.label);
+            chip.addEventListener('click', function() {
+              var isSelected = chip.classList.toggle('ux-selected');
+              chip.setAttribute('aria-checked', isSelected ? 'true' : 'false');
+              var idx = selectedSymptoms.indexOf(symptom.label);
+              if (idx > -1) {
+                selectedSymptoms.splice(idx, 1);
+              } else {
+                selectedSymptoms.push(symptom.label);
+              }
+              // Update textarea with selected symptoms
+              var current = textarea.value;
+              // Remove previous symptom prefix
+              current = current.replace(/^.+の症状があります。\s*/, '');
+              var newVal = selectedSymptoms.length > 0
+                ? selectedSymptoms.join('、') + 'の症状があります。' + current
+                : current;
+              try {
+                var nativeSet = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
+                nativeSet.call(textarea, newVal);
+                textarea.dispatchEvent(new Event('input', { bubbles: true }));
+              } catch(e) {
+                textarea.value = newVal;
+              }
+              triggerHaptic('light');
+            });
+            grid.appendChild(chip);
+          });
+
+          // Medical disclaimer
+          var disclaimer = document.createElement('div');
+          disclaimer.style.cssText = 'font-size:11px;color:' + (isDark ? '#777' : '#aaa') + ';margin:8px 0 4px;line-height:1.5;';
+          disclaimer.textContent = '※ AIの回答は参考情報だよ。心配なときは獣医さんに相談してね。';
+
+          textarea.parentNode.insertBefore(label, textarea);
+          textarea.parentNode.insertBefore(grid, textarea);
+          textarea.parentNode.insertBefore(disclaimer, textarea);
+        }, 200);
+      };
+      clearInterval(_aiReadyCheck);
+    }
+  }, 300);
+  setTimeout(function() { clearInterval(_aiReadyCheck); }, 10000);
+
+  /* ==============================
+     24. PWA INSTALL PROMOTION (PWAインストール促進) - Feature E
+     ============================== */
+  var _deferredPrompt = null;
+
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    _deferredPrompt = e;
+
+    // Check if already dismissed recently
+    var dismissed = localStorage.getItem('ux_pwa_dismissed');
+    if (dismissed) {
+      var dismissedDate = new Date(dismissed);
+      var daysSince = (Date.now() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24);
+      if (daysSince < 7) return; // Don't show again for 7 days
+    }
+
+    // Show banner after 30 seconds of use
+    setTimeout(showPWABanner, 30000);
+  });
+
+  function showPWABanner() {
+    if (!_deferredPrompt) return;
+    // Don't show if already installed
+    if (window.matchMedia('(display-mode: standalone)').matches) return;
+
+    var existing = document.querySelector('.ux-pwa-banner');
+    if (existing) existing.remove();
+
+    var banner = document.createElement('div');
+    banner.className = 'ux-pwa-banner';
+    banner.innerHTML = '<div class="ux-pwa-banner-icon">🐾</div>' +
+      '<div class="ux-pwa-banner-text"><div class="ux-pwa-banner-title">ホーム画面に追加しよう</div><div class="ux-pwa-banner-sub">いつでもサッと日記が書けるようになるよ</div></div>' +
+      '<div class="ux-pwa-banner-actions"><button class="ux-pwa-dismiss-btn" id="pwa-dismiss">あとで</button><button class="ux-pwa-install-btn" id="pwa-install">追加する</button></div>';
+
+    document.body.appendChild(banner);
+
+    document.getElementById('pwa-install').addEventListener('click', function() {
+      if (_deferredPrompt) {
+        _deferredPrompt.prompt();
+        _deferredPrompt.userChoice.then(function(result) {
+          if (result.outcome === 'accepted') {
+            showToast('ホーム画面に追加しました！', 'success');
+            var an = window.__wanchan && window.__wanchan.analytics;
+            if (an && an.logEvent) an.logEvent('pwa_install', { outcome: 'accepted' });
+          }
+          _deferredPrompt = null;
+        }).catch(function() { _deferredPrompt = null; });
+      }
+      banner.remove();
+    });
+
+    document.getElementById('pwa-dismiss').addEventListener('click', function() {
+      safeSetItem('ux_pwa_dismissed', new Date().toISOString());
+      banner.style.animation = 'none';
+      banner.style.transform = 'translateY(100%)';
+      banner.style.transition = 'transform .3s ease';
+      setTimeout(function() { banner.remove(); }, 300);
+      var an = window.__wanchan && window.__wanchan.analytics;
+      if (an && an.logEvent) an.logEvent('pwa_install', { outcome: 'dismissed' });
+    });
+  }
+
+  // Also show a subtle install hint in the menu for iOS (which doesn't support beforeinstallprompt)
+  if ((/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) && !window.matchMedia('(display-mode: standalone)').matches) {
+    var btnPWA = document.createElement('button');
+    btnPWA.textContent = '📲 ホーム画面に追加';
+    btnPWA.addEventListener('click', function() {
+      backupMenu.classList.remove('ux-show');
+      showToast('Safari の「共有」ボタン → 「ホーム画面に追加」をタップしてね', 'info');
+    });
+    backupMenu.appendChild(btnPWA);
+  }
+
+  /* ==============================
+     25. SW UPDATE NOTIFICATION
      ============================== */
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.ready.then(function(reg) {
@@ -965,7 +1973,31 @@ Error generating stack: `+n.message+`
         if (!newWorker) return;
         newWorker.addEventListener('statechange', function() {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            showToast('新しい機能が追加されました！画面を更新すると使えるようになります', 'info');
+            var t = document.createElement('div');
+            t.className = 'ux-toast ux-toast-info';
+            var iconSpan = document.createElement('span');
+            iconSpan.className = 'ux-toast-icon';
+            iconSpan.textContent = '💡';
+            var msgSpan = document.createElement('span');
+            msgSpan.textContent = '新しい機能が追加されました！';
+            msgSpan.style.cssText = 'flex:1;';
+            var updateBtn = document.createElement('button');
+            updateBtn.textContent = '更新する';
+            updateBtn.style.cssText = 'background:#3B82F6;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;margin-left:8px;';
+            updateBtn.setAttribute('aria-label', 'アプリを最新版に更新する');
+            updateBtn.addEventListener('click', function() {
+              newWorker.postMessage({ type: 'SKIP_WAITING' });
+              window.location.reload();
+            });
+            t.appendChild(iconSpan);
+            t.appendChild(msgSpan);
+            t.appendChild(updateBtn);
+            while (toastContainer.children.length >= 5) {
+              toastContainer.firstChild.remove();
+            }
+            toastContainer.appendChild(t);
+            setTimeout(function(){ t.classList.add('ux-toast-out'); }, 10000);
+            setTimeout(function(){ t.remove(); }, 10300);
           }
         });
       });
