@@ -2658,9 +2658,11 @@ Error generating stack: `+n.message+`
     document.getElementById('pwa-dismiss').addEventListener('click', function() {
       safeSetItem('ux_pwa_dismissed', new Date().toISOString());
       banner.style.animation = 'none';
-      banner.style.transform = 'translateY(100%)';
-      banner.style.transition = 'transform .3s ease';
-      setTimeout(function() { banner.remove(); }, 300);
+      requestAnimationFrame(function() {
+        banner.style.transition = 'transform .3s ease';
+        banner.style.transform = 'translateY(100%)';
+        setTimeout(function() { banner.remove(); }, 300);
+      });
       var an = window.__wanchan && window.__wanchan.analytics;
       if (an && an.logEvent) an.logEvent('pwa_install', { outcome: 'dismissed' });
     });
