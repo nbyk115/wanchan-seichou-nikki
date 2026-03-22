@@ -1203,18 +1203,7 @@ Error generating stack: `+n.message+`
   btnAddDog.addEventListener('click', function() {
     backupMenu.classList.remove('ux-show');
     backupFab.setAttribute('aria-expanded', 'false');
-    // Click the bottom nav "メニュー" tab to navigate to settings
-    var navButtons = document.querySelectorAll('nav button, nav a, [role="navigation"] button');
-    var menuBtn = null;
-    navButtons.forEach(function(btn) {
-      if (btn.textContent.includes('メニュー') || btn.textContent.includes('設定')) menuBtn = btn;
-    });
-    if (menuBtn) {
-      menuBtn.click();
-      showToast('メニュー画面から「うちの子を追加」をタップしてね', 'info');
-    } else {
-      showToast('メニュー画面から「うちの子を追加」で登録できるよ', 'info');
-    }
+    navigateToAddDog();
   });
 
   backupMenu.appendChild(btnAddDog);
@@ -1336,6 +1325,58 @@ Error generating stack: `+n.message+`
   setTimeout(showOnboarding, 600);
 
   /* ==============================
+     14b. NAVIGATE TO ADD DOG HELPER
+     ============================== */
+  // Reliably navigate to menu > settings by finding the React bottom nav divs
+  function navigateToAddDog() {
+    // The React bottom nav uses div elements (not buttons) with cursor:pointer style.
+    // Find the fixed-bottom nav container, then locate the tab containing "メニュー" or "☰".
+    var navContainer = document.querySelector('[role="navigation"]');
+    if (!navContainer) {
+      // Fallback: look for fixed-bottom div with multiple clickable children
+      var fixedDivs = document.querySelectorAll('#root div[style*="position"]');
+      fixedDivs.forEach(function(d) {
+        if (d.style.position === 'fixed' && (d.style.bottom === '0px' || d.style.bottom === '0')) {
+          var kids = d.querySelectorAll('[style*="cursor"]');
+          if (kids.length >= 3) navContainer = d;
+        }
+      });
+    }
+    if (navContainer) {
+      var tabs = navContainer.querySelectorAll('[style*="cursor"]');
+      var menuTab = null;
+      tabs.forEach(function(tab) {
+        var text = tab.textContent || '';
+        if (text.includes('メニュー') || text.includes('☰')) menuTab = tab;
+      });
+      if (menuTab) {
+        menuTab.click();
+        // After navigating to menu, find and click "設定" or "うちの子を追加"
+        setTimeout(function() {
+          var menuItems = document.querySelectorAll('#root [style*="cursor"]');
+          var settingsItem = null;
+          menuItems.forEach(function(item) {
+            var text = item.textContent || '';
+            if (text.includes('うちの子を追加') || (text.includes('設定') && text.includes('テーマ'))) {
+              settingsItem = item;
+            }
+          });
+          if (settingsItem) {
+            settingsItem.click();
+            showToast('ここからわんちゃんを追加できるよ', 'info');
+          } else {
+            showToast('メニュー画面の「設定」からわんちゃんを追加してね', 'info');
+          }
+        }, 300);
+        return true;
+      }
+    }
+    // Last resort fallback: show instruction
+    showToast('画面下の「メニュー」→「設定」からわんちゃんを追加してね', 'info');
+    return false;
+  }
+
+  /* ==============================
      15. MULTI-DOG QUICK SWITCHER (多頭飼い対応)
      ============================== */
   var _dogProfileCache = null;
@@ -1421,11 +1462,7 @@ Error generating stack: `+n.message+`
     addBtn.title = 'わんちゃんを追加';
     addBtn.addEventListener('click', function() {
       triggerHaptic('light');
-      // Navigate to settings page via React custom event
-      window.dispatchEvent(new CustomEvent('ux-navigate', { detail: { page: 'settings' } }));
-      // Fallback: click the menu settings button if available
-      var settingsBtn = document.querySelector('[data-page="settings"]');
-      if (settingsBtn) settingsBtn.click();
+      navigateToAddDog();
     });
     switcher.appendChild(addBtn);
 
