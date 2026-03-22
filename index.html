@@ -386,6 +386,11 @@ Error generating stack: `+n.message+`
     if (idx > -1) _activeOverlayCleanups.splice(idx, 1);
   }
 
+  // Lock/unlock body scroll when modals are open
+  var _bodyScrollLockCount = 0;
+  function lockBodyScroll() { _bodyScrollLockCount++; document.body.style.overflow = 'hidden'; }
+  function unlockBodyScroll() { _bodyScrollLockCount = Math.max(0, _bodyScrollLockCount - 1); if (_bodyScrollLockCount === 0) document.body.style.overflow = ''; }
+
   // Close all UX-layer overlays/modals (called on popstate and pageshow)
   function closeAllUXOverlays() {
     var selectors = [
@@ -402,6 +407,8 @@ Error generating stack: `+n.message+`
       var el = document.querySelector(sel);
       if (el) el.remove();
     });
+    _bodyScrollLockCount = 0;
+    document.body.style.overflow = '';
     // Run registered cleanup callbacks (removes document-level keydown handlers etc.)
     var cleanups = _activeOverlayCleanups.slice();
     _activeOverlayCleanups = [];
@@ -1576,6 +1583,7 @@ Error generating stack: `+n.message+`
     var nameInput = document.createElement('input');
     nameInput.className = 'ux-add-dog-input';
     nameInput.type = 'text';
+    nameInput.maxLength = 20;
     nameInput.placeholder = 'わんちゃんの名前を入れてね';
     nameInput.addEventListener('input', function() {
       dogName = nameInput.value.trim();
@@ -1697,9 +1705,13 @@ Error generating stack: `+n.message+`
     actions.appendChild(submitBtn);
     panel.appendChild(actions);
 
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', 'わんちゃんを追加');
     overlay.appendChild(panel);
     overlay.addEventListener('click', closeModal);
     document.body.appendChild(overlay);
+    lockBodyScroll();
 
     // Focus name input
     setTimeout(function() { nameInput.focus(); }, 100);
@@ -1707,6 +1719,7 @@ Error generating stack: `+n.message+`
 
     function closeModal() {
       overlay.remove();
+      unlockBodyScroll();
     }
 
     // Trap focus
@@ -1851,9 +1864,11 @@ Error generating stack: `+n.message+`
     sheet.innerHTML = html;
     overlay.appendChild(sheet);
     document.body.appendChild(overlay);
+    lockBodyScroll();
 
     function closeShareSheet() {
       overlay.remove();
+      unlockBodyScroll();
       document.removeEventListener('keydown', shareEscHandler);
       unregisterOverlayCleanup(shareCleanup);
     }
@@ -1874,6 +1889,8 @@ Error generating stack: `+n.message+`
   window.__wanchan.shareToSNS = shareToSNS;
   window.__wanchan.showShareSheet = showShareSheet;
   window.__wanchan.showToast = showToast;
+  window.__wanchan.lockBodyScroll = lockBodyScroll;
+  window.__wanchan.unlockBodyScroll = unlockBodyScroll;
 
   /* ==============================
      17. NOTIFICATIONS PANEL (お知らせ)
@@ -1898,9 +1915,11 @@ Error generating stack: `+n.message+`
 
     overlay.appendChild(panel);
     document.body.appendChild(overlay);
+    lockBodyScroll();
 
     function closeNotifPanel() {
       overlay.remove();
+      unlockBodyScroll();
       document.removeEventListener('keydown', notifEscHandler);
       unregisterOverlayCleanup(notifCleanup);
     }
@@ -2359,9 +2378,11 @@ Error generating stack: `+n.message+`
     panel.innerHTML = html;
     overlay.appendChild(panel);
     document.body.appendChild(overlay);
+    lockBodyScroll();
 
     function closeCurveModal() {
       overlay.remove();
+      unlockBodyScroll();
       document.removeEventListener('keydown', curveEscHandler);
       unregisterOverlayCleanup(curveCleanup);
     }

@@ -212,7 +212,9 @@ async function askAI(question) {
       fb.timeoutWarning = '回答の取得に時間がかかったため、定型文で回答しています。時間をおいて再度お試しください。';
       return fb;
     }
-    return _localFallback(question);
+    var fb = _localFallback(question);
+    fb.timeoutWarning = 'ネットワークエラーのため、定型文で回答しています。';
+    return fb;
   }
 }
 
@@ -334,10 +336,11 @@ function showConsultationModal() {
   modal.innerHTML = html;
   overlay.appendChild(modal);
   document.body.appendChild(overlay);
+  if (window.__wanchan && window.__wanchan.lockBodyScroll) window.__wanchan.lockBodyScroll();
 
   // --- Event Handlers ---
   var closeBtn = document.getElementById('ai-close');
-  function closeAIModal() { overlay.remove(); document.removeEventListener('keydown', aiEscHandler); }
+  function closeAIModal() { overlay.remove(); document.removeEventListener('keydown', aiEscHandler); if (window.__wanchan && window.__wanchan.unlockBodyScroll) window.__wanchan.unlockBodyScroll(); }
   function aiEscHandler(e) { if (e.key === 'Escape') closeAIModal(); }
   closeBtn.addEventListener('click', closeAIModal);
   overlay.addEventListener('click', function(e) { if (e.target === overlay) closeAIModal(); });

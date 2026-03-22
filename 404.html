@@ -352,6 +352,11 @@ Error generating stack: `+n.message+`
     if (idx > -1) _activeOverlayCleanups.splice(idx, 1);
   }
 
+  // Lock/unlock body scroll when modals are open
+  var _bodyScrollLockCount = 0;
+  function lockBodyScroll() { _bodyScrollLockCount++; document.body.style.overflow = 'hidden'; }
+  function unlockBodyScroll() { _bodyScrollLockCount = Math.max(0, _bodyScrollLockCount - 1); if (_bodyScrollLockCount === 0) document.body.style.overflow = ''; }
+
   // Close all UX-layer overlays/modals (called on popstate and pageshow)
   function closeAllUXOverlays() {
     var selectors = [
@@ -367,6 +372,8 @@ Error generating stack: `+n.message+`
       var el = document.querySelector(sel);
       if (el) el.remove();
     });
+    _bodyScrollLockCount = 0;
+    document.body.style.overflow = '';
     // Run registered cleanup callbacks (removes document-level keydown handlers etc.)
     var cleanups = _activeOverlayCleanups.slice();
     _activeOverlayCleanups = [];
@@ -1556,9 +1563,11 @@ Error generating stack: `+n.message+`
     sheet.innerHTML = html;
     overlay.appendChild(sheet);
     document.body.appendChild(overlay);
+    lockBodyScroll();
 
     function closeShareSheet() {
       overlay.remove();
+      unlockBodyScroll();
       document.removeEventListener('keydown', shareEscHandler);
       unregisterOverlayCleanup(shareCleanup);
     }
@@ -1603,9 +1612,11 @@ Error generating stack: `+n.message+`
 
     overlay.appendChild(panel);
     document.body.appendChild(overlay);
+    lockBodyScroll();
 
     function closeNotifPanel() {
       overlay.remove();
+      unlockBodyScroll();
       document.removeEventListener('keydown', notifEscHandler);
       unregisterOverlayCleanup(notifCleanup);
     }
@@ -2064,9 +2075,11 @@ Error generating stack: `+n.message+`
     panel.innerHTML = html;
     overlay.appendChild(panel);
     document.body.appendChild(overlay);
+    lockBodyScroll();
 
     function closeCurveModal() {
       overlay.remove();
+      unlockBodyScroll();
       document.removeEventListener('keydown', curveEscHandler);
       unregisterOverlayCleanup(curveCleanup);
     }
