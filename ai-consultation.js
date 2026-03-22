@@ -29,7 +29,22 @@ const AI_CONFIG = {
 // ============================================================
 function _getUsageKey() {
   var now = new Date();
-  return 'wanchan_ai_usage_' + now.getFullYear() + '_' + (now.getMonth() + 1);
+  var currentKey = 'wanchan_ai_usage_' + now.getFullYear() + '_' + (now.getMonth() + 1);
+  _cleanupOldUsageKeys(currentKey);
+  return currentKey;
+}
+
+function _cleanupOldUsageKeys(currentKey) {
+  try {
+    for (var i = 0; i < localStorage.length; i++) {
+      var key = localStorage.key(i);
+      if (key && key.startsWith('wanchan_ai_usage_') && key !== currentKey) {
+        localStorage.removeItem(key);
+      }
+    }
+  } catch (e) {
+    // localStorage アクセス不可時は無視
+  }
 }
 
 function getUsageCount() {
@@ -190,6 +205,11 @@ async function askAI(question) {
     return { answer: answer };
   } catch (e) {
     console.error('AI consultation error:', e);
+    if (e.name === 'AbortError') {
+      var fb = _localFallback(question);
+      fb.timeoutWarning = '回答の取得に時間がかかったため、定型文で回答しています。時間をおいて再度お試しください。';
+      return fb;
+    }
     return _localFallback(question);
   }
 }
@@ -223,7 +243,7 @@ function _localFallback(question) {
   saveToHistory(question, answer);
   _trackEvent('ai_consultation', { question_length: question.length, fallback: true });
 
-  return { answer: answer };
+  return { answer: answer, fallback: true };
 }
 
 // Analytics helper (graceful if not loaded)
@@ -299,7 +319,7 @@ function showConsultationModal() {
 
   // 入力エリア
   html += '<div style="display:flex;gap:8px;align-items:flex-end;">';
-  html += '<textarea id="ai-input" placeholder="わんちゃんの気になることを書いてね..." style="flex:1;padding:12px 16px;border-radius:16px;border:1.5px solid ' + (isDark ? '#444' : '#e0e0e0') + ';background:' + (isDark ? '#2a2a3e' : '#f8f8f8') + ';font-size:14px;font-family:inherit;resize:none;min-height:48px;max-height:120px;outline:none;color:' + (isDark ? '#e0e0e0' : '#333') + ';" rows="1"></textarea>';
+  html += '<textarea id="ai-input" maxlength="500" placeholder="わんちゃんの気になることを書いてね..." style="flex:1;padding:12px 16px;border-radius:16px;border:1.5px solid ' + (isDark ? '#444' : '#e0e0e0') + ';background:' + (isDark ? '#2a2a3e' : '#f8f8f8') + ';font-size:14px;font-family:inherit;resize:none;min-height:48px;max-height:120px;outline:none;color:' + (isDark ? '#e0e0e0' : '#333') + ';" rows="1"></textarea>';
   html += '<button id="ai-send" style="width:48px;height:48px;border-radius:50%;border:none;background:linear-gradient(135deg,#FF7B9C,#FF5A85);color:#fff;font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;">➤</button>';
   html += '</div>';
 
@@ -411,7 +431,16 @@ function showConsultationModal() {
         countEl.textContent = newRemaining + ' / ' + AI_CONFIG.freeLimit + ' 回';
       }
 
-      answerArea.innerHTML = '<div style="padding:16px;background:' + (isDark ? '#1a2a1a' : '#F0FFF4') + ';border-radius:16px;font-size:14px;line-height:1.8;color:' + (isDark ? '#a7f3d0' : '#166534') + ';white-space:pre-wrap;">' + _escapeHtml(result.answer) + '</div>' +
+      var fallbackMsg = result.timeoutWarning
+        ? result.timeoutWarning
+        : result.fallback
+          ? '※ 現在AI機能に接続できないため、定型文での回答です。'
+          : '';
+      var fallbackNotice = fallbackMsg
+        ? '<div style="margin-bottom:8px;padding:8px 12px;border-radius:10px;background:' + (isDark ? '#2a2a1a' : '#FFFBEB') + ';font-size:11px;color:' + (isDark ? '#fcd34d' : '#92400E') + ';text-align:center;">' + _escapeHtml(fallbackMsg) + '</div>'
+        : '';
+      answerArea.innerHTML = fallbackNotice +
+        '<div style="padding:16px;background:' + (isDark ? '#1a2a1a' : '#F0FFF4') + ';border-radius:16px;font-size:14px;line-height:1.8;color:' + (isDark ? '#a7f3d0' : '#166534') + ';white-space:pre-wrap;">' + _escapeHtml(result.answer) + '</div>' +
         '<div style="margin-top:8px;padding:8px 12px;font-size:11px;color:#999;text-align:center;">※ AIの回答は参考情報です。診断・治療は獣医師にご相談ください。</div>';
     }
 

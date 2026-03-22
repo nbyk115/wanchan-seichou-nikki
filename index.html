@@ -19,7 +19,9 @@
 <meta name="twitter:image" content="https://nbyk115.github.io/wanchan-seichou-nikki/og-image.png"/>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="icon-192.png"/>
-<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&family=Kosugi+Maru&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&family=Kosugi+Maru&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
 <script type="module" src="firebase-config.js"></script>
 <script type="module" src="analytics.js"></script>
 <script type="module" src="ai-consultation.js"></script>
@@ -258,6 +260,11 @@ body.ux-dark-on .ux-symptom-chip.ux-selected{border-color:#FF7B9C;background:#3a
   body.ux-dark-auto .ux-symptom-chip{background:#2a2a3e;border-color:#444;color:#ccc;}
   body.ux-dark-auto .ux-symptom-chip.ux-selected{border-color:#FF7B9C;background:#3a2a3e;color:#FF7B9C;}
 }
+@media (max-width:359px){
+  .ux-symptom-grid{grid-template-columns:repeat(2,1fr);}
+  .ux-growth-card-stats{grid-template-columns:1fr 1fr;gap:8px;}
+  .ux-growth-stat-value{font-size:20px;}
+}
 
 /* PWA Install Banner */
 .ux-pwa-banner{position:fixed;bottom:0;left:0;right:0;z-index:9999;padding:16px 20px env(safe-area-inset-bottom,16px);background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -4px 24px rgba(0,0,0,.1);animation:ux-slide-up .3s ease;display:flex;align-items:center;gap:14px;}
@@ -271,9 +278,13 @@ body.ux-dark-on .ux-symptom-chip.ux-selected{border-color:#FF7B9C;background:#3a
 .ux-pwa-dismiss-btn{background:#f0f0f0;color:#888;}
 @keyframes ux-slide-up{from{transform:translateY(100%);}to{transform:translateY(0);}}
 body.ux-dark-on .ux-pwa-banner{background:#1e1e2e;}
+body.ux-dark-on .ux-pwa-banner-title{color:#F0F0F0;}
+body.ux-dark-on .ux-pwa-banner-sub{color:#aaa;}
 body.ux-dark-on .ux-pwa-dismiss-btn{background:#333;color:#aaa;}
 @media (prefers-color-scheme:dark){
   body.ux-dark-auto .ux-pwa-banner{background:#1e1e2e;}
+  body.ux-dark-auto .ux-pwa-banner-title{color:#F0F0F0;}
+  body.ux-dark-auto .ux-pwa-banner-sub{color:#aaa;}
   body.ux-dark-auto .ux-pwa-dismiss-btn{background:#333;color:#aaa;}
 }
 
@@ -708,7 +719,7 @@ Error generating stack: `+n.message+`
       localStorage.setItem('wp', JSON.stringify({on: true, exp: "2099-12-31T00:00:00.000Z"}));
     }
   } catch(e) {
-    localStorage.setItem('wp', JSON.stringify({on: true, exp: "2099-12-31T00:00:00.000Z"}));
+    try { localStorage.setItem('wp', JSON.stringify({on: true, exp: "2099-12-31T00:00:00.000Z"})); } catch(_) {}
   }
   // Sync React dark flag on page load
   try {
@@ -921,8 +932,22 @@ Error generating stack: `+n.message+`
   backupMenu.appendChild(btnDark);
   document.body.appendChild(backupMenu);
 
+  backupMenu.setAttribute('role', 'menu');
+  backupFab.setAttribute('aria-expanded', 'false');
+  backupFab.setAttribute('aria-haspopup', 'true');
   backupFab.addEventListener('click', function() {
-    backupMenu.classList.toggle('ux-show');
+    var isOpen = backupMenu.classList.toggle('ux-show');
+    backupFab.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    if (isOpen && backupMenu.firstElementChild) backupMenu.firstElementChild.focus();
+  });
+
+  // Close menu with Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && backupMenu.classList.contains('ux-show')) {
+      backupMenu.classList.remove('ux-show');
+      backupFab.setAttribute('aria-expanded', 'false');
+      backupFab.focus();
+    }
   });
 
   // Close menu when clicking outside
@@ -1259,7 +1284,7 @@ Error generating stack: `+n.message+`
 
           content.innerHTML = html;
           // Mark as checked
-          localStorage.setItem('ux_notif_last_check', String(Date.now()));
+          try { localStorage.setItem('ux_notif_last_check', String(Date.now())); } catch(_) {}
           _updateNotifBadge(0);
         }).catch(function() {
           var content = document.getElementById('notif-content');
@@ -1809,6 +1834,8 @@ Error generating stack: `+n.message+`
 
           var grid = document.createElement('div');
           grid.className = 'ux-symptom-grid';
+          grid.setAttribute('role', 'group');
+          grid.setAttribute('aria-label', '症状を選択');
 
           var selectedSymptoms = [];
 
@@ -1946,7 +1973,31 @@ Error generating stack: `+n.message+`
         if (!newWorker) return;
         newWorker.addEventListener('statechange', function() {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            showToast('新しい機能が追加されました！画面を更新すると使えるようになります', 'info');
+            var t = document.createElement('div');
+            t.className = 'ux-toast ux-toast-info';
+            var iconSpan = document.createElement('span');
+            iconSpan.className = 'ux-toast-icon';
+            iconSpan.textContent = '💡';
+            var msgSpan = document.createElement('span');
+            msgSpan.textContent = '新しい機能が追加されました！';
+            msgSpan.style.cssText = 'flex:1;';
+            var updateBtn = document.createElement('button');
+            updateBtn.textContent = '更新する';
+            updateBtn.style.cssText = 'background:#3B82F6;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;margin-left:8px;';
+            updateBtn.setAttribute('aria-label', 'アプリを最新版に更新する');
+            updateBtn.addEventListener('click', function() {
+              newWorker.postMessage({ type: 'SKIP_WAITING' });
+              window.location.reload();
+            });
+            t.appendChild(iconSpan);
+            t.appendChild(msgSpan);
+            t.appendChild(updateBtn);
+            while (toastContainer.children.length >= 5) {
+              toastContainer.firstChild.remove();
+            }
+            toastContainer.appendChild(t);
+            setTimeout(function(){ t.classList.add('ux-toast-out'); }, 10000);
+            setTimeout(function(){ t.remove(); }, 10300);
           }
         });
       });

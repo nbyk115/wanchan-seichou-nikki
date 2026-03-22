@@ -10,10 +10,10 @@
  */
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
-import { getAuth, signInWithPopup, signOut, onAuthStateChanged, GoogleAuthProvider }
+import { getAuth, signInWithPopup, signInWithRedirect, signOut, onAuthStateChanged, GoogleAuthProvider }
   from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, addDoc,
-  query, where, orderBy, limit, serverTimestamp, onSnapshot, deleteDoc, updateDoc }
+  query, where, orderBy, limit, serverTimestamp, onSnapshot, deleteDoc, updateDoc, writeBatch }
   from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
 
 // ============================================================
@@ -46,8 +46,9 @@ async function login() {
     _toast('Firebase未設定です', 'error');
     return null;
   }
+  const provider = new GoogleAuthProvider();
   try {
-    const result = await signInWithPopup(auth, new GoogleAuthProvider());
+    const result = await signInWithPopup(auth, provider);
     // Create/update user profile in Firestore
     await setDoc(doc(db, 'users', result.user.uid), {
       displayName: result.user.displayName,
@@ -56,6 +57,11 @@ async function login() {
     }, { merge: true });
     return result.user;
   } catch (e) {
+    if (e.code === 'auth/popup-blocked' || e.code === 'auth/cancelled-popup-request') {
+      // Popup blocked — fall back to redirect
+      await signInWithRedirect(auth, provider);
+      return null;
+    }
     if (e.code !== 'auth/popup-closed-by-user') {
       _toast('ログインに失敗しました', 'error');
     }
@@ -120,7 +126,8 @@ async function syncFromCloud(uid) {
     const cloudData = JSON.parse(raw);
 
     // Timestamp comparison: skip cloud pull if local is newer
-    const cloudUpdatedAt = snapData.updatedAt ? snapData.updatedAt.toMillis() : 0;
+    const cloudUpdatedAt = snapData.updatedAt && typeof snapData.updatedAt.toMillis === 'function'
+      ? snapData.updatedAt.toMillis() : 0;
     const localSyncAt = parseInt(localStorage.getItem('ux_last_sync_at') || '0', 10);
     if (localSyncAt > cloudUpdatedAt && cloudUpdatedAt > 0) {
       // Local data is newer than cloud — don't overwrite, let syncToCloud push later
@@ -156,13 +163,17 @@ async function syncFromCloud(uid) {
 // ============================================================
 async function leaveFootprint(targetUid) {
   if (!isConfigured || !auth.currentUser) return;
-  await addDoc(collection(db, 'footprints'), {
-    from: auth.currentUser.uid,
-    fromName: auth.currentUser.displayName,
-    fromPhoto: auth.currentUser.photoURL,
-    to: targetUid,
-    createdAt: serverTimestamp()
-  });
+  try {
+    await addDoc(collection(db, 'footprints'), {
+      from: auth.currentUser.uid,
+      fromName: auth.currentUser.displayName,
+      fromPhoto: auth.currentUser.photoURL,
+      to: targetUid,
+      createdAt: serverTimestamp()
+    });
+  } catch (e) {
+    console.error('leaveFootprint failed:', e);
+  }
 }
 
 async function getFootprints(uid, max) {
@@ -183,27 +194,39 @@ async function getFootprints(uid, max) {
 // ============================================================
 async function sendFriendRequest(targetUid) {
   if (!isConfigured || !auth.currentUser) return;
-  await setDoc(doc(db, 'friendRequests', auth.currentUser.uid + '_' + targetUid), {
-    from: auth.currentUser.uid,
-    fromName: auth.currentUser.displayName,
-    to: targetUid,
-    status: 'pending',
-    createdAt: serverTimestamp()
-  });
+  try {
+    await setDoc(doc(db, 'friendRequests', auth.currentUser.uid + '_' + targetUid), {
+      from: auth.currentUser.uid,
+      fromName: auth.currentUser.displayName,
+      to: targetUid,
+      status: 'pending',
+      createdAt: serverTimestamp()
+    });
+  } catch (e) {
+    _toast('フレンド申請に失敗しました', 'error');
+    console.error('sendFriendRequest failed:', e);
+  }
 }
 
 async function acceptFriendRequest(requestId, fromUid) {
   if (!isConfigured || !auth.currentUser) return;
   const uid = auth.currentUser.uid;
-  // Update request status
-  await updateDoc(doc(db, 'friendRequests', requestId), { status: 'accepted' });
-  // Create bidirectional friend records
-  await setDoc(doc(db, 'friends', uid + '_' + fromUid), {
-    users: [uid, fromUid], createdAt: serverTimestamp()
-  });
-  await setDoc(doc(db, 'friends', fromUid + '_' + uid), {
-    users: [fromUid, uid], createdAt: serverTimestamp()
-  });
+  try {
+    const batch = writeBatch(db);
+    // Update request status
+    batch.update(doc(db, 'friendRequests', requestId), { status: 'accepted' });
+    // Create bidirectional friend records
+    batch.set(doc(db, 'friends', uid + '_' + fromUid), {
+      users: [uid, fromUid], createdAt: serverTimestamp()
+    });
+    batch.set(doc(db, 'friends', fromUid + '_' + uid), {
+      users: [fromUid, uid], createdAt: serverTimestamp()
+    });
+    await batch.commit();
+  } catch (e) {
+    _toast('フレンド承認に失敗しました', 'error');
+    console.error('acceptFriendRequest failed:', e);
+  }
 }
 
 async function getFriends(uid) {
@@ -230,14 +253,19 @@ async function getFriends(uid) {
 // ============================================================
 async function postComment(entryId, text) {
   if (!isConfigured || !auth.currentUser) return;
-  await addDoc(collection(db, 'comments'), {
-    entryId: entryId,
-    uid: auth.currentUser.uid,
-    displayName: auth.currentUser.displayName,
-    photoURL: auth.currentUser.photoURL,
-    text: text,
-    createdAt: serverTimestamp()
-  });
+  try {
+    await addDoc(collection(db, 'comments'), {
+      entryId: entryId,
+      uid: auth.currentUser.uid,
+      displayName: auth.currentUser.displayName,
+      photoURL: auth.currentUser.photoURL,
+      text: text,
+      createdAt: serverTimestamp()
+    });
+  } catch (e) {
+    _toast('コメント投稿に失敗しました', 'error');
+    console.error('postComment failed:', e);
+  }
 }
 
 async function getComments(entryId, max) {
@@ -300,10 +328,12 @@ Object.assign(window.__wanchan, {
 if (isConfigured) {
   let _syncInterval = null;
   let _isFirstAuth = true;
+  let _currentUid = null;
   onAuth(async function(user) {
     // Clear previous sync interval on any auth state change
     if (_syncInterval) { clearInterval(_syncInterval); _syncInterval = null; }
     if (user) {
+      _currentUid = user.uid;
       // Only show toast on actual login, not on page reload with cached session
       if (!_isFirstAuth) {
         _toast(user.displayName + 'でログイン中', 'success');
@@ -315,7 +345,23 @@ if (isConfigured) {
       }
       _syncInterval = setInterval(function() { syncToCloud(user.uid).catch(function() {}); }, 30000);
     } else {
+      _currentUid = null;
       _isFirstAuth = false;
+    }
+  });
+
+  // Sync on page visibility change (tab switch / minimize)
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden' && _currentUid) {
+      syncToCloud(_currentUid).catch(function() {});
+    }
+  });
+
+  // Last-resort sync on page unload
+  window.addEventListener('beforeunload', function() {
+    if (_currentUid) {
+      // Use sendBeacon-style: fire and forget since await is not reliable here
+      syncToCloud(_currentUid).catch(function() {});
     }
   });
 }
