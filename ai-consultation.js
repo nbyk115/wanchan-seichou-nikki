@@ -212,7 +212,9 @@ async function askAI(question) {
       fb.timeoutWarning = '回答の取得に時間がかかったため、定型文で回答しています。時間をおいて再度お試しください。';
       return fb;
     }
-    return _localFallback(question);
+    var fb = _localFallback(question);
+    fb.timeoutWarning = 'ネットワークエラーのため、定型文で回答しています。';
+    return fb;
   }
 }
 
@@ -290,7 +292,7 @@ function showConsultationModal() {
   html += '<div style="font-size:12px;color:#888;">わんちゃんの気になることを聞いてみよう</div>';
   html += '</div>';
   html += '</div>';
-  html += '<div id="ai-close" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:' + (isDark ? '#333' : '#f0f0f0') + ';cursor:pointer;font-size:16px;">✕</div>';
+  html += '<div id="ai-close" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:' + (isDark ? '#333' : '#f0f0f0') + ';cursor:pointer;font-size:16px;">✕</div>';
   html += '</div>';
 
   // 残り回数
@@ -334,11 +336,18 @@ function showConsultationModal() {
   modal.innerHTML = html;
   overlay.appendChild(modal);
   document.body.appendChild(overlay);
+  if (window.__wanchan && window.__wanchan.lockBodyScroll) window.__wanchan.lockBodyScroll();
 
   // --- Event Handlers ---
   var closeBtn = document.getElementById('ai-close');
-  closeBtn.addEventListener('click', function() { overlay.remove(); });
-  overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+  function closeAIModal() { overlay.remove(); document.removeEventListener('keydown', aiEscHandler); if (window.__wanchan && window.__wanchan.unlockBodyScroll) window.__wanchan.unlockBodyScroll(); }
+  function aiEscHandler(e) { if (e.key === 'Escape') closeAIModal(); }
+  closeBtn.addEventListener('click', closeAIModal);
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) closeAIModal(); });
+  document.addEventListener('keydown', aiEscHandler);
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-label', 'AI健康相談');
 
   var input = document.getElementById('ai-input');
   var sendBtn = document.getElementById('ai-send');

@@ -120,7 +120,7 @@ body.ux-dark-on .ux-toast{background:rgba(50,50,70,.95) !important;}
 }
 
 /* Data Backup FAB */
-.ux-backup-fab{position:fixed;bottom:90px;right:16px;z-index:9998;width:48px;height:48px;border-radius:50%;background:#FF7B9C;color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(255,123,156,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s,opacity .2s,left .3s ease,right .3s ease,bottom .3s ease;font-family:inherit;touch-action:none;user-select:none;-webkit-user-select:none;}
+.ux-backup-fab{position:fixed;bottom:90px;right:16px;z-index:9999;width:48px;height:48px;border-radius:50%;background:#FF7B9C;color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(255,123,156,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s,opacity .2s,left .3s ease,right .3s ease,bottom .3s ease;font-family:inherit;touch-action:none;user-select:none;-webkit-user-select:none;}
 .ux-backup-fab.ux-fab-dragging{transition:none !important;opacity:.85;}
 .ux-backup-fab:active:not(.ux-fab-dragging){transform:scale(.9);}
 .ux-backup-menu{position:fixed;bottom:148px;right:16px;z-index:9998;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.15);padding:8px 0;min-width:180px;opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s;pointer-events:none;}
@@ -386,6 +386,11 @@ Error generating stack: `+n.message+`
     if (idx > -1) _activeOverlayCleanups.splice(idx, 1);
   }
 
+  // Lock/unlock body scroll when modals are open
+  var _bodyScrollLockCount = 0;
+  function lockBodyScroll() { _bodyScrollLockCount++; document.body.style.overflow = 'hidden'; }
+  function unlockBodyScroll() { _bodyScrollLockCount = Math.max(0, _bodyScrollLockCount - 1); if (_bodyScrollLockCount === 0) document.body.style.overflow = ''; }
+
   // Close all UX-layer overlays/modals (called on popstate and pageshow)
   function closeAllUXOverlays() {
     var selectors = [
@@ -402,6 +407,8 @@ Error generating stack: `+n.message+`
       var el = document.querySelector(sel);
       if (el) el.remove();
     });
+    _bodyScrollLockCount = 0;
+    document.body.style.overflow = '';
     // Run registered cleanup callbacks (removes document-level keydown handlers etc.)
     var cleanups = _activeOverlayCleanups.slice();
     _activeOverlayCleanups = [];
@@ -1173,7 +1180,7 @@ Error generating stack: `+n.message+`
     if (!fb || !fb.isConfigured) return;
     if (_currentUser) {
       if (!confirm('クラウド保存を停止しますか？\nこの端末のデータはそのまま残ります。')) return;
-      fb.logout().then(function() { showToast('データの同期を停止したよ', 'info'); });
+      fb.logout().then(function() { showToast('データの同期を停止したよ', 'info'); }).catch(function() { showToast('ログアウトに失敗しました', 'error'); });
     } else {
       fb.login();
     }
@@ -1322,6 +1329,7 @@ Error generating stack: `+n.message+`
   document.addEventListener('click', function(e) {
     if (!backupFab.contains(e.target) && !backupMenu.contains(e.target)) {
       backupMenu.classList.remove('ux-show');
+      backupFab.setAttribute('aria-expanded', 'false');
     }
   });
 
@@ -1575,6 +1583,7 @@ Error generating stack: `+n.message+`
     var nameInput = document.createElement('input');
     nameInput.className = 'ux-add-dog-input';
     nameInput.type = 'text';
+    nameInput.maxLength = 20;
     nameInput.placeholder = 'わんちゃんの名前を入れてね';
     nameInput.addEventListener('input', function() {
       dogName = nameInput.value.trim();
@@ -1615,7 +1624,7 @@ Error generating stack: `+n.message+`
       item.className = 'ux-drum-picker-item' + (i === 0 ? ' ux-selected' : '');
       item.textContent = breed;
       item.setAttribute('data-index', i);
-      item.addEventListener('click', function() { scrollToIndex(i); });
+      item.addEventListener('click', function() { if (wasDragging) return; scrollToIndex(i); });
       list.appendChild(item);
     });
     for (var p2 = 0; p2 < CENTER_OFFSET; p2++) {
@@ -1638,9 +1647,10 @@ Error generating stack: `+n.message+`
     }
 
     // Touch/mouse drag for drum picker
-    var startY = 0, startTranslate = 0, isDragging = false;
+    var startY = 0, startTranslate = 0, isDragging = false, wasDragging = false;
     function onDragStart(e) {
       isDragging = true;
+      wasDragging = false;
       startY = e.touches ? e.touches[0].clientY : e.clientY;
       startTranslate = -selectedBreedIndex * ITEM_HEIGHT;
       list.style.transition = 'none';
@@ -1655,6 +1665,8 @@ Error generating stack: `+n.message+`
     function onDragEnd(e) {
       if (!isDragging) return;
       isDragging = false;
+      wasDragging = true;
+      setTimeout(function() { wasDragging = false; }, 50);
       list.style.transition = 'transform .3s cubic-bezier(.23,1,.32,1)';
       var currentY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
       var diff = currentY - startY;
@@ -1693,9 +1705,13 @@ Error generating stack: `+n.message+`
     actions.appendChild(submitBtn);
     panel.appendChild(actions);
 
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', 'わんちゃんを追加');
     overlay.appendChild(panel);
     overlay.addEventListener('click', closeModal);
     document.body.appendChild(overlay);
+    lockBodyScroll();
 
     // Focus name input
     setTimeout(function() { nameInput.focus(); }, 100);
@@ -1703,6 +1719,7 @@ Error generating stack: `+n.message+`
 
     function closeModal() {
       overlay.remove();
+      unlockBodyScroll();
     }
 
     // Trap focus
@@ -1781,11 +1798,15 @@ Error generating stack: `+n.message+`
         shareUrl = 'https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(text);
         break;
       case 'copy':
-        navigator.clipboard.writeText(url).then(function() {
-          showToast('リンクをコピーしました', 'success');
-        }).catch(function() {
-          showToast('コピーがうまくいきませんでした。もう一度試してみてね', 'error');
-        });
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(function() {
+            showToast('リンクをコピーしました', 'success');
+          }).catch(function() {
+            showToast('コピーがうまくいきませんでした。もう一度試してみてね', 'error');
+          });
+        } else {
+          try { var ta = document.createElement('textarea'); ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); showToast('リンクをコピーしました', 'success'); } catch(_) { showToast('コピーがうまくいきませんでした。もう一度試してみてね', 'error'); }
+        }
         // Track
         var a = window.__wanchan && window.__wanchan.analytics;
         if (a && a.trackShare) a.trackShare('clipboard', 'link');
@@ -1843,9 +1864,11 @@ Error generating stack: `+n.message+`
     sheet.innerHTML = html;
     overlay.appendChild(sheet);
     document.body.appendChild(overlay);
+    lockBodyScroll();
 
     function closeShareSheet() {
       overlay.remove();
+      unlockBodyScroll();
       document.removeEventListener('keydown', shareEscHandler);
       unregisterOverlayCleanup(shareCleanup);
     }
@@ -1866,6 +1889,8 @@ Error generating stack: `+n.message+`
   window.__wanchan.shareToSNS = shareToSNS;
   window.__wanchan.showShareSheet = showShareSheet;
   window.__wanchan.showToast = showToast;
+  window.__wanchan.lockBodyScroll = lockBodyScroll;
+  window.__wanchan.unlockBodyScroll = unlockBodyScroll;
 
   /* ==============================
      17. NOTIFICATIONS PANEL (お知らせ)
@@ -1886,13 +1911,15 @@ Error generating stack: `+n.message+`
     var panel = document.createElement('div');
     panel.style.cssText = 'background:' + (isDark ? '#1e1e2e' : '#fff') + ';border-radius:20px 20px 0 0;max-width:500px;width:100%;padding:24px 20px env(safe-area-inset-bottom,20px);max-height:70vh;overflow-y:auto;';
 
-    panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div style="font-size:18px;font-weight:900;color:' + (isDark ? '#e0e0e0' : '#333') + ';">🔔 お知らせ</div><div id="notif-close" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:' + (isDark ? '#333' : '#f0f0f0') + ';cursor:pointer;font-size:14px;">✕</div></div><div id="notif-content" style="text-align:center;padding:20px;"><div class="ux-spinner" style="width:24px;height:24px;border-width:2.5px;color:#FF7B9C;margin:0 auto;"></div></div>';
+    panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div style="font-size:18px;font-weight:900;color:' + (isDark ? '#e0e0e0' : '#333') + ';">🔔 お知らせ</div><div id="notif-close" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:' + (isDark ? '#333' : '#f0f0f0') + ';cursor:pointer;font-size:14px;">✕</div></div><div id="notif-content" style="text-align:center;padding:20px;"><div class="ux-spinner" style="width:24px;height:24px;border-width:2.5px;color:#FF7B9C;margin:0 auto;"></div></div>';
 
     overlay.appendChild(panel);
     document.body.appendChild(overlay);
+    lockBodyScroll();
 
     function closeNotifPanel() {
       overlay.remove();
+      unlockBodyScroll();
       document.removeEventListener('keydown', notifEscHandler);
       unregisterOverlayCleanup(notifCleanup);
     }
@@ -1976,8 +2003,7 @@ Error generating stack: `+n.message+`
       if (!badge) {
         badge = document.createElement('span');
         badge.className = 'ux-notif-badge';
-        badge.style.cssText = 'position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#EF4444;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;';
-        backupFab.style.position = 'relative';
+        badge.style.cssText = 'position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#EF4444;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;pointer-events:none;';
         backupFab.appendChild(badge);
       }
       badge.textContent = count > 9 ? '9+' : count;
@@ -2352,9 +2378,11 @@ Error generating stack: `+n.message+`
     panel.innerHTML = html;
     overlay.appendChild(panel);
     document.body.appendChild(overlay);
+    lockBodyScroll();
 
     function closeCurveModal() {
       overlay.remove();
+      unlockBodyScroll();
       document.removeEventListener('keydown', curveEscHandler);
       unregisterOverlayCleanup(curveCleanup);
     }
@@ -2630,9 +2658,11 @@ Error generating stack: `+n.message+`
     document.getElementById('pwa-dismiss').addEventListener('click', function() {
       safeSetItem('ux_pwa_dismissed', new Date().toISOString());
       banner.style.animation = 'none';
-      banner.style.transform = 'translateY(100%)';
-      banner.style.transition = 'transform .3s ease';
-      setTimeout(function() { banner.remove(); }, 300);
+      requestAnimationFrame(function() {
+        banner.style.transition = 'transform .3s ease';
+        banner.style.transform = 'translateY(100%)';
+        setTimeout(function() { banner.remove(); }, 300);
+      });
       var an = window.__wanchan && window.__wanchan.analytics;
       if (an && an.logEvent) an.logEvent('pwa_install', { outcome: 'dismissed' });
     });

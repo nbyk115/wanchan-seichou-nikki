@@ -120,7 +120,7 @@ body.ux-dark-on .ux-toast{background:rgba(50,50,70,.95) !important;}
 }
 
 /* Data Backup FAB */
-.ux-backup-fab{position:fixed;bottom:90px;right:16px;z-index:9998;width:48px;height:48px;border-radius:50%;background:#FF7B9C;color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(255,123,156,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s,opacity .2s,left .3s ease,right .3s ease,bottom .3s ease;font-family:inherit;touch-action:none;user-select:none;-webkit-user-select:none;}
+.ux-backup-fab{position:fixed;bottom:90px;right:16px;z-index:9999;width:48px;height:48px;border-radius:50%;background:#FF7B9C;color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(255,123,156,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s,opacity .2s,left .3s ease,right .3s ease,bottom .3s ease;font-family:inherit;touch-action:none;user-select:none;-webkit-user-select:none;}
 .ux-backup-fab.ux-fab-dragging{transition:none !important;opacity:.85;}
 .ux-backup-fab:active:not(.ux-fab-dragging){transform:scale(.9);}
 .ux-backup-menu{position:fixed;bottom:148px;right:16px;z-index:9998;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.15);padding:8px 0;min-width:180px;opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s;pointer-events:none;}
@@ -158,6 +158,41 @@ body.ux-dark-on .ux-offline-banner{background:#991B1B;}
   body.ux-dark-auto .ux-offline-banner{background:#991B1B;}
 }
 
+
+/* Add Dog Modal */
+.ux-add-dog-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10002;display:flex;align-items:flex-end;justify-content:center;animation:ux-fade-in .2s ease;}
+.ux-add-dog-panel{background:#fff;border-radius:20px 20px 0 0;max-width:430px;width:100%;padding:20px 20px calc(20px + env(safe-area-inset-bottom, 0px));animation:ux-slide-up .3s ease;}
+.ux-add-dog-title{font-size:18px;font-weight:900;text-align:center;margin-bottom:16px;}
+.ux-add-dog-input{width:100%;padding:12px 16px;border-radius:14px;border:2px solid #eee;font-size:16px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:12px;transition:border-color .2s;}
+.ux-add-dog-input:focus{border-color:#FF7B9C;}
+.ux-add-dog-label{font-size:13px;font-weight:700;color:#888;margin-bottom:6px;}
+/* Drum Picker */
+.ux-drum-picker{position:relative;height:180px;overflow:hidden;border-radius:14px;border:2px solid #eee;margin-bottom:12px;background:#fafafa;}
+.ux-drum-picker-list{position:absolute;width:100%;transition:transform .3s cubic-bezier(.23,1,.32,1);will-change:transform;}
+.ux-drum-picker-item{height:36px;display:flex;align-items:center;justify-content:center;font-size:15px;color:#999;cursor:pointer;transition:all .2s;user-select:none;}
+.ux-drum-picker-item.ux-selected{font-size:18px;font-weight:700;color:#333;}
+.ux-drum-picker-highlight{position:absolute;top:50%;left:8px;right:8px;height:36px;transform:translateY(-50%);border-radius:10px;background:rgba(255,123,156,.08);border:1.5px solid rgba(255,123,156,.3);pointer-events:none;}
+.ux-add-dog-actions{display:flex;gap:10px;margin-top:16px;}
+.ux-add-dog-actions button{flex:1;padding:14px;border-radius:14px;border:none;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;}
+.ux-add-dog-cancel{background:#f0f0f0;color:#888;}
+.ux-add-dog-submit{background:#FF7B9C;color:#fff;}
+.ux-add-dog-submit:disabled{opacity:.4;cursor:not-allowed;}
+body.ux-dark-on .ux-add-dog-panel{background:#1e1e2e;color:#e0e0e0;}
+body.ux-dark-on .ux-add-dog-input{background:#2a2a3e;border-color:#444;color:#e0e0e0;}
+body.ux-dark-on .ux-drum-picker{background:#252535;border-color:#444;}
+body.ux-dark-on .ux-drum-picker-item{color:#777;}
+body.ux-dark-on .ux-drum-picker-item.ux-selected{color:#e0e0e0;}
+body.ux-dark-on .ux-drum-picker-highlight{background:rgba(255,123,156,.12);border-color:rgba(255,123,156,.3);}
+body.ux-dark-on .ux-add-dog-cancel{background:#333;color:#aaa;}
+@media(prefers-color-scheme:dark){
+  body.ux-dark-auto .ux-add-dog-panel{background:#1e1e2e;color:#e0e0e0;}
+  body.ux-dark-auto .ux-add-dog-input{background:#2a2a3e;border-color:#444;color:#e0e0e0;}
+  body.ux-dark-auto .ux-drum-picker{background:#252535;border-color:#444;}
+  body.ux-dark-auto .ux-drum-picker-item{color:#777;}
+  body.ux-dark-auto .ux-drum-picker-item.ux-selected{color:#e0e0e0;}
+  body.ux-dark-auto .ux-drum-picker-highlight{background:rgba(255,123,156,.12);border-color:rgba(255,123,156,.3);}
+  body.ux-dark-auto .ux-add-dog-cancel{background:#333;color:#aaa;}
+}
 
 /* Multi-Dog Quick Switcher */
 .ux-dog-switcher{position:fixed;top:env(safe-area-inset-top,12px);left:12px;z-index:9997;display:flex;gap:6px;align-items:center;max-width:calc(100vw - 80px);overflow-x:auto;}
@@ -352,6 +387,11 @@ Error generating stack: `+n.message+`
     if (idx > -1) _activeOverlayCleanups.splice(idx, 1);
   }
 
+  // Lock/unlock body scroll when modals are open
+  var _bodyScrollLockCount = 0;
+  function lockBodyScroll() { _bodyScrollLockCount++; document.body.style.overflow = 'hidden'; }
+  function unlockBodyScroll() { _bodyScrollLockCount = Math.max(0, _bodyScrollLockCount - 1); if (_bodyScrollLockCount === 0) document.body.style.overflow = ''; }
+
   // Close all UX-layer overlays/modals (called on popstate and pageshow)
   function closeAllUXOverlays() {
     var selectors = [
@@ -367,6 +407,8 @@ Error generating stack: `+n.message+`
       var el = document.querySelector(sel);
       if (el) el.remove();
     });
+    _bodyScrollLockCount = 0;
+    document.body.style.overflow = '';
     // Run registered cleanup callbacks (removes document-level keydown handlers etc.)
     var cleanups = _activeOverlayCleanups.slice();
     _activeOverlayCleanups = [];
@@ -1138,7 +1180,7 @@ Error generating stack: `+n.message+`
     if (!fb || !fb.isConfigured) return;
     if (_currentUser) {
       if (!confirm('クラウド保存を停止しますか？\nこの端末のデータはそのまま残ります。')) return;
-      fb.logout().then(function() { showToast('データの同期を停止したよ', 'info'); });
+      fb.logout().then(function() { showToast('データの同期を停止したよ', 'info'); }).catch(function() { showToast('ログアウトに失敗しました', 'error'); });
     } else {
       fb.login();
     }
@@ -1254,6 +1296,7 @@ Error generating stack: `+n.message+`
   document.addEventListener('click', function(e) {
     if (!backupFab.contains(e.target) && !backupMenu.contains(e.target)) {
       backupMenu.classList.remove('ux-show');
+      backupFab.setAttribute('aria-expanded', 'false');
     }
   });
 
@@ -1489,11 +1532,15 @@ Error generating stack: `+n.message+`
         shareUrl = 'https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(text);
         break;
       case 'copy':
-        navigator.clipboard.writeText(url).then(function() {
-          showToast('リンクをコピーしました', 'success');
-        }).catch(function() {
-          showToast('コピーがうまくいきませんでした。もう一度試してみてね', 'error');
-        });
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(function() {
+            showToast('リンクをコピーしました', 'success');
+          }).catch(function() {
+            showToast('コピーがうまくいきませんでした。もう一度試してみてね', 'error');
+          });
+        } else {
+          try { var ta = document.createElement('textarea'); ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); showToast('リンクをコピーしました', 'success'); } catch(_) { showToast('コピーがうまくいきませんでした。もう一度試してみてね', 'error'); }
+        }
         // Track
         var a = window.__wanchan && window.__wanchan.analytics;
         if (a && a.trackShare) a.trackShare('clipboard', 'link');
@@ -1551,9 +1598,11 @@ Error generating stack: `+n.message+`
     sheet.innerHTML = html;
     overlay.appendChild(sheet);
     document.body.appendChild(overlay);
+    lockBodyScroll();
 
     function closeShareSheet() {
       overlay.remove();
+      unlockBodyScroll();
       document.removeEventListener('keydown', shareEscHandler);
       unregisterOverlayCleanup(shareCleanup);
     }
@@ -1594,13 +1643,15 @@ Error generating stack: `+n.message+`
     var panel = document.createElement('div');
     panel.style.cssText = 'background:' + (isDark ? '#1e1e2e' : '#fff') + ';border-radius:20px 20px 0 0;max-width:500px;width:100%;padding:24px 20px env(safe-area-inset-bottom,20px);max-height:70vh;overflow-y:auto;';
 
-    panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div style="font-size:18px;font-weight:900;color:' + (isDark ? '#e0e0e0' : '#333') + ';">🔔 お知らせ</div><div id="notif-close" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:' + (isDark ? '#333' : '#f0f0f0') + ';cursor:pointer;font-size:14px;">✕</div></div><div id="notif-content" style="text-align:center;padding:20px;"><div class="ux-spinner" style="width:24px;height:24px;border-width:2.5px;color:#FF7B9C;margin:0 auto;"></div></div>';
+    panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div style="font-size:18px;font-weight:900;color:' + (isDark ? '#e0e0e0' : '#333') + ';">🔔 お知らせ</div><div id="notif-close" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:' + (isDark ? '#333' : '#f0f0f0') + ';cursor:pointer;font-size:14px;">✕</div></div><div id="notif-content" style="text-align:center;padding:20px;"><div class="ux-spinner" style="width:24px;height:24px;border-width:2.5px;color:#FF7B9C;margin:0 auto;"></div></div>';
 
     overlay.appendChild(panel);
     document.body.appendChild(overlay);
+    lockBodyScroll();
 
     function closeNotifPanel() {
       overlay.remove();
+      unlockBodyScroll();
       document.removeEventListener('keydown', notifEscHandler);
       unregisterOverlayCleanup(notifCleanup);
     }
@@ -1684,8 +1735,7 @@ Error generating stack: `+n.message+`
       if (!badge) {
         badge = document.createElement('span');
         badge.className = 'ux-notif-badge';
-        badge.style.cssText = 'position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#EF4444;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;';
-        backupFab.style.position = 'relative';
+        badge.style.cssText = 'position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#EF4444;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;pointer-events:none;';
         backupFab.appendChild(badge);
       }
       badge.textContent = count > 9 ? '9+' : count;
@@ -2060,9 +2110,11 @@ Error generating stack: `+n.message+`
     panel.innerHTML = html;
     overlay.appendChild(panel);
     document.body.appendChild(overlay);
+    lockBodyScroll();
 
     function closeCurveModal() {
       overlay.remove();
+      unlockBodyScroll();
       document.removeEventListener('keydown', curveEscHandler);
       unregisterOverlayCleanup(curveCleanup);
     }
@@ -2338,9 +2390,11 @@ Error generating stack: `+n.message+`
     document.getElementById('pwa-dismiss').addEventListener('click', function() {
       safeSetItem('ux_pwa_dismissed', new Date().toISOString());
       banner.style.animation = 'none';
-      banner.style.transform = 'translateY(100%)';
-      banner.style.transition = 'transform .3s ease';
-      setTimeout(function() { banner.remove(); }, 300);
+      requestAnimationFrame(function() {
+        banner.style.transition = 'transform .3s ease';
+        banner.style.transform = 'translateY(100%)';
+        setTimeout(function() { banner.remove(); }, 300);
+      });
       var an = window.__wanchan && window.__wanchan.analytics;
       if (an && an.logEvent) an.logEvent('pwa_install', { outcome: 'dismissed' });
     });
