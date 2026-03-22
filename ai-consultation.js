@@ -384,7 +384,8 @@ function showConsultationModal() {
     } else {
       // 残り回数を更新
       var newRemaining = getRemainingCount();
-      var countEl = answerArea.closest('#wanchan-ai-modal').querySelector('[style*="今月の残り"]');
+      var modal = answerArea.closest('#wanchan-ai-modal');
+      var countEl = modal ? modal.querySelector('[style*="今月の残り"]') : null;
       if (countEl) {
         countEl.parentElement.innerHTML = '<span>今月の残り回数</span><span style="font-weight:900;color:' + (newRemaining <= 1 ? '#EF4444' : '#F59E0B') + ';">' + newRemaining + ' / ' + AI_CONFIG.freeLimit + ' 回</span>';
       }

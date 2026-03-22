@@ -96,13 +96,17 @@ async function syncToCloud(uid) {
   const json = JSON.stringify(data);
   // Skip sync if nothing changed
   if (json === _lastSyncHash) return;
-  await setDoc(doc(db, 'userData', uid), {
-    data: json,
-    updatedAt: serverTimestamp()
-  }, { merge: true });
-  _lastSyncHash = json;
-  // Record successful sync time locally
-  try { localStorage.setItem('ux_last_sync_at', Date.now().toString()); } catch (_) {}
+  try {
+    await setDoc(doc(db, 'userData', uid), {
+      data: json,
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+    _lastSyncHash = json;
+    // Record successful sync time locally
+    try { localStorage.setItem('ux_last_sync_at', Date.now().toString()); } catch (_) {}
+  } catch (e) {
+    console.error('syncToCloud failed:', e);
+  }
 }
 
 async function syncFromCloud(uid) {

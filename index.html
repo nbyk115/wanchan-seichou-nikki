@@ -1658,6 +1658,7 @@ Error generating stack: `+n.message+`
         var bDate = new Date(birthday);
         if (!isNaN(bDate.getTime())) weights.forEach(function(w) {
           var wDate = new Date(w.date || w.d);
+          if (isNaN(wDate.getTime())) return;
           var monthAge = Math.round((wDate - bDate) / (1000 * 60 * 60 * 24 * 30));
           if (monthAge >= 0 && monthAge < 12) {
             userWeightsByMonth[monthAge] = parseFloat(w.weight || w.w || 0);
