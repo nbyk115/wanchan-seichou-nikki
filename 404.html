@@ -1026,7 +1026,12 @@ Error generating stack: `+n.message+`
       }
     }, 100);
     // Timeout after 3s
-    setTimeout(function() { clearInterval(_aiCheck); }, 3000);
+    setTimeout(function() {
+      clearInterval(_aiCheck);
+      if (!(window.__wanchan && window.__wanchan.ai && window.__wanchan.ai.showConsultation)) {
+        showToast('AI相談の読み込みに失敗しました。ページを再読み込みしてね', 'error');
+      }
+    }, 3000);
   });
 
   // 通知ボタン（足あと・コメント）

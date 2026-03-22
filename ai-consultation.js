@@ -36,12 +36,14 @@ function _getUsageKey() {
 
 function _cleanupOldUsageKeys(currentKey) {
   try {
+    var keysToRemove = [];
     for (var i = 0; i < localStorage.length; i++) {
       var key = localStorage.key(i);
       if (key && key.startsWith('wanchan_ai_usage_') && key !== currentKey) {
-        localStorage.removeItem(key);
+        keysToRemove.push(key);
       }
     }
+    keysToRemove.forEach(function(k) { localStorage.removeItem(k); });
   } catch (e) {
     // localStorage アクセス不可時は無視
   }
