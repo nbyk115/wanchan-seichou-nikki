@@ -67,7 +67,8 @@ self.addEventListener('fetch', (e) => {
   if (e.request.url.includes('googleapis.com/identitytoolkit')) return;
   if (e.request.url.includes('firestore.googleapis.com')) return;
 
-  // For navigation requests, network-first with offline fallback
+  // For navigation requests, network-first with SPA fallback
+  // All navigation resolves to index.html (SPA uses state-based routing)
   if (e.request.mode === 'navigate') {
     e.respondWith(
       fetch(e.request)
@@ -79,11 +80,13 @@ self.addEventListener('fetch', (e) => {
           return res;
         })
         .catch(() =>
-          caches.match(e.request).then((cached) =>
-            cached || new Response(OFFLINE_PAGE, {
-              headers: { 'Content-Type': 'text/html; charset=utf-8' }
-            })
-          )
+          caches.match(e.request)
+            .then((cached) => cached || caches.match('/wanchan-seichou-nikki/index.html'))
+            .then((cached) =>
+              cached || new Response(OFFLINE_PAGE, {
+                headers: { 'Content-Type': 'text/html; charset=utf-8' }
+              })
+            )
         )
     );
     return;

@@ -117,12 +117,12 @@ async function syncToCloud(uid) {
 
 async function syncFromCloud(uid) {
   if (!isConfigured || !uid) return false;
+  try {
   const snap = await getDoc(doc(db, 'userData', uid));
   if (!snap.exists()) return false;
   const snapData = snap.data();
   const raw = snapData.data;
   if (!raw) return false;
-  try {
     const cloudData = JSON.parse(raw);
 
     // Timestamp comparison: skip cloud pull if local is newer
@@ -178,15 +178,20 @@ async function leaveFootprint(targetUid) {
 
 async function getFootprints(uid, max) {
   if (!isConfigured) return [];
-  max = max || 30;
-  const q = query(
-    collection(db, 'footprints'),
-    where('to', '==', uid),
-    orderBy('createdAt', 'desc'),
-    limit(max)
-  );
-  const snap = await getDocs(q);
-  return snap.docs.map(function(d) { return { id: d.id, ...d.data() }; });
+  try {
+    max = max || 30;
+    const q = query(
+      collection(db, 'footprints'),
+      where('to', '==', uid),
+      orderBy('createdAt', 'desc'),
+      limit(max)
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(function(d) { return { id: d.id, ...d.data() }; });
+  } catch (e) {
+    console.error('getFootprints failed:', e);
+    return [];
+  }
 }
 
 // ============================================================
@@ -231,21 +236,27 @@ async function acceptFriendRequest(requestId, fromUid) {
 
 async function getFriends(uid) {
   if (!isConfigured) return [];
-  const q = query(collection(db, 'friends'), where('users', 'array-contains', uid));
-  const snap = await getDocs(q);
-  const friendUids = [];
-  snap.docs.forEach(function(d) {
-    const users = d.data().users;
-    const friendUid = users[0] === uid ? users[1] : users[0];
-    if (friendUids.indexOf(friendUid) === -1) friendUids.push(friendUid);
-  });
-  // Fetch friend profiles
-  const friends = [];
-  for (const fuid of friendUids) {
-    const uSnap = await getDoc(doc(db, 'users', fuid));
-    if (uSnap.exists()) friends.push({ uid: fuid, ...uSnap.data() });
+  try {
+    const q = query(collection(db, 'friends'), where('users', 'array-contains', uid));
+    const snap = await getDocs(q);
+    const friendUids = [];
+    snap.docs.forEach(function(d) {
+      const users = d.data().users;
+      const friendUid = users[0] === uid ? users[1] : users[0];
+      if (friendUids.indexOf(friendUid) === -1) friendUids.push(friendUid);
+    });
+    const friends = [];
+    for (const fuid of friendUids) {
+      try {
+        const uSnap = await getDoc(doc(db, 'users', fuid));
+        if (uSnap.exists()) friends.push({ uid: fuid, ...uSnap.data() });
+      } catch (_) {}
+    }
+    return friends;
+  } catch (e) {
+    console.error('getFriends failed:', e);
+    return [];
   }
-  return friends;
 }
 
 // ============================================================
@@ -270,15 +281,20 @@ async function postComment(entryId, text) {
 
 async function getComments(entryId, max) {
   if (!isConfigured) return [];
-  max = max || 50;
-  const q = query(
-    collection(db, 'comments'),
-    where('entryId', '==', entryId),
-    orderBy('createdAt', 'asc'),
-    limit(max)
-  );
-  const snap = await getDocs(q);
-  return snap.docs.map(function(d) { return { id: d.id, ...d.data() }; });
+  try {
+    max = max || 50;
+    const q = query(
+      collection(db, 'comments'),
+      where('entryId', '==', entryId),
+      orderBy('createdAt', 'asc'),
+      limit(max)
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(function(d) { return { id: d.id, ...d.data() }; });
+  } catch (e) {
+    console.error('getComments failed:', e);
+    return [];
+  }
 }
 
 function onCommentsUpdate(entryId, cb) {
