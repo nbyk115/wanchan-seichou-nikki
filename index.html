@@ -1275,9 +1275,18 @@ Error generating stack: `+n.message+`
     if (isOpen) {
       var mp = backupFab._getMenuPosition ? backupFab._getMenuPosition() : { side: 'right', rect: backupFab.getBoundingClientRect() };
       var fabRect = mp.rect;
-      var menuBottom = (window.innerHeight - fabRect.top + 8) + 'px';
-      backupMenu.style.bottom = menuBottom;
-      backupMenu.style.top = 'auto';
+      var fabCenterY = fabRect.top + fabRect.height / 2;
+      var showBelow = fabCenterY < window.innerHeight * 0.4;
+
+      if (showBelow) {
+        // FABが上部にある場合: メニューをFABの下に表示
+        backupMenu.style.top = (fabRect.bottom + 8) + 'px';
+        backupMenu.style.bottom = 'auto';
+      } else {
+        // FABが下部にある場合: メニューをFABの上に表示
+        backupMenu.style.bottom = (window.innerHeight - fabRect.top + 8) + 'px';
+        backupMenu.style.top = 'auto';
+      }
       if (mp.side === 'left') {
         backupMenu.style.left = fabRect.left + 'px';
         backupMenu.style.right = 'auto';
@@ -1285,6 +1294,17 @@ Error generating stack: `+n.message+`
         backupMenu.style.right = (window.innerWidth - fabRect.right) + 'px';
         backupMenu.style.left = 'auto';
       }
+      // 画面外にはみ出す場合の補正
+      requestAnimationFrame(function() {
+        var menuRect = backupMenu.getBoundingClientRect();
+        if (menuRect.top < 8) {
+          backupMenu.style.top = '8px';
+          backupMenu.style.bottom = 'auto';
+        } else if (menuRect.bottom > window.innerHeight - 8) {
+          backupMenu.style.bottom = '8px';
+          backupMenu.style.top = 'auto';
+        }
+      });
       if (backupMenu.firstElementChild) backupMenu.firstElementChild.focus();
     }
   });
