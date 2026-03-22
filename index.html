@@ -1267,8 +1267,9 @@ Error generating stack: `+n.message+`
             var timeStr = date.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
             html += '<div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;margin-bottom:6px;background:' + (isNew ? (isDark ? '#2a2a3e' : '#FFF8F0') : 'transparent') + ';">';
-            if (fp.fromPhoto) {
-              html += '<img src="' + _escHtml(fp.fromPhoto) + '" style="width:40px;height:40px;border-radius:50%;object-fit:cover;" alt="' + _escHtml(fp.fromName || '訪問者') + 'のアイコン">';
+            var safePhoto = (fp.fromPhoto && (fp.fromPhoto.startsWith('https://') || fp.fromPhoto.startsWith('http://'))) ? _escHtml(fp.fromPhoto) : '';
+            if (safePhoto) {
+              html += '<img src="' + safePhoto + '" style="width:40px;height:40px;border-radius:50%;object-fit:cover;" alt="' + _escHtml(fp.fromName || '訪問者') + 'のアイコン">';
             } else {
               html += '<div style="width:40px;height:40px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:20px;">🐾</div>';
             }
@@ -1575,7 +1576,19 @@ Error generating stack: `+n.message+`
     banner.className = 'ux-anniversary-banner';
     banner.setAttribute('role', 'alert');
     banner.setAttribute('aria-live', 'polite');
-    banner.innerHTML = '<div class="ux-anniv-icon">' + icon + '</div><div class="ux-anniv-text">' + text + '</div><button class="ux-anniv-close" aria-label="閉じる">✕</button>';
+    var iconEl = document.createElement('div');
+    iconEl.className = 'ux-anniv-icon';
+    iconEl.textContent = icon;
+    var textEl = document.createElement('div');
+    textEl.className = 'ux-anniv-text';
+    textEl.textContent = text;
+    var closeBtn = document.createElement('button');
+    closeBtn.className = 'ux-anniv-close';
+    closeBtn.setAttribute('aria-label', '閉じる');
+    closeBtn.textContent = '\u2715';
+    banner.appendChild(iconEl);
+    banner.appendChild(textEl);
+    banner.appendChild(closeBtn);
 
     document.body.appendChild(banner);
 
