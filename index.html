@@ -1173,7 +1173,7 @@ Error generating stack: `+n.message+`
     if (!fb || !fb.isConfigured) return;
     if (_currentUser) {
       if (!confirm('クラウド保存を停止しますか？\nこの端末のデータはそのまま残ります。')) return;
-      fb.logout().then(function() { showToast('データの同期を停止したよ', 'info'); });
+      fb.logout().then(function() { showToast('データの同期を停止したよ', 'info'); }).catch(function() { showToast('ログアウトに失敗しました', 'error'); });
     } else {
       fb.login();
     }
@@ -1322,6 +1322,7 @@ Error generating stack: `+n.message+`
   document.addEventListener('click', function(e) {
     if (!backupFab.contains(e.target) && !backupMenu.contains(e.target)) {
       backupMenu.classList.remove('ux-show');
+      backupFab.setAttribute('aria-expanded', 'false');
     }
   });
 
@@ -1615,7 +1616,7 @@ Error generating stack: `+n.message+`
       item.className = 'ux-drum-picker-item' + (i === 0 ? ' ux-selected' : '');
       item.textContent = breed;
       item.setAttribute('data-index', i);
-      item.addEventListener('click', function() { scrollToIndex(i); });
+      item.addEventListener('click', function() { if (wasDragging) return; scrollToIndex(i); });
       list.appendChild(item);
     });
     for (var p2 = 0; p2 < CENTER_OFFSET; p2++) {
@@ -1638,9 +1639,10 @@ Error generating stack: `+n.message+`
     }
 
     // Touch/mouse drag for drum picker
-    var startY = 0, startTranslate = 0, isDragging = false;
+    var startY = 0, startTranslate = 0, isDragging = false, wasDragging = false;
     function onDragStart(e) {
       isDragging = true;
+      wasDragging = false;
       startY = e.touches ? e.touches[0].clientY : e.clientY;
       startTranslate = -selectedBreedIndex * ITEM_HEIGHT;
       list.style.transition = 'none';
@@ -1655,6 +1657,8 @@ Error generating stack: `+n.message+`
     function onDragEnd(e) {
       if (!isDragging) return;
       isDragging = false;
+      wasDragging = true;
+      setTimeout(function() { wasDragging = false; }, 50);
       list.style.transition = 'transform .3s cubic-bezier(.23,1,.32,1)';
       var currentY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
       var diff = currentY - startY;
@@ -1781,11 +1785,15 @@ Error generating stack: `+n.message+`
         shareUrl = 'https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(text);
         break;
       case 'copy':
-        navigator.clipboard.writeText(url).then(function() {
-          showToast('リンクをコピーしました', 'success');
-        }).catch(function() {
-          showToast('コピーがうまくいきませんでした。もう一度試してみてね', 'error');
-        });
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(function() {
+            showToast('リンクをコピーしました', 'success');
+          }).catch(function() {
+            showToast('コピーがうまくいきませんでした。もう一度試してみてね', 'error');
+          });
+        } else {
+          try { var ta = document.createElement('textarea'); ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); showToast('リンクをコピーしました', 'success'); } catch(_) { showToast('コピーがうまくいきませんでした。もう一度試してみてね', 'error'); }
+        }
         // Track
         var a = window.__wanchan && window.__wanchan.analytics;
         if (a && a.trackShare) a.trackShare('clipboard', 'link');

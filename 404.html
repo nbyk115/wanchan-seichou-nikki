@@ -1138,7 +1138,7 @@ Error generating stack: `+n.message+`
     if (!fb || !fb.isConfigured) return;
     if (_currentUser) {
       if (!confirm('クラウド保存を停止しますか？\nこの端末のデータはそのまま残ります。')) return;
-      fb.logout().then(function() { showToast('データの同期を停止したよ', 'info'); });
+      fb.logout().then(function() { showToast('データの同期を停止したよ', 'info'); }).catch(function() { showToast('ログアウトに失敗しました', 'error'); });
     } else {
       fb.login();
     }
@@ -1254,6 +1254,7 @@ Error generating stack: `+n.message+`
   document.addEventListener('click', function(e) {
     if (!backupFab.contains(e.target) && !backupMenu.contains(e.target)) {
       backupMenu.classList.remove('ux-show');
+      backupFab.setAttribute('aria-expanded', 'false');
     }
   });
 
@@ -1489,11 +1490,15 @@ Error generating stack: `+n.message+`
         shareUrl = 'https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(text);
         break;
       case 'copy':
-        navigator.clipboard.writeText(url).then(function() {
-          showToast('リンクをコピーしました', 'success');
-        }).catch(function() {
-          showToast('コピーがうまくいきませんでした。もう一度試してみてね', 'error');
-        });
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(function() {
+            showToast('リンクをコピーしました', 'success');
+          }).catch(function() {
+            showToast('コピーがうまくいきませんでした。もう一度試してみてね', 'error');
+          });
+        } else {
+          try { var ta = document.createElement('textarea'); ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); showToast('リンクをコピーしました', 'success'); } catch(_) { showToast('コピーがうまくいきませんでした。もう一度試してみてね', 'error'); }
+        }
         // Track
         var a = window.__wanchan && window.__wanchan.analytics;
         if (a && a.trackShare) a.trackShare('clipboard', 'link');
