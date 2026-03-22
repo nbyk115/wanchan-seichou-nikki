@@ -120,8 +120,9 @@ body.ux-dark-on .ux-toast{background:rgba(50,50,70,.95) !important;}
 }
 
 /* Data Backup FAB */
-.ux-backup-fab{position:fixed;bottom:90px;right:16px;z-index:9998;width:48px;height:48px;border-radius:50%;background:#FF7B9C;color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(255,123,156,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s,opacity .2s;font-family:inherit;}
-.ux-backup-fab:active{transform:scale(.9);}
+.ux-backup-fab{position:fixed;bottom:90px;right:16px;z-index:9998;width:48px;height:48px;border-radius:50%;background:#FF7B9C;color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(255,123,156,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s,opacity .2s,left .3s ease,right .3s ease,bottom .3s ease;font-family:inherit;touch-action:none;user-select:none;-webkit-user-select:none;}
+.ux-backup-fab.ux-fab-dragging{transition:none !important;opacity:.85;}
+.ux-backup-fab:active:not(.ux-fab-dragging){transform:scale(.9);}
 .ux-backup-menu{position:fixed;bottom:148px;right:16px;z-index:9998;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.15);padding:8px 0;min-width:180px;opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s;pointer-events:none;}
 .ux-backup-menu.ux-show{opacity:1;transform:translateY(0);pointer-events:auto;}
 .ux-backup-menu button{display:block;width:100%;padding:12px 18px;border:none;background:none;text-align:left;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;color:#333;}
@@ -965,6 +966,159 @@ Error generating stack: `+n.message+`
   backupFab.title = '設定';
   document.body.appendChild(backupFab);
 
+  // --- FAB Drag Logic ---
+  (function() {
+    var fab = backupFab;
+    var dragging = false;
+    var dragMoved = false;
+    var startX = 0, startY = 0;
+    var fabStartLeft = 0, fabStartTop = 0;
+    var DRAG_THRESHOLD = 8;
+    var FAB_SIZE = 48;
+    var EDGE_MARGIN = 16;
+
+    // Restore saved position
+    var saved = null;
+    try { saved = JSON.parse(localStorage.getItem('ux_fab_pos')); } catch(e) {}
+    if (saved && typeof saved.bottom === 'number' && typeof saved.right === 'number') {
+      fab.style.bottom = saved.bottom + 'px';
+      fab.style.right = saved.right + 'px';
+      if (typeof saved.side === 'string' && saved.side === 'left') {
+        fab.style.right = 'auto';
+        fab.style.left = saved.left + 'px';
+      }
+    }
+
+    function getPointerPos(e) {
+      if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      return { x: e.clientX, y: e.clientY };
+    }
+
+    function getSafeArea() {
+      var s = getComputedStyle(document.documentElement);
+      return {
+        top: parseInt(s.getPropertyValue('env(safe-area-inset-top)')) || 0,
+        bottom: parseInt(s.getPropertyValue('env(safe-area-inset-bottom)')) || 0,
+        left: parseInt(s.getPropertyValue('env(safe-area-inset-left)')) || 0,
+        right: parseInt(s.getPropertyValue('env(safe-area-inset-right)')) || 0
+      };
+    }
+
+    function onStart(e) {
+      if (e.button && e.button !== 0) return;
+      var pos = getPointerPos(e);
+      startX = pos.x;
+      startY = pos.y;
+      var rect = fab.getBoundingClientRect();
+      fabStartLeft = rect.left;
+      fabStartTop = rect.top;
+      dragging = true;
+      dragMoved = false;
+      fab.classList.add('ux-fab-dragging');
+      // Switch to left/top positioning for dragging
+      fab.style.left = rect.left + 'px';
+      fab.style.top = rect.top + 'px';
+      fab.style.right = 'auto';
+      fab.style.bottom = 'auto';
+    }
+
+    function onMove(e) {
+      if (!dragging) return;
+      var pos = getPointerPos(e);
+      var dx = pos.x - startX;
+      var dy = pos.y - startY;
+      if (!dragMoved && Math.abs(dx) < DRAG_THRESHOLD && Math.abs(dy) < DRAG_THRESHOLD) return;
+      dragMoved = true;
+      e.preventDefault();
+
+      var vw = window.innerWidth;
+      var vh = window.innerHeight;
+      var safe = getSafeArea();
+      var newLeft = fabStartLeft + dx;
+      var newTop = fabStartTop + dy;
+
+      // Constrain to viewport
+      newLeft = Math.max(EDGE_MARGIN + safe.left, Math.min(newLeft, vw - FAB_SIZE - EDGE_MARGIN - safe.right));
+      newTop = Math.max(EDGE_MARGIN + safe.top, Math.min(newTop, vh - FAB_SIZE - EDGE_MARGIN - safe.bottom));
+
+      fab.style.left = newLeft + 'px';
+      fab.style.top = newTop + 'px';
+    }
+
+    function onEnd(e) {
+      if (!dragging) return;
+      dragging = false;
+      fab.classList.remove('ux-fab-dragging');
+
+      if (!dragMoved) {
+        // Restore to right/bottom positioning (was just a tap)
+        var rect = fab.getBoundingClientRect();
+        fab.style.left = '';
+        fab.style.top = '';
+        fab.style.right = (window.innerWidth - rect.right) + 'px';
+        fab.style.bottom = (window.innerHeight - rect.bottom) + 'px';
+        return;
+      }
+
+      // Snap to nearest horizontal edge
+      var rect = fab.getBoundingClientRect();
+      var vw = window.innerWidth;
+      var vh = window.innerHeight;
+      var safe = getSafeArea();
+      var centerX = rect.left + FAB_SIZE / 2;
+      var bottomVal = vh - rect.bottom;
+
+      fab.style.top = '';
+      fab.style.bottom = Math.max(EDGE_MARGIN + safe.bottom, bottomVal) + 'px';
+
+      if (centerX < vw / 2) {
+        // Snap left
+        fab.style.left = (EDGE_MARGIN + safe.left) + 'px';
+        fab.style.right = 'auto';
+        saveFabPos('left');
+      } else {
+        // Snap right
+        fab.style.left = '';
+        fab.style.right = (EDGE_MARGIN + safe.right) + 'px';
+        saveFabPos('right');
+      }
+    }
+
+    function saveFabPos(side) {
+      var rect = fab.getBoundingClientRect();
+      var vw = window.innerWidth;
+      var vh = window.innerHeight;
+      var data = {
+        side: side,
+        bottom: vh - rect.bottom,
+        right: vw - rect.right,
+        left: rect.left
+      };
+      try { localStorage.setItem('ux_fab_pos', JSON.stringify(data)); } catch(e) {}
+    }
+
+    // Expose dragMoved for click handler
+    fab._isDragMove = function() { return dragMoved; };
+
+    // Expose position update for menu
+    fab._getMenuPosition = function() {
+      var rect = fab.getBoundingClientRect();
+      var vw = window.innerWidth;
+      var side = (rect.left + FAB_SIZE / 2 < vw / 2) ? 'left' : 'right';
+      return { side: side, rect: rect };
+    };
+
+    // Touch events
+    fab.addEventListener('touchstart', onStart, { passive: true });
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('touchend', onEnd);
+    // Mouse events
+    fab.addEventListener('mousedown', onStart);
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onEnd);
+  })();
+  // --- End FAB Drag Logic ---
+
   var backupMenu = document.createElement('div');
   backupMenu.className = 'ux-backup-menu';
 
@@ -974,7 +1128,7 @@ Error generating stack: `+n.message+`
 
   // Login/logout button (appears when Firebase is configured)
   var btnAuth = document.createElement('button');
-  btnAuth.textContent = '☁️ バックアップ・復元';
+  btnAuth.textContent = '☁️ データを安全に保存';
   btnAuth.style.display = 'none';
   var _currentUser = null;
 
@@ -983,7 +1137,7 @@ Error generating stack: `+n.message+`
     var fb = window.__wanchan && window.__wanchan.firebase;
     if (!fb || !fb.isConfigured) return;
     if (_currentUser) {
-      if (!confirm('データの同期を停止しますか？')) return;
+      if (!confirm('クラウド保存を停止しますか？\nこの端末のデータはそのまま残ります。')) return;
       fb.logout().then(function() { showToast('データの同期を停止したよ', 'info'); });
     } else {
       fb.login();
@@ -993,9 +1147,9 @@ Error generating stack: `+n.message+`
   function updateAuthButton(user) {
     _currentUser = user;
     if (user) {
-      btnAuth.textContent = '☁️ 同期中：' + (user.displayName || '').split(' ')[0];
+      btnAuth.textContent = '✅ ' + (user.displayName || '').split(' ')[0] + 'さん（同期中）';
     } else {
-      btnAuth.textContent = '☁️ バックアップ・復元';
+      btnAuth.textContent = '☁️ データを安全に保存';
     }
   }
 
@@ -1048,26 +1202,54 @@ Error generating stack: `+n.message+`
   btnAddDog.textContent = '🐕 わんちゃん追加';
   btnAddDog.addEventListener('click', function() {
     backupMenu.classList.remove('ux-show');
-    // Navigate to settings page via React custom event
-    window.dispatchEvent(new CustomEvent('ux-navigate', { detail: { page: 'settings' } }));
-    var settingsBtn = document.querySelector('[data-page="settings"]');
-    if (settingsBtn) settingsBtn.click();
+    backupFab.setAttribute('aria-expanded', 'false');
+    // Click the bottom nav "メニュー" tab to navigate to settings
+    var navButtons = document.querySelectorAll('nav button, nav a, [role="navigation"] button');
+    var menuBtn = null;
+    navButtons.forEach(function(btn) {
+      if (btn.textContent.includes('メニュー') || btn.textContent.includes('設定')) menuBtn = btn;
+    });
+    if (menuBtn) {
+      menuBtn.click();
+      showToast('メニュー画面から「うちの子を追加」をタップしてね', 'info');
+    } else {
+      showToast('メニュー画面から「うちの子を追加」で登録できるよ', 'info');
+    }
   });
 
-  backupMenu.appendChild(btnAuth);
   backupMenu.appendChild(btnAddDog);
   backupMenu.appendChild(btnAI);
   backupMenu.appendChild(btnNotif);
   backupMenu.appendChild(btnDark);
+  backupMenu.appendChild(btnAuth);
   document.body.appendChild(backupMenu);
 
   backupMenu.setAttribute('role', 'menu');
   backupFab.setAttribute('aria-expanded', 'false');
   backupFab.setAttribute('aria-haspopup', 'true');
   backupFab.addEventListener('click', function() {
+    // Ignore click if it was a drag gesture
+    if (backupFab._isDragMove && backupFab._isDragMove()) return;
+
     var isOpen = backupMenu.classList.toggle('ux-show');
     backupFab.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-    if (isOpen && backupMenu.firstElementChild) backupMenu.firstElementChild.focus();
+
+    // Position menu relative to FAB
+    if (isOpen) {
+      var mp = backupFab._getMenuPosition ? backupFab._getMenuPosition() : { side: 'right', rect: backupFab.getBoundingClientRect() };
+      var fabRect = mp.rect;
+      var menuBottom = (window.innerHeight - fabRect.top + 8) + 'px';
+      backupMenu.style.bottom = menuBottom;
+      backupMenu.style.top = 'auto';
+      if (mp.side === 'left') {
+        backupMenu.style.left = fabRect.left + 'px';
+        backupMenu.style.right = 'auto';
+      } else {
+        backupMenu.style.right = (window.innerWidth - fabRect.right) + 'px';
+        backupMenu.style.left = 'auto';
+      }
+      if (backupMenu.firstElementChild) backupMenu.firstElementChild.focus();
+    }
   });
 
   // Close menu with Escape key
