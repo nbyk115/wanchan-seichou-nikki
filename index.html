@@ -1526,7 +1526,13 @@ Error generating stack: `+n.message+`
   }
 
   // Render switcher after React is loaded
-  setTimeout(renderDogSwitcher, 1000);
+  (function waitForRoot() {
+    if (document.getElementById('root') && document.getElementById('root').children.length > 0) {
+      renderDogSwitcher();
+    } else {
+      setTimeout(waitForRoot, 300);
+    }
+  })();
   // Re-check when data changes
   window.addEventListener('storage', function() { _dogProfileCache = null; _dogProfileCacheKey = ''; setTimeout(renderDogSwitcher, 500); });
 
@@ -1539,8 +1545,7 @@ Error generating stack: `+n.message+`
     var existing = document.querySelector('.ux-add-dog-modal');
     if (existing) existing.remove();
 
-    var isDark = document.body.classList.contains('ux-dark-on') ||
-      (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    var isDark = _isDark();
 
     var selectedBreedIndex = 0;
     var dogName = '';
@@ -1822,8 +1827,7 @@ Error generating stack: `+n.message+`
     var existing = document.getElementById('wanchan-share-sheet');
     if (existing) existing.remove();
 
-    var isDark = document.body.classList.contains('ux-dark-on') ||
-      (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    var isDark = _isDark();
 
     var overlay = document.createElement('div');
     overlay.id = 'wanchan-share-sheet';
@@ -1889,8 +1893,7 @@ Error generating stack: `+n.message+`
     var existing = document.getElementById('wanchan-notif-panel');
     if (existing) existing.remove();
 
-    var isDark = document.body.classList.contains('ux-dark-on') ||
-      (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    var isDark = _isDark();
 
     var overlay = document.createElement('div');
     overlay.id = 'wanchan-notif-panel';
@@ -1992,7 +1995,7 @@ Error generating stack: `+n.message+`
         badge = document.createElement('span');
         badge.className = 'ux-notif-badge';
         badge.style.cssText = 'position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#EF4444;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;pointer-events:none;';
-        backupFab.appendChild(badge);
+        if (backupFab) backupFab.appendChild(badge);
       }
       badge.textContent = count > 9 ? '9+' : count;
     } else if (badge) {
@@ -2007,6 +2010,7 @@ Error generating stack: `+n.message+`
 
     var user = _currentUser;
     if (!user) return;
+    if (typeof fb.getFootprints !== 'function') return;
     fb.getFootprints(user.uid, 10).then(function(footprints) {
       var lastCheck = parseInt(localStorage.getItem('ux_notif_last_check') || '0', 10);
       var newCount = 0;
@@ -2016,7 +2020,7 @@ Error generating stack: `+n.message+`
       });
       if (newCount > 0) {
         _updateNotifBadge(newCount);
-        btnNotif.style.display = '';
+        if (btnNotif) btnNotif.style.display = '';
       }
     }).catch(function() {});
   }
@@ -2028,7 +2032,7 @@ Error generating stack: `+n.message+`
     var fb = window.__wanchan && window.__wanchan.firebase;
     if (fb && fb.isConfigured) {
       clearInterval(_notifCheck);
-      btnNotif.style.display = '';
+      if (btnNotif) btnNotif.style.display = '';
       _checkNewNotifications();
       // Re-check every 2 minutes (store interval for potential cleanup)
       window.__wanchan._notifInterval = setInterval(_checkNewNotifications, 120000);
@@ -2045,6 +2049,7 @@ Error generating stack: `+n.message+`
     // Look for diary entry containers (typically have date + content)
     var entries = document.querySelectorAll('#root [data-entry-id]:not([data-share-added])');
     entries.forEach(function(entry) {
+      if (!entry || !entry.parentNode) return;
       entry.setAttribute('data-share-added', '1');
       var shareBtn = document.createElement('div');
       shareBtn.style.cssText = 'display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:12px;background:transparent;cursor:pointer;font-size:12px;color:#888;margin-top:4px;';
@@ -2320,8 +2325,7 @@ Error generating stack: `+n.message+`
     var existing = document.querySelector('.ux-breed-curve-modal');
     if (existing) existing.remove();
 
-    var isDark = document.body.classList.contains('ux-dark-on') ||
-      (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    var isDark = _isDark();
 
     var data;
     try { data = JSON.parse(localStorage.getItem('wc2') || '{}'); } catch(e) { data = {}; }
@@ -2452,7 +2456,7 @@ Error generating stack: `+n.message+`
         });
 
         if (lastUserMonth >= 0 && lastUserMonth < 12) {
-          var expected = months[lastUserMonth];
+          var expected = months[lastUserMonth] || 0;
           if (expected <= 0) { status.style.display = 'none'; return; } // zero division guard
           var pct = ((lastUserWeight / expected) * 100).toFixed(0);
           var msg = '';
@@ -2527,8 +2531,7 @@ Error generating stack: `+n.message+`
           var textarea = modal.querySelector('textarea');
           if (!textarea || textarea.parentNode.querySelector('.ux-symptom-grid')) return;
 
-          var isDark = document.body.classList.contains('ux-dark-on') ||
-            (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          var isDark = _isDark();
 
           var label = document.createElement('div');
           label.style.cssText = 'font-size:12px;color:' + (isDark ? '#aaa' : '#888') + ';margin-bottom:6px;font-weight:600;';
