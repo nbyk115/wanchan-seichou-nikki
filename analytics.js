@@ -99,18 +99,138 @@ function trackShare(platform, contentType) {
 }
 
 // 6. 足あと閲覧
-function trackFootprintView() {
-  logEvent('footprint_view');
+function trackFootprintView(source, variant, count) {
+  logEvent('footprint_view', {
+    source: source || 'notification',
+    variant: variant || 'none',
+    count: count || 0
+  });
 }
 
 // 7. 犬友リクエスト
-function trackFriendRequest() {
-  logEvent('friend_request');
+function trackFriendRequest(source, variant) {
+  logEvent('friend_request', {
+    source: source || 'unknown',
+    variant: variant || 'none'
+  });
 }
 
 // 8. コメント投稿
-function trackComment() {
-  logEvent('comment_post');
+function trackComment(entryId, wordCount, isReply) {
+  logEvent('comment_post', {
+    entry_id: entryId || '',
+    word_count: wordCount || 0,
+    is_reply: isReply ? 'true' : 'false'
+  });
+}
+
+// ============================================================
+// A/B TEST FRAMEWORK
+// ============================================================
+
+// テスト群の割り当て（Deterministic hashing by user_id）
+function getTestVariant(testId, userId) {
+  if (!userId) return 'control';
+  var hash = 0;
+  var str = testId + '_' + userId;
+  for (var i = 0; i < str.length; i++) {
+    var char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return (Math.abs(hash) % 100) < 50 ? 'control' : 'treatment';
+}
+
+function trackTestExposure(testId, variant) {
+  logEvent('ab_test_exposure', {
+    test_id: testId,
+    variant: variant,
+    timestamp: Date.now()
+  });
+}
+
+// ============================================================
+// COMMUNITY EVENTS (犬友ひろば計測)
+// ============================================================
+
+function trackCommunityTabOpen(tabName, variant) {
+  logEvent('community_tab_open', {
+    tab_name: tabName,
+    variant: variant || 'none'
+  });
+}
+
+function trackCommunityTabSwitch(fromTab, toTab, variant) {
+  logEvent('community_tab_switch', {
+    from_tab: fromTab,
+    to_tab: toTab,
+    variant: variant || 'none'
+  });
+}
+
+function trackFootprintLeave(targetUserId, source) {
+  logEvent('footprint_leave', {
+    target_user_id: targetUserId || '',
+    source: source || 'profile'
+  });
+}
+
+function trackFootprintListView(countShown, variant) {
+  logEvent('footprint_list_view', {
+    count_shown: countShown || 0,
+    variant: variant || 'none'
+  });
+}
+
+function trackFootprintTap(targetUserId) {
+  logEvent('footprint_tap', { target_user_id: targetUserId || '' });
+}
+
+function trackProfileView(source, targetUserId, variant) {
+  logEvent('profile_view', {
+    source: source || 'unknown',
+    target_user_id: targetUserId || '',
+    variant: variant || 'none'
+  });
+}
+
+function trackCarouselSwipe(direction, positionIndex) {
+  logEvent('carousel_swipe', {
+    direction: direction || 'right',
+    position_index: positionIndex || 0
+  });
+}
+
+function trackCommentExpand(entryId, expandedCount) {
+  logEvent('comment_expand', {
+    entry_id: entryId || '',
+    expanded_count: expandedCount || 0
+  });
+}
+
+function trackFriendSearchView(variant, resultCount) {
+  logEvent('friend_search_view', {
+    variant: variant || 'none',
+    result_count: resultCount || 0
+  });
+}
+
+function trackFriendRequestAccept(requestId) {
+  logEvent('friend_request_accept', { request_id: requestId || '' });
+}
+
+function trackDiaryFeedScroll(scrollDepthPct, itemsViewed) {
+  logEvent('diary_feed_scroll', {
+    scroll_depth_pct: scrollDepthPct || 0,
+    items_viewed: itemsViewed || 0
+  });
+}
+
+function trackBlockReport(targetUserId, reason) {
+  logEvent('block_report', {
+    target_user_id: targetUserId || '',
+    reason: reason || 'other'
+  });
 }
 
 // 9. ログイン
@@ -168,6 +288,22 @@ Object.assign(window.__wanchan, {
     trackFriendRequest: trackFriendRequest,
     trackComment: trackComment,
     trackLogin: trackLogin,
-    trackPageView: trackPageView
+    trackPageView: trackPageView,
+    // A/B Test
+    getTestVariant: getTestVariant,
+    trackTestExposure: trackTestExposure,
+    // Community
+    trackCommunityTabOpen: trackCommunityTabOpen,
+    trackCommunityTabSwitch: trackCommunityTabSwitch,
+    trackFootprintLeave: trackFootprintLeave,
+    trackFootprintListView: trackFootprintListView,
+    trackFootprintTap: trackFootprintTap,
+    trackProfileView: trackProfileView,
+    trackCarouselSwipe: trackCarouselSwipe,
+    trackCommentExpand: trackCommentExpand,
+    trackFriendSearchView: trackFriendSearchView,
+    trackFriendRequestAccept: trackFriendRequestAccept,
+    trackDiaryFeedScroll: trackDiaryFeedScroll,
+    trackBlockReport: trackBlockReport
   }
 });
