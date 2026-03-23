@@ -159,38 +159,217 @@ async function syncFromCloud(uid) {
 }
 
 // ============================================================
-// SOCIAL: Footprints (あしあと)
+// SOCIAL: Footprints v2 (あしあと — マージ対応)
 // ============================================================
+
+/**
+ * 足あとを残す（同一訪問者はマージ — mixi仕様準拠）
+ * ドキュメントID: {targetUid}_{visitorUid}
+ */
 async function leaveFootprint(targetUid) {
   if (!isConfigured || !auth.currentUser) return;
+  if (auth.currentUser.uid === targetUid) return; // 自分には足あとを残さない
+
+  const docId = targetUid + '_' + auth.currentUser.uid;
+  const ref = doc(db, 'footprints', docId);
+
   try {
-    await addDoc(collection(db, 'footprints'), {
-      from: auth.currentUser.uid,
-      fromName: auth.currentUser.displayName,
-      fromPhoto: auth.currentUser.photoURL,
-      to: targetUid,
-      createdAt: serverTimestamp()
-    });
+    const existing = await getDoc(ref);
+    if (existing.exists()) {
+      await updateDoc(ref, {
+        updatedAt: serverTimestamp(),
+        visitCount: (existing.data().visitCount || 1) + 1,
+        fromName: auth.currentUser.displayName,
+        fromPhoto: auth.currentUser.photoURL
+      });
+    } else {
+      await setDoc(ref, {
+        from: auth.currentUser.uid,
+        fromName: auth.currentUser.displayName,
+        fromPhoto: auth.currentUser.photoURL,
+        to: targetUid,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        visitCount: 1
+      });
+    }
   } catch (e) {
     console.error('leaveFootprint failed:', e);
   }
 }
 
+/**
+ * 足あとを取得（日付グルーピング対応）
+ * 返り値: { today: [...], yesterday: [...], thisWeek: [...], all: [...] }
+ */
 async function getFootprints(uid, max) {
-  if (!isConfigured) return [];
+  if (!isConfigured) return { today: [], yesterday: [], thisWeek: [], all: [] };
   try {
     max = max || 30;
     const q = query(
       collection(db, 'footprints'),
       where('to', '==', uid),
-      orderBy('createdAt', 'desc'),
+      orderBy('updatedAt', 'desc'),
       limit(max)
     );
     const snap = await getDocs(q);
-    return snap.docs.map(function(d) { return { id: d.id, ...d.data() }; });
+    const items = snap.docs.map(function(d) { return { id: d.id, ...d.data() }; });
+
+    var now = new Date();
+    var todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    var yesterdayStart = todayStart - 86400000;
+    var weekStart = todayStart - (now.getDay() * 86400000);
+    var grouped = { today: [], yesterday: [], thisWeek: [], all: items };
+
+    items.forEach(function(fp) {
+      var ts = fp.updatedAt
+        ? (fp.updatedAt.seconds ? fp.updatedAt.seconds * 1000 : fp.updatedAt)
+        : 0;
+      if (ts >= todayStart) grouped.today.push(fp);
+      else if (ts >= yesterdayStart) grouped.yesterday.push(fp);
+      else if (ts >= weekStart) grouped.thisWeek.push(fp);
+    });
+
+    return grouped;
   } catch (e) {
     console.error('getFootprints failed:', e);
+    return { today: [], yesterday: [], thisWeek: [], all: [] };
+  }
+}
+
+/**
+ * 新着足あと数を取得（既読管理）
+ */
+async function getUnreadFootprintCount(uid) {
+  if (!isConfigured) return 0;
+  try {
+    var statusSnap = await getDoc(doc(db, 'footprintReadStatus', uid));
+    var lastReadAt = (statusSnap.exists() && statusSnap.data().lastReadAt)
+      ? statusSnap.data().lastReadAt : null;
+
+    var q;
+    if (lastReadAt) {
+      q = query(
+        collection(db, 'footprints'),
+        where('to', '==', uid),
+        where('updatedAt', '>', lastReadAt),
+        orderBy('updatedAt', 'desc'),
+        limit(30)
+      );
+    } else {
+      q = query(
+        collection(db, 'footprints'),
+        where('to', '==', uid),
+        orderBy('updatedAt', 'desc'),
+        limit(30)
+      );
+    }
+    var snap = await getDocs(q);
+    return snap.size;
+  } catch (e) {
+    console.error('getUnreadFootprintCount failed:', e);
+    return 0;
+  }
+}
+
+/**
+ * 足あとを既読にする
+ */
+async function markFootprintsRead(uid) {
+  if (!isConfigured) return;
+  try {
+    await setDoc(doc(db, 'footprintReadStatus', uid), { lastReadAt: serverTimestamp() });
+  } catch (e) {
+    console.error('markFootprintsRead failed:', e);
+  }
+}
+
+// ============================================================
+// SOCIAL: Introductions (ひとこと紹介文)
+// ============================================================
+
+/**
+ * ひとこと紹介文を投稿・更新（1ユーザーにつき1件、100文字以内）
+ */
+async function postIntroduction(targetUid, text) {
+  if (!isConfigured || !auth.currentUser) return false;
+  if (auth.currentUser.uid === targetUid) {
+    _toast('自分にひとことは書けません', 'error');
+    return false;
+  }
+  if (!text || text.length === 0 || text.length > 100) {
+    _toast('1〜100文字で入力してください', 'error');
+    return false;
+  }
+
+  var docId = targetUid + '_' + auth.currentUser.uid;
+  var ref = doc(db, 'introductions', docId);
+
+  try {
+    var existing = await getDoc(ref);
+    if (existing.exists()) {
+      await updateDoc(ref, {
+        text: text,
+        updatedAt: serverTimestamp(),
+        authorName: auth.currentUser.displayName,
+        authorPhoto: auth.currentUser.photoURL
+      });
+    } else {
+      await setDoc(ref, {
+        targetUid: targetUid,
+        authorUid: auth.currentUser.uid,
+        authorName: auth.currentUser.displayName,
+        authorPhoto: auth.currentUser.photoURL,
+        text: text,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+    }
+    _toast('ひとことを投稿しました', 'success');
+    return true;
+  } catch (e) {
+    console.error('postIntroduction failed:', e);
+    _toast('ひとことの投稿に失敗しました', 'error');
+    return false;
+  }
+}
+
+/**
+ * 対象ユーザーの紹介文一覧を取得
+ */
+async function getIntroductions(targetUid, max) {
+  if (!isConfigured) return [];
+  try {
+    max = max || 20;
+    var q = query(
+      collection(db, 'introductions'),
+      where('targetUid', '==', targetUid),
+      orderBy('updatedAt', 'desc'),
+      limit(max)
+    );
+    var snap = await getDocs(q);
+    return snap.docs.map(function(d) { return { id: d.id, ...d.data() }; });
+  } catch (e) {
+    console.error('getIntroductions failed:', e);
     return [];
+  }
+}
+
+/**
+ * 紹介文を削除（著者本人 or 対象ユーザー本人）
+ */
+async function deleteIntroduction(targetUid, authorUid) {
+  if (!isConfigured || !auth.currentUser) return;
+  var uid = auth.currentUser.uid;
+  if (uid !== authorUid && uid !== targetUid) return;
+
+  try {
+    var docId = targetUid + '_' + authorUid;
+    await deleteDoc(doc(db, 'introductions', docId));
+    _toast('ひとことを削除しました', 'info');
+  } catch (e) {
+    console.error('deleteIntroduction failed:', e);
+    _toast('削除に失敗しました', 'error');
   }
 }
 
@@ -329,6 +508,11 @@ Object.assign(window.__wanchan, {
     syncFromCloud: syncFromCloud,
     leaveFootprint: leaveFootprint,
     getFootprints: getFootprints,
+    getUnreadFootprintCount: getUnreadFootprintCount,
+    markFootprintsRead: markFootprintsRead,
+    postIntroduction: postIntroduction,
+    getIntroductions: getIntroductions,
+    deleteIntroduction: deleteIntroduction,
     sendFriendRequest: sendFriendRequest,
     acceptFriendRequest: acceptFriendRequest,
     getFriends: getFriends,

@@ -1933,11 +1933,12 @@ Error generating stack: `+n.message+`
         var nc = document.getElementById('notif-content');
         if (nc) nc.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">ログインするとお知らせが届きます</div>';
       } else {
-        fb.getFootprints(user.uid, 20).then(function(footprints) {
+        fb.getFootprints(user.uid, 20).then(function(grouped) {
+          var footprints = grouped.all || grouped;
           var content = document.getElementById('notif-content');
           if (!content) return;
 
-          if (footprints.length === 0) {
+          if (!footprints || footprints.length === 0) {
             content.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;line-height:1.7;">まだお知らせはありません<br><span style="font-size:12px;">犬友ができると足あとが届きます</span></div>';
             return;
           }
@@ -1946,7 +1947,7 @@ Error generating stack: `+n.message+`
           var lastCheckTs = parseInt(localStorage.getItem('ux_notif_last_check') || '0', 10);
 
           footprints.forEach(function(fp) {
-            var ts = fp.createdAt ? (fp.createdAt.seconds ? fp.createdAt.seconds * 1000 : fp.createdAt) : 0;
+            var ts = (fp.updatedAt || fp.createdAt) ? ((fp.updatedAt || fp.createdAt).seconds ? (fp.updatedAt || fp.createdAt).seconds * 1000 : (fp.updatedAt || fp.createdAt)) : 0;
             var isNew = ts > lastCheckTs;
             var date = ts ? new Date(ts) : new Date();
             var timeStr = date.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -1969,8 +1970,9 @@ Error generating stack: `+n.message+`
           });
 
           content.innerHTML = html;
-          // Mark as checked
+          // Mark as checked (both localStorage legacy + Firestore)
           try { localStorage.setItem('ux_notif_last_check', String(Date.now())); } catch(_) {}
+          if (typeof fb.markFootprintsRead === 'function') fb.markFootprintsRead(user.uid);
           _updateNotifBadge(0);
         }).catch(function() {
           var content = document.getElementById('notif-content');
@@ -2010,18 +2012,12 @@ Error generating stack: `+n.message+`
 
     var user = _currentUser;
     if (!user) return;
-    if (typeof fb.getFootprints !== 'function') return;
-    fb.getFootprints(user.uid, 10).then(function(footprints) {
-      var lastCheck = parseInt(localStorage.getItem('ux_notif_last_check') || '0', 10);
-      var newCount = 0;
-      footprints.forEach(function(fp) {
-        var ts = fp.createdAt ? (fp.createdAt.seconds ? fp.createdAt.seconds * 1000 : fp.createdAt) : 0;
-        if (ts > lastCheck) newCount++;
-      });
-      if (newCount > 0) {
-        _updateNotifBadge(newCount);
-        if (btnNotif) btnNotif.style.display = '';
-      }
+    if (typeof fb.getUnreadFootprintCount === 'function') {
+      fb.getUnreadFootprintCount(user.uid).then(function(newCount) {
+        if (newCount > 0) {
+          _updateNotifBadge(newCount);
+          if (btnNotif) btnNotif.style.display = '';
+        }
     }).catch(function() {});
   }
 
@@ -2147,8 +2143,7 @@ Error generating stack: `+n.message+`
     var data = getGrowthData();
     if (!data || (!data.ageText && data.diaryCount === 0)) return;
 
-    var isDark = document.body.classList.contains('ux-dark-on') ||
-      (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    var isDark = _isDark();
 
     var card = document.createElement('div');
     card.className = 'ux-growth-card';
