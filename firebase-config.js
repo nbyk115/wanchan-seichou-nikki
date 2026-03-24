@@ -55,6 +55,7 @@ async function login() {
       photoURL: result.user.photoURL,
       lastLogin: serverTimestamp()
     }, { merge: true });
+    window.dispatchEvent(new CustomEvent('wanchan-login', { detail: { uid: result.user.uid } }));
     return result.user;
   } catch (e) {
     if (e.code === 'auth/popup-blocked' || e.code === 'auth/cancelled-popup-request') {
@@ -63,7 +64,7 @@ async function login() {
       return null;
     }
     if (e.code !== 'auth/popup-closed-by-user') {
-      _toast('ログインに失敗しました', 'error');
+      _toast('ログインがうまくいかなかったみたい。もう一度試してね', 'error');
     }
     return null;
   }
@@ -298,7 +299,7 @@ async function postIntroduction(targetUid, text) {
     return false;
   }
   if (!text || text.length === 0 || text.length > 100) {
-    _toast('1〜100文字で入力してください', 'error');
+    _toast('1〜100文字で書いてね', 'error');
     return false;
   }
 
@@ -329,7 +330,7 @@ async function postIntroduction(targetUid, text) {
     return true;
   } catch (e) {
     console.error('postIntroduction failed:', e);
-    _toast('ひとことの投稿に失敗しました', 'error');
+    _toast('ひとことがうまく届かなかったよ。もう一度試してみてね', 'error');
     return false;
   }
 }
@@ -369,7 +370,7 @@ async function deleteIntroduction(targetUid, authorUid) {
     _toast('ひとことを削除しました', 'info');
   } catch (e) {
     console.error('deleteIntroduction failed:', e);
-    _toast('削除に失敗しました', 'error');
+    _toast('うまく削除できなかったよ。もう一度試してみてね', 'error');
   }
 }
 
@@ -387,7 +388,7 @@ async function sendFriendRequest(targetUid) {
       createdAt: serverTimestamp()
     });
   } catch (e) {
-    _toast('フレンド申請に失敗しました', 'error');
+    _toast('犬友申請がうまくいかなかったよ。もう一度試してみてね', 'error');
     console.error('sendFriendRequest failed:', e);
   }
 }
@@ -408,7 +409,7 @@ async function acceptFriendRequest(requestId, fromUid) {
     });
     await batch.commit();
   } catch (e) {
-    _toast('フレンド承認に失敗しました', 'error');
+    _toast('犬友承認がうまくいかなかったよ。もう一度試してみてね', 'error');
     console.error('acceptFriendRequest failed:', e);
   }
 }
@@ -424,14 +425,14 @@ async function getFriends(uid) {
       const friendUid = users[0] === uid ? users[1] : users[0];
       if (friendUids.indexOf(friendUid) === -1) friendUids.push(friendUid);
     });
-    const friends = [];
-    for (const fuid of friendUids) {
+    const friends = await Promise.all(friendUids.map(async function(fuid) {
       try {
         const uSnap = await getDoc(doc(db, 'users', fuid));
-        if (uSnap.exists()) friends.push({ uid: fuid, ...uSnap.data() });
+        if (uSnap.exists()) return { uid: fuid, ...uSnap.data() };
       } catch (_) {}
-    }
-    return friends;
+      return null;
+    }));
+    return friends.filter(Boolean);
   } catch (e) {
     console.error('getFriends failed:', e);
     return [];
@@ -453,7 +454,7 @@ async function postComment(entryId, text) {
       createdAt: serverTimestamp()
     });
   } catch (e) {
-    _toast('コメント投稿に失敗しました', 'error');
+    _toast('コメントがうまく届かなかったよ。もう一度試してみてね', 'error');
     console.error('postComment failed:', e);
   }
 }

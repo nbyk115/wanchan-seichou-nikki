@@ -244,6 +244,18 @@ function trackPageView(pageName) {
 }
 
 // ============================================================
+// LOGIN EVENT BRIDGE
+// firebase-config.js が dispatch する CustomEvent を受け取り
+// setUser + trackLogin を実行（循環依存を避けるための疎結合設計）
+// ============================================================
+window.addEventListener('wanchan-login', function(e) {
+  if (e.detail && e.detail.uid) {
+    setUser(e.detail.uid);
+    trackLogin();
+  }
+});
+
+// ============================================================
 // AUTO-TRACKING: Session & Page Views
 // ============================================================
 (function autoTrack() {
