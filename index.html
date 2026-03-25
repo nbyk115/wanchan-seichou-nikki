@@ -347,15 +347,17 @@ body.ux-dark-on .ux-symptom-chip.ux-selected{border-color:#FF7B9C;background:#3a
 }
 
 /* PWA Install Banner */
-.ux-pwa-banner{position:fixed;bottom:0;left:0;right:0;z-index:9992;padding:16px 20px env(safe-area-inset-bottom,16px);background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -4px 24px rgba(0,0,0,.1);animation:ux-slide-up .3s ease;display:flex;align-items:center;gap:14px;}
-.ux-pwa-banner-icon{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#FF7B9C,#FF9B6A);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.ux-pwa-banner{position:fixed;bottom:0;left:0;right:0;z-index:9992;padding:16px 20px env(safe-area-inset-bottom,16px);background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -4px 24px rgba(255,123,156,.12),0 -1px 0 rgba(255,123,156,.15);border-top:2px solid rgba(255,123,156,.18);animation:ux-slide-up .3s ease;display:flex;align-items:center;gap:14px;}
+.ux-pwa-banner-icon{width:48px;height:48px;border-radius:var(--wc-radius-card);background:linear-gradient(135deg,var(--wc-grad-start),var(--wc-grad-end));display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;box-shadow:0 4px 10px rgba(255,123,156,.3);}
 .ux-pwa-banner-text{flex:1;}
-.ux-pwa-banner-title{font-size:14px;font-weight:900;margin-bottom:2px;}
-.ux-pwa-banner-sub{font-size:12px;color:#636363;}
+.ux-pwa-banner-title{font-size:14px;font-weight:900;color:var(--wc-text);margin-bottom:2px;}
+.ux-pwa-banner-sub{font-size:12px;color:#7A6060;}
 .ux-pwa-banner-actions{display:flex;gap:8px;flex-shrink:0;}
-.ux-pwa-banner-actions button{padding:10px 16px;border-radius:12px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
-.ux-pwa-install-btn{background:#FF7B9C;color:#fff;}
-.ux-pwa-dismiss-btn{background:#f0f0f0;color:#636363;}
+.ux-pwa-banner-actions button{padding:10px 16px;border-radius:var(--wc-radius-btn);border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .15s,opacity .15s;}
+.ux-pwa-banner-actions button:active{transform:scale(.95);}
+.ux-pwa-install-btn{background:linear-gradient(135deg,var(--wc-grad-start),var(--wc-grad-end));color:#fff;box-shadow:0 4px 12px rgba(255,123,156,.35);}
+.ux-pwa-install-btn:hover{opacity:.9;}
+.ux-pwa-dismiss-btn{background:#F0E8E6;color:#7A6060;}
 @keyframes ux-slide-up{from{transform:translateY(100%);}to{transform:translateY(0);}}
 body.ux-dark-on .ux-pwa-banner{background:#1e1e2e;}
 body.ux-dark-on .ux-pwa-banner-title{color:#F0F0F0;}
@@ -1261,7 +1263,7 @@ Error generating stack: `+n.message+`
     setTimeout(function() {
       clearInterval(_aiCheck);
       if (!(window.__wanchan && window.__wanchan.ai && window.__wanchan.ai.showConsultation)) {
-        showToast('AI相談の読み込みに失敗しました。ページを再読み込みしてね', 'error');
+        showToast('AI相談がうまく開けなかったよ。一度アプリを開き直してみてね', 'error');
       }
     }, 3000);
   });
@@ -1294,7 +1296,7 @@ Error generating stack: `+n.message+`
         // Delay reload to let user see the success toast
         setTimeout(function() { location.reload(); }, 1500);
       } catch(err) {
-        showToast('追加に失敗しました', 'error');
+        showToast('うまく追加できなかったよ。もう一度試してみてね', 'error');
       }
     });
   });
@@ -1412,7 +1414,7 @@ Error generating stack: `+n.message+`
 
     var skip = document.createElement('button');
     skip.className = 'ux-ob-skip';
-    skip.textContent = 'すでにデータがあります';
+    skip.textContent = '以前のデータを引き継ぐ';
 
     function closeOnboard() {
       safeSetItem('ux_onboarded', '1');
@@ -1420,7 +1422,10 @@ Error generating stack: `+n.message+`
       setTimeout(function() { overlay.remove(); }, 500);
     }
 
-    start.addEventListener('click', closeOnboard);
+    start.addEventListener('click', function() {
+      closeOnboard();
+      setTimeout(function() { showAddDogModal(function() {}); }, 550);
+    });
     skip.addEventListener('click', closeOnboard);
 
     overlay.appendChild(paw);
@@ -1818,7 +1823,7 @@ Error generating stack: `+n.message+`
                 setTimeout(function() { location.reload(); }, 1500);
               } catch(err) {
                 console.error('Add dog error:', err);
-                showToast('追加に失敗しました', 'error');
+                showToast('うまく追加できなかったよ。もう一度試してみてね', 'error');
               }
             });
           }, true); // Use capture phase to intercept before React
@@ -1984,7 +1989,7 @@ Error generating stack: `+n.message+`
       var user = _currentUser;
       if (!user) {
         var nc = document.getElementById('notif-content');
-        if (nc) nc.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">ログインするとお知らせが届きます</div>';
+        if (nc) nc.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">犬友と繋がったら、ここに足あとが届くよ</div>';
       } else {
         fb.getFootprints(user.uid, 20).then(function(grouped) {
           var footprints = grouped.all || grouped;
@@ -2038,7 +2043,7 @@ Error generating stack: `+n.message+`
       }
     } else {
       var ncFb = document.getElementById('notif-content');
-      if (ncFb) ncFb.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">ログインするとお知らせが届きます</div>';
+      if (ncFb) ncFb.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">犬友と繋がったら、ここに足あとが届くよ</div>';
     }
   }
 
@@ -2216,7 +2221,7 @@ Error generating stack: `+n.message+`
       html += '<div class="ux-growth-card-milestone" style="color:' + (isDark ? '#FFD700' : '#B45309') + ';">' + data.milestone + '</div>';
     }
 
-    html += '<div class="ux-growth-share"><button id="ux-growth-share-btn">📤 成長をみんなにシェアしてね</button></div>';
+    html += '<div class="ux-growth-share"><button id="ux-growth-share-btn">📤 みんなに見せてあげよう</button></div>';
 
     card.innerHTML = html;
 
@@ -2489,7 +2494,7 @@ Error generating stack: `+n.message+`
         var label = document.createElement('div');
         label.className = 'ux-breed-curve-label';
         label.style.cssText = 'position:absolute;bottom:-18px;left:' + x + 'px;width:' + barWidth + 'px;';
-        label.textContent = (i + 1) + 'M';
+        label.textContent = (i + 1) + 'ヶ月';
         chart.appendChild(label);
       }
 
@@ -2630,7 +2635,7 @@ Error generating stack: `+n.message+`
 
           // Medical disclaimer
           var disclaimer = document.createElement('div');
-          disclaimer.style.cssText = 'font-size:11px;color:' + (isDark ? '#777' : '#aaa') + ';margin:8px 0 4px;line-height:1.5;';
+          disclaimer.style.cssText = 'font-size:12px;font-weight:600;color:' + (isDark ? '#fbbf24' : '#92400e') + ';background:' + (isDark ? 'rgba(251,191,36,.1)' : 'rgba(245,158,11,.08)') + ';border-left:3px solid ' + (isDark ? '#fbbf24' : '#f59e0b') + ';padding:8px 12px;border-radius:0 8px 8px 0;margin:8px 0 12px;line-height:1.6;';
           disclaimer.textContent = '※ AIの回答は参考情報だよ。心配なときは獣医さんに相談してね。';
 
           textarea.parentNode.insertBefore(label, textarea);
