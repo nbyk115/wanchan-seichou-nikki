@@ -17,7 +17,7 @@
 const AI_CONFIG = {
   // プロキシエンドポイント（Cloud Functions / Vercel 等）
   // ユーザーからのリクエストを受け取り、サーバー側で Claude API を呼ぶ
-  endpoint: '',
+  endpoint: '/api/ai',
   // 無料枠: 月5回
   freeLimit: 5,
   // モデル指定（プロキシ側で使用）
@@ -196,17 +196,28 @@ async function askAI(question) {
   }
 
   try {
+    // Firebase IDトークンを取得（認証済みの場合）
+    var idToken = '';
+    try {
+      var fb = window.__wanchan && window.__wanchan.firebase;
+      if (fb && fb._getIdToken) {
+        idToken = await fb._getIdToken();
+      }
+    } catch (_authErr) {
+      console.warn('Failed to get ID token:', _authErr);
+    }
+
+    var headers = { 'Content-Type': 'application/json' };
+    if (idToken) headers['Authorization'] = 'Bearer ' + idToken;
+
     var controller = new AbortController();
     var timeoutId = setTimeout(function() { controller.abort(); }, 15000);
     var res = await fetch(AI_CONFIG.endpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: headers,
       signal: controller.signal,
       body: JSON.stringify({
-        message: userMessage,
-        // システムプロンプトはサーバー側で固定すべき。クライアント送信はフォールバック用
-        systemPromptVersion: '2',
-        model: AI_CONFIG.model
+        message: userMessage
       })
     });
     clearTimeout(timeoutId);
@@ -214,7 +225,20 @@ async function askAI(question) {
     if (res.status === 429) {
       return { error: 'ちょっと混み合っているみたい。少し時間をおいてからもう一度試してね', rateLimited: true };
     }
-    if (res.status === 401 || res.status === 403) {
+    if (res.status === 401) {
+      return { error: 'ログインしてからもう一度試してね' };
+    }
+    if (res.status === 403) {
+      // サーバー側の利用回数制限チェック
+      try {
+        var errData = await res.json();
+        if (errData.limitReached) {
+          return {
+            error: '今月の無料相談回数（' + AI_CONFIG.freeLimit + '回）を使い切ったよ。\nもっと相談したい？ プレミアムなら何回でも使えるよ',
+            limitReached: true
+          };
+        }
+      } catch (_) {}
       return { error: 'うまくつながらなかったみたい。ページを更新してもう一度試してね' };
     }
     if (!res.ok) {
@@ -236,13 +260,14 @@ async function askAI(question) {
     }
 
     if (answer) {
+      // サーバー側で利用回数を管理しているため、クライアント側もlocalStorageを同期
       incrementUsage();
       saveToHistory(question, answer);
       // Analytics event
-      _trackEvent('ai_consultation', { question_length: question.length });
+      _trackEvent('ai_consultation', { question_length: question.length, fallback: !!data.fallback });
     }
 
-    return { answer: answer };
+    return { answer: answer, fallback: data.fallback || false };
   } catch (e) {
     console.error('AI consultation error:', e);
     if (e.name === 'AbortError') {
