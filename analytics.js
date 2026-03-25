@@ -262,20 +262,22 @@ function trackPageView(pageName) {
   } catch (e) {}
 
   // Track when user has used the app this week (WAD calculation)
-  var today = new Date().toISOString().slice(0, 10);
-  var lastActive = localStorage.getItem('ux_last_active_date');
-  if (lastActive !== today) {
-    localStorage.setItem('ux_last_active_date', today);
-    logEvent('daily_active');
-  }
+  try {
+    var today = new Date().toISOString().slice(0, 10);
+    var lastActive = localStorage.getItem('ux_last_active_date');
+    if (lastActive !== today) {
+      localStorage.setItem('ux_last_active_date', today);
+      logEvent('daily_active');
+    }
+  } catch (_lsErr) {}
 })();
 
 // ============================================================
 // EXPOSE TO APP
 // ============================================================
-window.__wanchan = window.__wanchan || {};
-Object.assign(window.__wanchan, {
-  analytics: {
+// Ensure namespace exists without overwriting other modules' additions
+if (!window.__wanchan) window.__wanchan = {};
+window.__wanchan.analytics = {
     logEvent: logEvent,
     setUser: setUser,
     setProperties: setProperties,
@@ -305,5 +307,4 @@ Object.assign(window.__wanchan, {
     trackFriendRequestAccept: trackFriendRequestAccept,
     trackDiaryFeedScroll: trackDiaryFeedScroll,
     trackBlockReport: trackBlockReport
-  }
-});
+  };

@@ -53,6 +53,11 @@ function isPremium() {
     if (!data) return false;
     var parsed = JSON.parse(data);
     if (!parsed || !parsed.expiresAt) return false;
+    // 簡易改竄検知（チェックサム検証）
+    if (parsed._cs !== undefined && parsed._cs !== _computeChecksum(parsed)) {
+      console.warn('Premium status checksum mismatch - possible tampering');
+      return false;
+    }
     return Date.now() < parsed.expiresAt;
   } catch (e) {
     return false;
@@ -60,11 +65,28 @@ function isPremium() {
 }
 
 function setPremiumStatus(planId, expiresAt) {
-  localStorage.setItem('wanchan_premium', JSON.stringify({
-    planId: planId,
-    activatedAt: Date.now(),
-    expiresAt: expiresAt
-  }));
+  try {
+    var data = {
+      planId: planId,
+      activatedAt: Date.now(),
+      expiresAt: expiresAt
+    };
+    // 簡易改竄検知用チェックサム（完全な保護にはサーバーサイド検証が必要）
+    data._cs = _computeChecksum(data);
+    localStorage.setItem('wanchan_premium', JSON.stringify(data));
+  } catch (e) {
+    console.error('Failed to save premium status:', e);
+  }
+}
+
+function _computeChecksum(data) {
+  var str = String(data.planId) + '|' + String(data.activatedAt) + '|' + String(data.expiresAt) + '|wanchan2024';
+  var hash = 0;
+  for (var i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return hash;
 }
 
 function getPremiumInfo() {
@@ -97,13 +119,25 @@ async function createSession(planKey) {
   }
 
   try {
+    // 金額はサーバー側でplanKeyから決定すべき（クライアント送信の金額は改竄リスクあり）
+    var headers = { 'Content-Type': 'application/json' };
+    // Firebase IDトークンがあれば認証ヘッダーに追加
+    try {
+      var fb = window.__wanchan && window.__wanchan.firebase;
+      if (fb && fb._getIdToken) {
+        var idToken = await fb._getIdToken();
+        if (idToken) headers['Authorization'] = 'Bearer ' + idToken;
+      }
+    } catch (_authErr) {}
+
+    var controller = new AbortController();
+    var timeoutId = setTimeout(function() { controller.abort(); }, 30000);
+
     var res = await fetch(KOMOJU_CONFIG.sessionEndpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: headers,
+      signal: controller.signal,
       body: JSON.stringify({
-        amount: plan.amount,
-        currency: plan.currency,
-        planId: plan.id,
         planKey: planKey,
         metadata: {
           app: 'wanchan-diary',
@@ -111,6 +145,7 @@ async function createSession(planKey) {
         }
       })
     });
+    clearTimeout(timeoutId);
 
     if (!res.ok) {
       throw new Error('Session creation failed: ' + res.status);
@@ -132,11 +167,23 @@ async function startPayment(planKey) {
   var session = await createSession(planKey);
   if (!session || !session.session_url) return;
 
-  // KOMOJU hosted payment page に遷移
+  // KOMOJU hosted payment page に遷移（URLドメインをホワイトリスト検証）
+  try {
+    var url = new URL(session.session_url);
+    if (!url.hostname.endsWith('komoju.com') && !url.hostname.endsWith('degica.com')) {
+      console.error('Unexpected payment URL domain:', url.hostname);
+      _toast('決済URLが不正です', 'error');
+      return;
+    }
+  } catch (e) {
+    console.error('Invalid payment URL:', session.session_url);
+    _toast('決済URLが不正です', 'error');
+    return;
+  }
   window.location.href = session.session_url;
 }
 
-function handlePaymentCallback() {
+async function handlePaymentCallback() {
   var params = new URLSearchParams(window.location.search);
   var sessionId = params.get('session_id');
   var status = params.get('status');
@@ -148,7 +195,33 @@ function handlePaymentCallback() {
   window.history.replaceState({}, '', cleanUrl);
 
   if (status === 'completed' || status === 'captured') {
-    // 決済成功
+    // サーバーサイドでセッションを検証（URLパラメータだけでは偽装可能）
+    if (KOMOJU_CONFIG.sessionEndpoint) {
+      try {
+        var verifyRes = await fetch(KOMOJU_CONFIG.sessionEndpoint + '/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ session_id: sessionId })
+        });
+        if (!verifyRes.ok) {
+          _toast('決済の検証に失敗しました。サポートにお問い合わせください', 'error');
+          console.error('Payment verification failed:', verifyRes.status);
+          return;
+        }
+        var verifyData = await verifyRes.json();
+        if (verifyData.status !== 'completed' && verifyData.status !== 'captured') {
+          _toast('決済が完了していません', 'error');
+          return;
+        }
+      } catch (e) {
+        console.error('Payment verification error:', e);
+        // サーバー検証が失敗した場合、ローカルのみのフォールバック（警告付き）
+        console.warn('SECURITY WARNING: Server-side verification unavailable, falling back to client-side. Configure sessionEndpoint/verify for production.');
+      }
+    } else {
+      console.warn('SECURITY WARNING: No sessionEndpoint configured. Payment status not verified server-side.');
+    }
+
     var planKey = params.get('plan') || 'monthly';
     var plan = KOMOJU_CONFIG.plans[planKey];
     var duration = planKey === 'yearly' ? 365 * 24 * 60 * 60 * 1000 : 30 * 24 * 60 * 60 * 1000;

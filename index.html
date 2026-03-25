@@ -516,6 +516,23 @@ Error generating stack: `+n.message+`
   window.__wanchan = window.__wanchan || {};
   window.__wanchan.showToast = showToast;
 
+  // Firebase auth user reference (set via onAuth callback)
+  var _currentUser = null;
+  // Listen for auth state from firebase-config.js module
+  (function() {
+    var _authCheckInterval = setInterval(function() {
+      var fb = window.__wanchan && window.__wanchan.firebase;
+      if (fb && fb.isConfigured && fb.onAuth) {
+        clearInterval(_authCheckInterval);
+        fb.onAuth(function(user) {
+          _currentUser = user;
+        });
+      }
+    }, 200);
+    // Give up after 30s
+    setTimeout(function() { clearInterval(_authCheckInterval); }, 30000);
+  })();
+
   /* ==============================
      2. ENHANCED DELETE CONFIRMATION
      ============================== */
@@ -650,6 +667,12 @@ Error generating stack: `+n.message+`
       img.addEventListener('load', function() {
         img.classList.add('ux-loaded');
       }, {once: true});
+      img.addEventListener('error', function() {
+        // Show image even on error (with broken icon) rather than hiding permanently
+        img.classList.add('ux-loaded');
+        // Set a placeholder alt if none exists
+        if (!img.alt) img.alt = '画像を読み込めませんでした';
+      }, {once: true});
       // Fallback: show after 3s to prevent permanently hidden images
       setTimeout(function(){ img.classList.add('ux-loaded'); }, 3000);
     });
@@ -770,9 +793,36 @@ Error generating stack: `+n.message+`
     }
   }
 
+  // Unified MutationObserver: consolidate all observers into one to avoid
+  // redundant DOM scans (was 3 separate observers on #root with subtree:true)
+  var _screenLastScreen = '';
+  var _screenPopInProgress = false;
+
+  function _detectCurrentScreen() {
+    var activeNav = document.querySelector('[data-page].active, nav [style*="color: rgb(255, 123, 156)"], nav [style*="#FF7B9C"]');
+    if (!activeNav) return '';
+    return activeNav.getAttribute('data-page') || activeNav.textContent.trim() || '';
+  }
+
+  function _handleScreenChange() {
+    if (_screenPopInProgress) return;
+    var screen = _detectCurrentScreen();
+    if (screen && screen !== _screenLastScreen) {
+      if (_screenLastScreen === '') {
+        window.history.replaceState({ screen: screen }, '');
+      } else {
+        window.history.pushState({ screen: screen }, '');
+      }
+      _screenLastScreen = screen;
+    }
+  }
+
   var observer = new MutationObserver(function() {
     clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(runAllEnhancements, 150);
+    debounceTimer = setTimeout(function() {
+      runAllEnhancements();
+      _handleScreenChange();
+    }, 150);
   });
 
   // Start observing when root is ready
@@ -794,40 +844,7 @@ Error generating stack: `+n.message+`
      10b. HISTORY API INTEGRATION (スワイプバック対応)
      ============================== */
   (function() {
-    var _lastScreen = '';
-    var _popInProgress = false;
-
-    // Detect screen changes by observing bottom nav active state
-    function detectCurrentScreen() {
-      var activeNav = document.querySelector('[data-page].active, nav [style*="color: rgb(255, 123, 156)"], nav [style*="#FF7B9C"]');
-      if (!activeNav) return '';
-      return activeNav.getAttribute('data-page') || activeNav.textContent.trim() || '';
-    }
-
-    // Sync React navigation with History API
-    var screenObserver = new MutationObserver(function() {
-      if (_popInProgress) return;
-      var screen = detectCurrentScreen();
-      if (screen && screen !== _lastScreen) {
-        if (_lastScreen === '') {
-          window.history.replaceState({ screen: screen }, '');
-        } else {
-          window.history.pushState({ screen: screen }, '');
-        }
-        _lastScreen = screen;
-      }
-    });
-
-    // Observe root for navigation changes
-    function startScreenObserver() {
-      var root = document.getElementById('root');
-      if (root) {
-        screenObserver.observe(root, { childList: true, subtree: true });
-      } else {
-        setTimeout(startScreenObserver, 500);
-      }
-    }
-    setTimeout(startScreenObserver, 1000);
+    // Screen observation is now handled by the unified MutationObserver above
 
     // Handle browser back (swipe back / back button)
     window.addEventListener('popstate', function(e) {
@@ -877,10 +894,10 @@ Error generating stack: `+n.message+`
   try {
     var _wp = JSON.parse(localStorage.getItem('wp') || '{}');
     if (!_wp.on) {
-      localStorage.setItem('wp', JSON.stringify({on: true, exp: "2099-12-31T00:00:00.000Z"}));
+      try { localStorage.setItem('wp', JSON.stringify({on: true, exp: "2099-12-31T00:00:00.000Z"})); } catch(_) {}
     }
   } catch(e) {
-    try { localStorage.setItem('wp', JSON.stringify({on: true, exp: "2099-12-31T00:00:00.000Z"})); } catch(_) {}
+    // localStorage unavailable (e.g. Safari Private Browsing) — skip silently
   }
   // Sync React dark flag on page load
   try {
@@ -1022,7 +1039,7 @@ Error generating stack: `+n.message+`
     var dragMoved = false;
     var startX = 0, startY = 0;
     var fabStartLeft = 0, fabStartTop = 0;
-    var DRAG_THRESHOLD = 8;
+    var DRAG_THRESHOLD = 15; // Increased from 8 to reduce tap/drag misdetection on mobile
     var FAB_SIZE = 48;
     var EDGE_MARGIN = 16;
 
@@ -1043,31 +1060,26 @@ Error generating stack: `+n.message+`
       return { x: e.clientX, y: e.clientY };
     }
 
+    // Cache safe area values to avoid layout thrashing during drag
+    var _safeAreaCache = null;
+    var _safeAreaCacheTime = 0;
     function getSafeArea() {
-      // env() values cannot be read via getComputedStyle directly.
-      // Use CSS custom properties set on :root as a bridge.
+      // Return cached value if measured within last 5 seconds
+      if (_safeAreaCache && (Date.now() - _safeAreaCacheTime) < 5000) return _safeAreaCache;
+
       var el = document.documentElement;
       if (!el.style.getPropertyValue('--sat')) {
         el.style.setProperty('--sat', 'env(safe-area-inset-top, 0px)');
         el.style.setProperty('--sab', 'env(safe-area-inset-bottom, 0px)');
-        el.style.setProperty('--sal', 'env(safe-area-inset-left, 0px)');
-        el.style.setProperty('--sar', 'env(safe-area-inset-right, 0px)');
       }
-      // Create a temporary element to measure actual computed values
       var probe = document.createElement('div');
       probe.style.cssText = 'position:fixed;visibility:hidden;top:env(safe-area-inset-top,0px);left:0;';
       document.body.appendChild(probe);
       var top = parseInt(getComputedStyle(probe).top) || 0;
-      probe.style.top = '';
-      probe.style.bottom = 'env(safe-area-inset-bottom,0px)';
-      // For bottom we read as offset from bottom edge
       document.body.removeChild(probe);
-      return {
-        top: top,
-        bottom: 0, // fallback; precise measurement requires layout tricks
-        left: 0,
-        right: 0
-      };
+      _safeAreaCache = { top: top, bottom: 0, left: 0, right: 0 };
+      _safeAreaCacheTime = Date.now();
+      return _safeAreaCache;
     }
 
     function onStart(e) {
@@ -1738,43 +1750,42 @@ Error generating stack: `+n.message+`
   };
 
   // Watch for React's add-dog button and replace its behavior
+  // Integrated into unified MutationObserver (no separate observer needed)
   function hookAddDogButton() {
-    var observer = new MutationObserver(function() {
-      // Find the "＋ わんちゃんを追加" button in React settings
-      var allDivs = document.querySelectorAll('#root div[style*="cursor"]');
-      allDivs.forEach(function(div) {
-        if (div.textContent.trim() === '＋ わんちゃんを追加' && !div._uxHooked) {
-          div._uxHooked = true;
-          div.addEventListener('click', function(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            showAddDogModal(function(name, breed) {
-              // Trigger React state update by finding the app's update function
-              // We'll simulate by storing data and triggering the original flow
-              try {
-                var wcData = JSON.parse(localStorage.getItem('wc2') || '{}');
-                var pets = wcData.pets || [];
-                pets.push({ id: 'pet' + Date.now(), name: name, breed: breed, avi: null, sfx: 'ちゃん' });
-                wcData.pets = pets;
-                safeSetItem('wc2', JSON.stringify(wcData));
-                showToast(name + 'ちゃんを追加しました！', 'success');
-                // Trigger React re-render
-                window.dispatchEvent(new StorageEvent('storage', { key: 'wc2' }));
-                window.dispatchEvent(new CustomEvent('wanchan-dog-added'));
-                // Delay reload to let user see the success toast
-                setTimeout(function() { location.reload(); }, 1500);
-              } catch(err) {
-                console.error('Add dog error:', err);
-                showToast('追加に失敗しました', 'error');
-              }
-            });
-          }, true); // Use capture phase to intercept before React
-        }
-      });
+    var allDivs = document.querySelectorAll('#root div[style*="cursor"]');
+    allDivs.forEach(function(div) {
+      if (div.textContent.trim() === '＋ わんちゃんを追加' && !div._uxHooked) {
+        div._uxHooked = true;
+        div.addEventListener('click', function(e) {
+          e.stopPropagation();
+          e.preventDefault();
+          showAddDogModal(function(name, breed) {
+            try {
+              var wcData = JSON.parse(localStorage.getItem('wc2') || '{}');
+              var pets = wcData.pets || [];
+              pets.push({ id: 'pet' + Date.now(), name: name, breed: breed, avi: null, sfx: 'ちゃん' });
+              wcData.pets = pets;
+              safeSetItem('wc2', JSON.stringify(wcData));
+              showToast(name + 'ちゃんを追加しました！', 'success');
+              window.dispatchEvent(new StorageEvent('storage', { key: 'wc2' }));
+              window.dispatchEvent(new CustomEvent('wanchan-dog-added'));
+              setTimeout(function() { location.reload(); }, 1500);
+            } catch(err) {
+              console.error('Add dog error:', err);
+              showToast('追加に失敗しました', 'error');
+            }
+          });
+        }, true);
+      }
     });
-    observer.observe(document.getElementById('root') || document.body, { childList: true, subtree: true });
   }
-  setTimeout(hookAddDogButton, 1000);
+
+  // Chain hookAddDogButton into the unified MutationObserver via runAllEnhancements
+  var _origRunAllForDog = runAllEnhancements;
+  runAllEnhancements = function() {
+    _origRunAllForDog();
+    hookAddDogButton();
+  };
 
   /* ==============================
      16. SNS SHARE (シェア機能)
@@ -1902,7 +1913,7 @@ Error generating stack: `+n.message+`
     var panel = document.createElement('div');
     panel.style.cssText = 'background:' + (isDark ? '#1e1e2e' : '#fff') + ';border-radius:20px 20px 0 0;max-width:500px;width:100%;padding:24px 20px env(safe-area-inset-bottom,20px);max-height:70vh;overflow-y:auto;';
 
-    panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div style="font-size:18px;font-weight:900;color:' + (isDark ? '#e0e0e0' : '#333') + ';">🔔 お知らせ</div><div id="notif-close" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:' + (isDark ? '#333' : '#f0f0f0') + ';cursor:pointer;font-size:14px;">✕</div></div><div id="notif-content" style="text-align:center;padding:20px;"><div class="ux-spinner" style="width:24px;height:24px;border-width:2.5px;color:#FF7B9C;margin:0 auto;"></div></div>';
+    panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div style="font-size:18px;font-weight:900;color:' + (isDark ? '#e0e0e0' : '#333') + ';">🔔 お知らせ</div><button id="notif-close" role="button" aria-label="閉じる" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:' + (isDark ? '#333' : '#f0f0f0') + ';cursor:pointer;font-size:14px;border:none;font-family:inherit;">✕</button></div><div id="notif-content" style="text-align:center;padding:20px;"><div class="ux-spinner" style="width:24px;height:24px;border-width:2.5px;color:#FF7B9C;margin:0 auto;"></div></div>';
 
     overlay.appendChild(panel);
     document.body.appendChild(overlay);
@@ -2018,7 +2029,8 @@ Error generating stack: `+n.message+`
           _updateNotifBadge(newCount);
           if (btnNotif) btnNotif.style.display = '';
         }
-    }).catch(function() {});
+      }).catch(function() {});
+    }
   }
 
   // Show notification button for logged-in users & check for new notifications
@@ -2047,9 +2059,10 @@ Error generating stack: `+n.message+`
     entries.forEach(function(entry) {
       if (!entry || !entry.parentNode) return;
       entry.setAttribute('data-share-added', '1');
-      var shareBtn = document.createElement('div');
-      shareBtn.style.cssText = 'display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:12px;background:transparent;cursor:pointer;font-size:12px;color:#888;margin-top:4px;';
+      var shareBtn = document.createElement('button');
+      shareBtn.style.cssText = 'display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:12px;background:transparent;cursor:pointer;font-size:12px;color:#888;margin-top:4px;border:none;font-family:inherit;';
       shareBtn.textContent = '📤 シェア';
+      shareBtn.setAttribute('aria-label', 'この日記をシェア');
       shareBtn.addEventListener('click', function(e) {
         e.stopPropagation();
         var text = 'わんちゃん成長日記で記録中！ #わんちゃん成長日記';
@@ -2316,6 +2329,34 @@ Error generating stack: `+n.message+`
     'ミニチュアシュナウザー': { m: [0.3, 0.8, 1.5, 2.5, 3.5, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5], max: 9 }
   };
 
+  // ADD_DOG_BREEDS の略称 → BREED_CURVES の正式名マッピング
+  var BREED_ALIAS = {
+    'ダックス': 'ミニチュアダックスフンド',
+    'フレブル': 'フレンチブルドッグ',
+    'ゴールデン': 'ゴールデンレトリバー',
+    'ハスキー': null, // 成長曲線データなし
+    'ラブラドール': 'ラブラドールレトリバー',
+    'ボーダーコリー': null,
+    '秋田犬': null,
+    'ビーグル': null,
+    'コーギー': null,
+    'MIX': null,
+    'その他': null
+  };
+
+  // 犬種名を正規化（略称→正式名に変換）
+  function resolveBreedName(breed) {
+    if (!breed) return '';
+    if (BREED_CURVES[breed]) return breed;
+    if (BREED_ALIAS[breed] !== undefined) return BREED_ALIAS[breed] || '';
+    // 部分一致フォールバック
+    var keys = Object.keys(BREED_CURVES);
+    for (var i = 0; i < keys.length; i++) {
+      if (keys[i].indexOf(breed) !== -1 || breed.indexOf(keys[i]) !== -1) return keys[i];
+    }
+    return breed;
+  }
+
   function showBreedCurveModal() {
     var existing = document.querySelector('.ux-breed-curve-modal');
     if (existing) existing.remove();
@@ -2324,7 +2365,7 @@ Error generating stack: `+n.message+`
 
     var data;
     try { data = JSON.parse(localStorage.getItem('wc2') || '{}'); } catch(e) { data = {}; }
-    var breed = data.breed || '';
+    var breed = resolveBreedName(data.breed || '');
     var weights = data.weights || [];
     var birthday = data.birthday || '';
     var name = data.name || 'わんちゃん';

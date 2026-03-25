@@ -13,7 +13,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebas
 import { getAuth, signInWithPopup, signInWithRedirect, signOut, onAuthStateChanged, GoogleAuthProvider }
   from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, addDoc,
-  query, where, orderBy, limit, serverTimestamp, onSnapshot, deleteDoc, updateDoc, writeBatch }
+  query, where, orderBy, limit, serverTimestamp, onSnapshot, deleteDoc, updateDoc, writeBatch, increment }
   from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
 
 // ============================================================
@@ -176,9 +176,10 @@ async function leaveFootprint(targetUid) {
   try {
     const existing = await getDoc(ref);
     if (existing.exists()) {
+      // increment() を使ってrace conditionを回避（アトミック操作）
       await updateDoc(ref, {
         updatedAt: serverTimestamp(),
-        visitCount: (existing.data().visitCount || 1) + 1,
+        visitCount: increment(1),
         fromName: auth.currentUser.displayName,
         fromPhoto: auth.currentUser.photoURL
       });
@@ -424,14 +425,14 @@ async function getFriends(uid) {
       const friendUid = users[0] === uid ? users[1] : users[0];
       if (friendUids.indexOf(friendUid) === -1) friendUids.push(friendUid);
     });
-    const friends = [];
-    for (const fuid of friendUids) {
-      try {
-        const uSnap = await getDoc(doc(db, 'users', fuid));
-        if (uSnap.exists()) friends.push({ uid: fuid, ...uSnap.data() });
-      } catch (_) {}
-    }
-    return friends;
+    // 並列取得でN+1クエリ問題を解消
+    const friendPromises = friendUids.map(function(fuid) {
+      return getDoc(doc(db, 'users', fuid)).then(function(uSnap) {
+        return uSnap.exists() ? { uid: fuid, ...uSnap.data() } : null;
+      }).catch(function() { return null; });
+    });
+    const results = await Promise.all(friendPromises);
+    return results.filter(function(f) { return f !== null; });
   } catch (e) {
     console.error('getFriends failed:', e);
     return [];
@@ -485,6 +486,8 @@ function onCommentsUpdate(entryId, cb) {
   );
   return onSnapshot(q, function(snap) {
     cb(snap.docs.map(function(d) { return { id: d.id, ...d.data() }; }));
+  }, function(err) {
+    console.error('onCommentsUpdate error:', err);
   });
 }
 
@@ -497,9 +500,9 @@ function _toast(msg, type) {
 // ============================================================
 // EXPOSE TO APP
 // ============================================================
-window.__wanchan = window.__wanchan || {};
-Object.assign(window.__wanchan, {
-  firebase: {
+// Ensure namespace exists without overwriting other modules' additions
+if (!window.__wanchan) window.__wanchan = {};
+window.__wanchan.firebase = {
     isConfigured: isConfigured,
     login: login,
     logout: logout,
@@ -519,8 +522,7 @@ Object.assign(window.__wanchan, {
     postComment: postComment,
     getComments: getComments,
     onCommentsUpdate: onCommentsUpdate
-  }
-});
+  };
 
 // ============================================================
 // AUTO-SYNC ON LOGIN
@@ -548,7 +550,12 @@ if (isConfigured) {
       if (synced) {
         _toast('クラウドからデータを同期しました', 'info');
       }
-      _syncInterval = setInterval(function() { syncToCloud(user.uid).catch(function() {}); }, 30000);
+      // Only sync when tab is visible (save battery/Firestore costs)
+      _syncInterval = setInterval(function() {
+        if (document.visibilityState !== 'hidden') {
+          syncToCloud(user.uid).catch(function() {});
+        }
+      }, 30000);
     } else {
       _currentUid = null;
       _isFirstAuth = false;
@@ -569,10 +576,8 @@ if (isConfigured) {
       try {
         var data = _getAppData();
         var json = JSON.stringify(data);
-        if (json !== _lastSyncHash && navigator.sendBeacon) {
-          // Send a minimal beacon to indicate data needs sync on next load
-          navigator.sendBeacon('data:text/plain,sync');
-          // Mark that we have unsent changes
+        if (json !== _lastSyncHash) {
+          // Mark that we have unsent changes (will sync on next load)
           try { localStorage.setItem('ux_pending_sync', '1'); } catch (_) {}
         }
       } catch (_) {}
