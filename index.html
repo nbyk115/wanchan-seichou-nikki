@@ -759,7 +759,7 @@ Error generating stack: `+n.message+`
           if (ta.value.trim()) {
             safeSetItem(key, ta.value);
           } else {
-            localStorage.removeItem(key);
+            try { localStorage.removeItem(key); } catch(_) {} // BUG-004: removeItem もエラーハンドリング
           }
         }, 2000);
       });
@@ -785,7 +785,7 @@ Error generating stack: `+n.message+`
           clearInterval(checkInterval);
           if (!hasNonEmpty || textareas.length === 0) {
             Object.keys(localStorage).forEach(function(k) {
-              if (k.startsWith('ux_draft_')) localStorage.removeItem(k);
+              if (k.startsWith('ux_draft_')) try { localStorage.removeItem(k); } catch(_) {} // BUG-004
             });
           }
         }
@@ -1809,13 +1809,25 @@ Error generating stack: `+n.message+`
   };
 
   // Watch for React's add-dog button and replace its behavior
+  // BUG-007: observerを変数に保持して、ボタン発見後にdisconnect（全DOM変化でquerySelectorAllが走るのを防ぐ）
+  var _addDogObserver = null;
+
+  function _rehookAddDogIfNeeded() {
+    // 設定画面でボタンが再レンダーされた場合に再フック
+    var btn = document.querySelector('#root div[style*="cursor"]');
+    if (btn && !btn._uxHooked) {
+      if (_addDogObserver) _addDogObserver.observe(document.getElementById('root') || document.body, { childList: true, subtree: true });
+    }
+  }
+
   function hookAddDogButton() {
-    var observer = new MutationObserver(function() {
-      // Find the "＋ わんちゃんを追加" button in React settings
+    _addDogObserver = new MutationObserver(function() {
       var allDivs = document.querySelectorAll('#root div[style*="cursor"]');
+      var hooked = false;
       allDivs.forEach(function(div) {
         if (div.textContent.trim() === '＋ わんちゃんを追加' && !div._uxHooked) {
           div._uxHooked = true;
+          hooked = true;
           div.addEventListener('click', function(e) {
             e.stopPropagation();
             e.preventDefault();
@@ -1845,10 +1857,16 @@ Error generating stack: `+n.message+`
           }, true); // Use capture phase to intercept before React
         }
       });
+      // ボタンを発見してフックできたらobserverを停止（毎DOM変化でのquerySelectorAllを防ぐ）
+      if (hooked && _addDogObserver) {
+        _addDogObserver.disconnect();
+      }
     });
-    observer.observe(document.getElementById('root') || document.body, { childList: true, subtree: true });
+    _addDogObserver.observe(document.getElementById('root') || document.body, { childList: true, subtree: true });
   }
   setTimeout(hookAddDogButton, 1000);
+  // ストレージイベント（ページ遷移後）でボタンが再レンダーされた際に再フック
+  window.addEventListener('wanchan-dog-added', _rehookAddDogIfNeeded);
 
   /* ==============================
      16. SNS SHARE (シェア機能)
