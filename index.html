@@ -1292,7 +1292,10 @@ Error generating stack: `+n.message+`
         var pets = wcData.pets || [];
         pets.push({ id: 'pet' + Date.now(), name: name, breed: breed, avi: null, sfx: 'ちゃん' });
         wcData.pets = pets;
-        safeSetItem('wc2', JSON.stringify(wcData));
+        if (!safeSetItem('wc2', JSON.stringify(wcData))) { // BUG-001: 書き込み失敗を検出
+          showToast('ストレージが不足しているよ。古いデータを整理してみてね', 'error');
+          return;
+        }
         showToast(name + 'ちゃんを追加しました！', 'success');
         window.dispatchEvent(new StorageEvent('storage', { key: 'wc2' }));
         window.dispatchEvent(new CustomEvent('wanchan-dog-added'));
@@ -1824,7 +1827,10 @@ Error generating stack: `+n.message+`
                 var pets = wcData.pets || [];
                 pets.push({ id: 'pet' + Date.now(), name: name, breed: breed, avi: null, sfx: 'ちゃん' });
                 wcData.pets = pets;
-                safeSetItem('wc2', JSON.stringify(wcData));
+                if (!safeSetItem('wc2', JSON.stringify(wcData))) { // BUG-001: 書き込み失敗を検出
+                  showToast('ストレージが不足しているよ。古いデータを整理してみてね', 'error');
+                  return;
+                }
                 showToast(name + 'ちゃんを追加しました！', 'success');
                 // Trigger React re-render
                 window.dispatchEvent(new StorageEvent('storage', { key: 'wc2' }));
@@ -2149,10 +2155,12 @@ Error generating stack: `+n.message+`
       var breed = data.breed || '';
 
       // Calculate age
+      // BUG-013: "YYYY-MM-DD" 形式はUTCとしてパースされるため、T00:00:00を付けてローカル時刻に強制
       var ageText = '';
       var ageDays = 0;
       if (birthday) {
-        var bDate = new Date(birthday);
+        var bdayStr = birthday.length === 10 ? birthday + 'T00:00:00' : birthday;
+        var bDate = new Date(bdayStr);
         if (isNaN(bDate.getTime())) return null; // Invalid date guard
         var now = new Date();
         ageDays = Math.floor((now - bDate) / (1000 * 60 * 60 * 24));
@@ -2226,7 +2234,7 @@ Error generating stack: `+n.message+`
     var html = '<div class="ux-growth-card-title">📊 ' + safeName + 'の成長まとめ</div>';
     html += '<div class="ux-growth-card-stats">';
     html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + (data.ageText || '-') + '</div><div class="ux-growth-stat-label">年齢</div></div>';
-    html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + data.latestWeight + '<span style="font-size:12px;">kg</span></div><div class="ux-growth-stat-label">現在の体重' + (data.weightChange ? ' (' + data.weightChange + ')' : '') + '</div></div>';
+    html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + (data.latestWeight !== '-' ? data.latestWeight + '<span style="font-size:12px;">kg</span>' : '-') + '</div><div class="ux-growth-stat-label">現在の体重' + (data.weightChange ? ' (' + data.weightChange + ')' : '') + '</div></div>';
     html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + data.diaryCount + '</div><div class="ux-growth-stat-label">日記数</div></div>';
     html += '</div>';
 
@@ -2277,7 +2285,9 @@ Error generating stack: `+n.message+`
       var data = JSON.parse(localStorage.getItem('wc2') || '{}');
       if (!data.birthday) return;
 
-      var birthday = new Date(data.birthday);
+      // BUG-013: ローカル時刻で解析してタイムゾーンズレを防ぐ
+      var bdayRaw = data.birthday.length === 10 ? data.birthday + 'T00:00:00' : data.birthday;
+      var birthday = new Date(bdayRaw);
       if (isNaN(birthday.getTime())) return; // Invalid date guard
       var now = new Date();
       var dogName = _escHtml(data.name || 'わんちゃん');
@@ -2548,6 +2558,10 @@ Error generating stack: `+n.message+`
             msg = '📉 ' + safeName + 'は犬種平均よりちょっと小さめ（' + pct + '%）だよ。気になったら獣医さんに相談してみてね。';
           }
           status.textContent = msg;
+          status.style.display = 'block';
+        } else if (lastUserMonth >= 12) {
+          // BUG-012: 1歳以上はグラフ対象外であることを明示
+          status.textContent = '※ このグラフは生後12ヶ月までの成長目安を表示しているよ。1歳以上の体重管理は体重記録で続けてね！';
           status.style.display = 'block';
         } else {
           status.style.display = 'none';
