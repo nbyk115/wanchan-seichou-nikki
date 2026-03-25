@@ -17,8 +17,23 @@ import { getAnalytics, logEvent as _logEvent, setUserId, setUserProperties }
 // CONFIG
 // ============================================================
 const ANALYTICS_CONFIG = {
-  // GA4 Measurement ID（Firebase Console → プロジェクト設定 → 全般 で確認）
-  measurementId: ''
+  // GA4 Measurement ID（Firebase Console → プロジェクト設定 → ウェブアプリ → measurementId で確認）
+  // 取得手順:
+  //   1. https://console.firebase.google.com/ → wanchan-diary プロジェクト
+  //   2. プロジェクト設定（歯車アイコン）→ 全般
+  //   3. 「マイアプリ」セクション → ウェブアプリ を選択
+  //   4. 「SDK の設定と構成」に表示される measurementId (G-XXXXXXXXXX 形式) をコピー
+  //   ※ measurementId が表示されない場合: Analytics → 有効にする を先に実行
+  // Firebase Analytics は完全無料（GA4ベース、イベント数制限なし）
+  // 取得手順:
+  //   1. https://console.firebase.google.com/ → wanchan-diary プロジェクト
+  //   2. プロジェクト設定（歯車アイコン）→ 全般
+  //   3. 「マイアプリ」セクション → ウェブアプリ を選択
+  //   4. 「SDK の設定と構成」に表示される measurementId (G-XXXXXXXXXX 形式) をコピー
+  //   ※ measurementId が表示されない場合:
+  //      Analytics → 有効にする を先に実行してからウェブアプリを再確認
+  //   ※ Firebase Analytics は完全無料（GA4ベース、イベント数・ユーザー数の課金なし）
+  measurementId: 'G-XXXXXXXXXX'  // TODO: Firebaseコンソールから取得した実際の値に置き換える
 };
 
 // ============================================================
@@ -28,10 +43,15 @@ let analytics = null;
 
 function init() {
   try {
+    if (!ANALYTICS_CONFIG.measurementId || ANALYTICS_CONFIG.measurementId === 'G-XXXXXXXXXX') {
+      console.warn('Analytics: measurementId not configured. Set it in ANALYTICS_CONFIG.');
+      return;
+    }
     // Firebase app は firebase-config.js で既に初期化済みのはず
     var apps = getApps();
     if (apps.length === 0) return;
     analytics = getAnalytics(apps[0]);
+    console.log('Analytics initialized with measurementId:', ANALYTICS_CONFIG.measurementId);
   } catch (e) {
     // Analytics SDK が読み込めない場合は graceful に無視
     console.warn('Analytics init skipped:', e.message);
