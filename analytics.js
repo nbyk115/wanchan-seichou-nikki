@@ -58,6 +58,11 @@ function setUser(uid) {
   try { setUserId(analytics, uid); } catch (e) {}
 }
 
+// PII保護: UIDを先頭8文字に切り詰めてGA4送信用匿名IDを生成
+function _anonId(uid) {
+  return uid ? uid.substring(0, 8) : '';
+}
+
 function setProperties(props) {
   if (!analytics) return;
   try { setUserProperties(analytics, props); } catch (e) {}
@@ -170,7 +175,7 @@ function trackCommunityTabSwitch(fromTab, toTab, variant) {
 
 function trackFootprintLeave(targetUserId, source) {
   logEvent('footprint_leave', {
-    target_user_id: targetUserId || '',
+    target_user_id: _anonId(targetUserId),
     source: source || 'profile'
   });
 }
@@ -183,13 +188,13 @@ function trackFootprintListView(countShown, variant) {
 }
 
 function trackFootprintTap(targetUserId) {
-  logEvent('footprint_tap', { target_user_id: targetUserId || '' });
+  logEvent('footprint_tap', { target_user_id: _anonId(targetUserId) });
 }
 
 function trackProfileView(source, targetUserId, variant) {
   logEvent('profile_view', {
     source: source || 'unknown',
-    target_user_id: targetUserId || '',
+    target_user_id: _anonId(targetUserId),
     variant: variant || 'none'
   });
 }
@@ -228,7 +233,7 @@ function trackDiaryFeedScroll(scrollDepthPct, itemsViewed) {
 
 function trackBlockReport(targetUserId, reason) {
   logEvent('block_report', {
-    target_user_id: targetUserId || '',
+    target_user_id: _anonId(targetUserId),
     reason: reason || 'other'
   });
 }
@@ -242,6 +247,18 @@ function trackLogin() {
 function trackPageView(pageName) {
   logEvent('page_view', { page_name: pageName || 'home' });
 }
+
+// ============================================================
+// LOGIN EVENT BRIDGE
+// firebase-config.js が dispatch する CustomEvent を受け取り
+// setUser + trackLogin を実行（循環依存を避けるための疎結合設計）
+// ============================================================
+window.addEventListener('wanchan-login', function(e) {
+  if (e.detail && e.detail.uid) {
+    setUser(e.detail.uid);
+    trackLogin();
+  }
+});
 
 // ============================================================
 // AUTO-TRACKING: Session & Page Views

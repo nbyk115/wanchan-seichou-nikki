@@ -33,7 +33,8 @@ service cloud.firestore {
         && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
     }
 
-    // Footprint read status: moved to friends section with field validation
+    // Footprint read status: 足あと既読管理（フィールド制限付き）
+    // Note: field-validated version is in the friends section below
 
     // Introductions: ひとこと紹介文（1著者→1対象に1件、100文字以内）
     match /introductions/{introId} {
@@ -53,6 +54,7 @@ service cloud.firestore {
       allow delete: if request.auth != null
         && (resource.data.authorUid == request.auth.uid || resource.data.targetUid == request.auth.uid);
     }
+
 
     // Friend requests: sender can create, target can read/update (status only, validated values)
     match /friendRequests/{requestId} {

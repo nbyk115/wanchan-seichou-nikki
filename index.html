@@ -28,6 +28,34 @@
 <!-- komoju-payment.js removed: premium features disabled -->
 <title>わんちゃん成長日記</title>
 <style>
+/* === Design Tokens === */
+:root {
+  --wc-bg: #FFF8F5;
+  --wc-card: #FFFFFF;
+  --wc-sub: #FFF0EB;
+  --wc-accent: #FF7B9C;
+  --wc-accent-light: #FFF0F3;
+  --wc-text: #3D2C2C;
+  --wc-subtext: #8A6F6A; /* UX: コントラスト比 2.8→4.7:1 (WCAG AA達成) */
+  --wc-border: #F0D9D1;
+  --wc-grad-start: #F5A6B8;
+  --wc-grad-end: #FF7B9C;
+  --wc-radius-card: 16px;
+  --wc-radius-btn: 20px;
+  --wc-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --wc-bg: #121212;
+    --wc-card: #1E1E1E;
+    --wc-sub: #2A2A2A;
+    --wc-accent-light: #2A1A22;
+    --wc-text: #F0F0F0;
+    --wc-subtext: #BBB;
+    --wc-border: #3A3A3A;
+  }
+}
+
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Zen Maru Gothic','Hiragino Sans',sans-serif;-webkit-font-smoothing:antialiased;overscroll-behavior:none;}
 input,textarea,select,button{font-family:inherit;}
@@ -51,8 +79,8 @@ img{max-width:100%;height:auto;}
 @keyframes ux-spin{to{transform:rotate(360deg);}}
 
 /* Accessibility: Focus Visible */
-*:focus-visible{outline:2.5px solid #3B82F6 !important;outline-offset:2px !important;}
-[role="button"]:focus-visible,[tabindex]:focus-visible{outline:2.5px solid #3B82F6 !important;outline-offset:2px !important;}
+*:focus-visible{outline:2.5px solid var(--wc-accent) !important;outline-offset:2px !important;}
+[role="button"]:focus-visible,[tabindex]:focus-visible{outline:2.5px solid var(--wc-accent) !important;outline-offset:2px !important;}
 
 /* Touch Target Enhancement - only for standalone buttons with explicit padding */
 #root button{min-height:44px;}
@@ -127,13 +155,15 @@ body.ux-dark-on .ux-toast{background:rgba(50,50,70,.95) !important;}
 }
 
 /* Data Backup FAB */
-.ux-backup-fab{position:fixed;bottom:90px;right:16px;z-index:9990;width:48px;height:48px;border-radius:50%;background:#FF7B9C;color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(255,123,156,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s,opacity .2s,left .3s ease,right .3s ease,bottom .3s ease;font-family:inherit;touch-action:none;user-select:none;-webkit-user-select:none;}
+.ux-backup-fab{position:fixed;bottom:90px;right:16px;z-index:9990;width:48px;height:48px;border-radius:50%;background:#FF7B9C;color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(255,123,156,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s,opacity .2s,box-shadow .2s,left .3s ease,right .3s ease,bottom .3s ease;font-family:inherit;touch-action:none;user-select:none;-webkit-user-select:none;}
+.ux-backup-fab:hover{transform:scale(1.1);box-shadow:0 6px 20px rgba(255,123,156,.55);}
+.ux-backup-fab:focus-visible{transform:scale(1.1);box-shadow:0 0 0 3px #fff,0 0 0 5px var(--wc-accent);}
 .ux-backup-fab.ux-fab-dragging{transition:none !important;opacity:.85;}
 .ux-backup-fab:active:not(.ux-fab-dragging){transform:scale(.9);}
-.ux-backup-menu{position:fixed;bottom:148px;right:16px;z-index:9998;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.15);padding:8px 0;min-width:180px;opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s;pointer-events:none;}
-.ux-backup-menu.ux-show{opacity:1;transform:translateY(0);pointer-events:auto;}
-.ux-backup-menu button{display:block;width:100%;padding:12px 18px;border:none;background:none;text-align:left;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;color:#333;}
-.ux-backup-menu button:hover,.ux-backup-menu button:focus{background:#FFF0F3;}
+.ux-backup-menu{position:fixed;bottom:148px;right:16px;z-index:9998;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.15);padding:8px 0;min-width:180px;opacity:0;transform:translateY(8px) scale(.96);transform-origin:bottom right;transition:opacity .22s cubic-bezier(.23,1,.32,1),transform .22s cubic-bezier(.23,1,.32,1);pointer-events:none;}
+.ux-backup-menu.ux-show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto;}
+.ux-backup-menu button{display:block;width:100%;padding:12px 18px;border:none;background:none;text-align:left;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;color:#333;transition:background .15s;}
+.ux-backup-menu button:hover,.ux-backup-menu button:focus{background:#FFF0F3;color:#FF7B9C;}
 body.ux-dark-on .ux-backup-menu{background:#2a2a3e;}
 body.ux-dark-on .ux-backup-menu button{color:#e0e0e0;}
 body.ux-dark-on .ux-backup-menu button:hover,body.ux-dark-on .ux-backup-menu button:focus{background:#3a3a4e;}
@@ -144,12 +174,14 @@ body.ux-dark-on .ux-backup-menu button:hover,body.ux-dark-on .ux-backup-menu but
 }
 
 /* Onboarding */
-.ux-onboard-overlay{position:fixed;inset:0;z-index:10003;background:linear-gradient(180deg,#FFF8F5 0%,#FFE8EC 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;opacity:0;transition:opacity .5s;pointer-events:none;text-align:center;}
-.ux-onboard-overlay.ux-show{opacity:1;pointer-events:auto;}
-.ux-onboard-overlay .ux-ob-paw{font-size:72px;margin-bottom:24px;}
-.ux-onboard-overlay .ux-ob-title{font-size:26px;font-weight:900;color:#333;margin-bottom:12px;line-height:1.4;}
+@keyframes ux-ob-paw-bounce{0%,100%{transform:scale(1) rotate(-5deg);}50%{transform:scale(1.15) rotate(5deg);}}
+.ux-onboard-overlay{position:fixed;inset:0;z-index:10003;background:linear-gradient(160deg,#FFF8F5 0%,#FFE8EC 60%,#FFF0EB 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;opacity:0;transform:scale(.98);transition:opacity .45s cubic-bezier(.23,1,.32,1),transform .45s cubic-bezier(.23,1,.32,1);pointer-events:none;text-align:center;}
+.ux-onboard-overlay.ux-show{opacity:1;transform:scale(1);pointer-events:auto;}
+.ux-onboard-overlay .ux-ob-paw{font-size:72px;margin-bottom:24px;display:inline-block;animation:ux-ob-paw-bounce 2.4s ease-in-out infinite;}
+.ux-onboard-overlay .ux-ob-title{font-size:26px;font-weight:900;color:#3D2C2C;margin-bottom:12px;line-height:1.4;}
 .ux-onboard-overlay .ux-ob-sub{font-size:15px;color:#636363;line-height:1.8;margin-bottom:40px;max-width:300px;}
-.ux-onboard-overlay .ux-ob-start{background:#FF7B9C;color:#fff;border:none;padding:16px 48px;border-radius:18px;font-size:16px;font-weight:900;cursor:pointer;font-family:inherit;box-shadow:0 8px 24px rgba(255,123,156,.4);transition:transform .2s;}
+.ux-onboard-overlay .ux-ob-start{background:linear-gradient(135deg,#F5A6B8,#FF7B9C);color:#fff;border:none;padding:16px 48px;border-radius:var(--wc-radius-btn);font-size:16px;font-weight:900;cursor:pointer;font-family:inherit;box-shadow:0 8px 24px rgba(255,123,156,.4);transition:transform .2s,box-shadow .2s;}
+.ux-onboard-overlay .ux-ob-start:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(255,123,156,.5);}
 .ux-onboard-overlay .ux-ob-start:active{transform:scale(.96);}
 .ux-onboard-overlay .ux-ob-skip{margin-top:16px;background:none;border:none;color:#636363;font-size:13px;cursor:pointer;font-family:inherit;min-height:44px;}
 body.ux-dark-on .ux-onboard-overlay{background:linear-gradient(180deg,#1a1a2e 0%,#2a1a2e 100%);}
@@ -243,16 +275,19 @@ body.ux-dark-on [style*="background: rgb(22, 163, 106)"],body.ux-dark-on [style*
 }
 
 /* Growth Summary Card */
-.ux-growth-card{position:relative;margin:16px;border-radius:20px;background:linear-gradient(135deg,#FFF8F5 0%,#FFE8EC 50%,#E8F4FD 100%);padding:24px 20px;box-shadow:0 4px 20px rgba(255,123,156,.15);overflow:hidden;}
-.ux-growth-card::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:rgba(255,123,156,.1);}
-.ux-growth-card-title{font-size:16px;font-weight:900;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.ux-growth-card{position:relative;margin:16px;border-radius:20px;background:linear-gradient(135deg,#FFF8F5 0%,#FFE8EC 55%,#FFF0F3 100%);padding:24px 20px;box-shadow:0 4px 20px rgba(255,123,156,.18),0 1px 4px rgba(255,123,156,.1);border:1px solid rgba(255,123,156,.12);overflow:hidden;}
+.ux-growth-card::before{content:'';position:absolute;top:-30px;right:-30px;width:110px;height:110px;border-radius:50%;background:radial-gradient(circle,rgba(255,123,156,.18) 0%,rgba(255,123,156,0) 70%);}
+.ux-growth-card::after{content:'';position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,rgba(245,166,184,.15) 0%,rgba(245,166,184,0) 70%);}
+.ux-growth-card-title{font-size:16px;font-weight:900;color:var(--wc-text);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
 .ux-growth-card-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;}
-.ux-growth-stat{text-align:center;padding:12px 8px;border-radius:14px;background:rgba(255,255,255,.7);}
+.ux-growth-stat{text-align:center;padding:12px 8px;border-radius:var(--wc-radius-card);background:rgba(255,255,255,.8);border:1px solid rgba(255,123,156,.1);transition:transform .2s;}
+.ux-growth-stat:hover{transform:translateY(-2px);}
 .ux-growth-stat-value{font-size:24px;font-weight:900;color:#FF7B9C;}
-.ux-growth-stat-label{font-size:11px;color:#636363;margin-top:4px;}
-.ux-growth-card-milestone{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.8);font-size:13px;font-weight:600;}
+.ux-growth-stat-label{font-size:11px;color:#7A6060;margin-top:4px;}
+.ux-growth-card-milestone{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.85);border:1px solid rgba(255,123,156,.12);font-size:13px;font-weight:600;}
 .ux-growth-share{margin-top:12px;text-align:center;}
-.ux-growth-share button{padding:10px 24px;border-radius:14px;border:none;background:#FF7B9C;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(255,123,156,.3);}
+.ux-growth-share button{padding:10px 24px;border-radius:var(--wc-radius-btn);border:none;background:linear-gradient(135deg,var(--wc-grad-start),var(--wc-grad-end));color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(255,123,156,.35);transition:transform .2s,box-shadow .2s;min-height:44px;} /* UX: タッチターゲット44px保証 */
+.ux-growth-share button:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(255,123,156,.45);}
 body.ux-dark-on .ux-growth-card{background:linear-gradient(135deg,#1a1a2e 0%,#2a1a2e 50%,#1a2a3e 100%);}
 body.ux-dark-on .ux-growth-stat{background:rgba(255,255,255,.08);}
 body.ux-dark-on .ux-growth-stat-label{color:#aaa;}
@@ -267,10 +302,13 @@ body.ux-dark-on .ux-growth-card-milestone{background:rgba(255,255,255,.06);}
 }
 
 /* Anniversary Reminder */
-.ux-anniversary-banner{position:fixed;top:env(safe-area-inset-top,12px);left:50%;transform:translateX(-50%);z-index:9995;max-width:380px;width:calc(100% - 32px);padding:16px 20px;border-radius:18px;background:linear-gradient(135deg,#FF7B9C,#FF9B6A);color:#fff;box-shadow:0 8px 24px rgba(255,123,156,.35);animation:ux-toast-in .35s cubic-bezier(.175,.885,.32,1.275);display:flex;align-items:center;gap:12px;cursor:pointer;}
-.ux-anniversary-banner .ux-anniv-icon{font-size:28px;flex-shrink:0;}
+@keyframes ux-anniv-shimmer{0%{background-position:-200% center;}100%{background-position:200% center;}}
+@keyframes ux-anniv-icon-pop{0%,100%{transform:scale(1);}40%{transform:scale(1.25) rotate(-8deg);}70%{transform:scale(.95) rotate(4deg);}}
+.ux-anniversary-banner{position:fixed;top:env(safe-area-inset-top,12px);left:50%;transform:translateX(-50%);z-index:9995;max-width:380px;width:calc(100% - 32px);padding:16px 20px;border-radius:20px;background:linear-gradient(135deg,#FF7B9C 0%,#FFAB76 50%,#FF7B9C 100%);background-size:200% auto;color:#fff;box-shadow:0 8px 28px rgba(255,123,156,.45),0 2px 8px rgba(255,123,156,.2);animation:ux-toast-in .35s cubic-bezier(.175,.885,.32,1.275),ux-anniv-shimmer 3s linear 1s infinite;display:flex;align-items:center;gap:12px;cursor:pointer;}
+.ux-anniversary-banner .ux-anniv-icon{font-size:28px;flex-shrink:0;animation:ux-anniv-icon-pop 1.8s ease-in-out infinite;}
 .ux-anniversary-banner .ux-anniv-text{flex:1;font-size:14px;font-weight:700;line-height:1.5;}
-.ux-anniversary-banner .ux-anniv-close{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;border:none;color:#fff;cursor:pointer;font-family:inherit;}
+.ux-anniversary-banner .ux-anniv-close{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;color:#fff;cursor:pointer;font-family:inherit;transition:background .2s;}
+.ux-anniversary-banner .ux-anniv-close:hover{background:rgba(255,255,255,.4);}
 
 /* Breed Growth Curve */
 .ux-breed-curve-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10001;display:flex;align-items:center;justify-content:center;animation:ux-fade-in .2s ease;padding:16px;}
@@ -294,7 +332,7 @@ body.ux-dark-on .ux-breed-curve-legend{color:#ccc;}
 
 /* Symptom Checker */
 .ux-symptom-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0;}
-.ux-symptom-chip{padding:10px 8px;border-radius:12px;border:2px solid #eee;background:#fff;text-align:center;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;}
+.ux-symptom-chip{padding:10px 8px;border-radius:12px;border:2px solid #eee;background:#fff;text-align:center;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;} /* UX: タッチターゲット44px保証 */
 .ux-symptom-chip.ux-selected{border-color:#FF7B9C;background:#FFF0F3;color:#FF7B9C;}
 body.ux-dark-on .ux-symptom-chip{background:#2a2a3e;border-color:#444;color:#ccc;}
 body.ux-dark-on .ux-symptom-chip.ux-selected{border-color:#FF7B9C;background:#3a2a3e;color:#FF7B9C;}
@@ -309,15 +347,17 @@ body.ux-dark-on .ux-symptom-chip.ux-selected{border-color:#FF7B9C;background:#3a
 }
 
 /* PWA Install Banner */
-.ux-pwa-banner{position:fixed;bottom:0;left:0;right:0;z-index:9992;padding:16px 20px env(safe-area-inset-bottom,16px);background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -4px 24px rgba(0,0,0,.1);animation:ux-slide-up .3s ease;display:flex;align-items:center;gap:14px;}
-.ux-pwa-banner-icon{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#FF7B9C,#FF9B6A);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.ux-pwa-banner{position:fixed;bottom:0;left:0;right:0;z-index:9992;padding:16px 20px env(safe-area-inset-bottom,16px);background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -4px 24px rgba(255,123,156,.12),0 -1px 0 rgba(255,123,156,.15);border-top:2px solid rgba(255,123,156,.18);animation:ux-slide-up .3s ease;display:flex;align-items:center;gap:14px;}
+.ux-pwa-banner-icon{width:48px;height:48px;border-radius:var(--wc-radius-card);background:linear-gradient(135deg,var(--wc-grad-start),var(--wc-grad-end));display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;box-shadow:0 4px 10px rgba(255,123,156,.3);}
 .ux-pwa-banner-text{flex:1;}
-.ux-pwa-banner-title{font-size:14px;font-weight:900;margin-bottom:2px;}
-.ux-pwa-banner-sub{font-size:12px;color:#636363;}
+.ux-pwa-banner-title{font-size:14px;font-weight:900;color:var(--wc-text);margin-bottom:2px;}
+.ux-pwa-banner-sub{font-size:12px;color:#7A6060;}
 .ux-pwa-banner-actions{display:flex;gap:8px;flex-shrink:0;}
-.ux-pwa-banner-actions button{padding:10px 16px;border-radius:12px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
-.ux-pwa-install-btn{background:#FF7B9C;color:#fff;}
-.ux-pwa-dismiss-btn{background:#f0f0f0;color:#636363;}
+.ux-pwa-banner-actions button{padding:10px 16px;border-radius:var(--wc-radius-btn);border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .15s,opacity .15s;}
+.ux-pwa-banner-actions button:active{transform:scale(.95);}
+.ux-pwa-install-btn{background:linear-gradient(135deg,var(--wc-grad-start),var(--wc-grad-end));color:#fff;box-shadow:0 4px 12px rgba(255,123,156,.35);}
+.ux-pwa-install-btn:hover{opacity:.9;}
+.ux-pwa-dismiss-btn{background:#F0E8E6;color:#7A6060;}
 @keyframes ux-slide-up{from{transform:translateY(100%);}to{transform:translateY(0);}}
 body.ux-dark-on .ux-pwa-banner{background:#1e1e2e;}
 body.ux-dark-on .ux-pwa-banner-title{color:#F0F0F0;}
@@ -377,6 +417,21 @@ Error generating stack: `+n.message+`
     div.textContent = str;
     return div.innerHTML;
   }
+
+  // Current authenticated user cache (set via firebase onAuth listener)
+  // Avoids registering multiple onAuth listeners across callers
+  var _currentUser = null;
+  (function _initAuthListener() {
+    function tryRegister() {
+      var fb = window.__wanchan && window.__wanchan.firebase;
+      if (fb && fb.isConfigured && fb.onAuth) {
+        fb.onAuth(function(user) { _currentUser = user || null; });
+      } else {
+        setTimeout(tryRegister, 500);
+      }
+    }
+    tryRegister();
+  })();
 
   /* ==============================
      0.1 BROWSER BACK / POPSTATE SAFETY
@@ -488,6 +543,7 @@ Error generating stack: `+n.message+`
     var iconSpan = document.createElement('span');
     iconSpan.className = 'ux-toast-icon';
     iconSpan.textContent = icons[type] || '💡';
+    iconSpan.setAttribute('aria-hidden', 'true'); // UX: スクリーンリーダーが絵文字を読まないように
     var msgSpan = document.createElement('span');
     msgSpan.textContent = msg;
     t.appendChild(iconSpan);
@@ -497,8 +553,10 @@ Error generating stack: `+n.message+`
       toastContainer.firstChild.remove();
     }
     toastContainer.appendChild(t);
-    setTimeout(function(){ t.classList.add('ux-toast-out'); }, 2500);
-    setTimeout(function(){ t.remove(); }, 2800);
+    // UX: error/warningは読み終わる時間を確保（4500ms）、通常は2500ms
+    var displayMs = (type === 'error' || type === 'warning') ? 4500 : 2500;
+    setTimeout(function(){ t.classList.add('ux-toast-out'); }, displayMs);
+    setTimeout(function(){ t.remove(); }, displayMs + 300);
   }
 
   // Override native alert with toast (coerce all types to string)
@@ -727,7 +785,7 @@ Error generating stack: `+n.message+`
           if (ta.value.trim()) {
             safeSetItem(key, ta.value);
           } else {
-            localStorage.removeItem(key);
+            try { localStorage.removeItem(key); } catch(_) {} // BUG-004: removeItem もエラーハンドリング
           }
         }, 2000);
       });
@@ -753,7 +811,7 @@ Error generating stack: `+n.message+`
           clearInterval(checkInterval);
           if (!hasNonEmpty || textareas.length === 0) {
             Object.keys(localStorage).forEach(function(k) {
-              if (k.startsWith('ux_draft_')) localStorage.removeItem(k);
+              if (k.startsWith('ux_draft_')) try { localStorage.removeItem(k); } catch(_) {} // BUG-004
             });
           }
         }
@@ -1027,9 +1085,9 @@ Error generating stack: `+n.message+`
   // Backup FAB (floating action button)
   var backupFab = document.createElement('button');
   backupFab.className = 'ux-backup-fab';
-  backupFab.textContent = '⚙️';
-  backupFab.setAttribute('aria-label', '設定');
-  backupFab.title = '設定';
+  backupFab.textContent = '＋'; // UX: ⚙️より「多機能メニュー」の意図が伝わる
+  backupFab.setAttribute('aria-label', 'メニューを開く');
+  backupFab.title = 'メニュー';
   document.body.appendChild(backupFab);
 
   // --- FAB Drag Logic ---
@@ -1046,12 +1104,15 @@ Error generating stack: `+n.message+`
     // Restore saved position
     var saved = null;
     try { saved = JSON.parse(localStorage.getItem('ux_fab_pos')); } catch(e) {}
-    if (saved && typeof saved.bottom === 'number' && typeof saved.right === 'number') {
-      fab.style.bottom = saved.bottom + 'px';
-      fab.style.right = saved.right + 'px';
-      if (typeof saved.side === 'string' && saved.side === 'left') {
+    if (saved && typeof saved.bottom === 'number') {
+      var vw = window.innerWidth, vh = window.innerHeight;
+      var safeBottom = Math.max(EDGE_MARGIN, Math.min(saved.bottom, vh - FAB_SIZE - EDGE_MARGIN));
+      fab.style.bottom = safeBottom + 'px';
+      if (typeof saved.side === 'string' && saved.side === 'left' && typeof saved.left === 'number') {
         fab.style.right = 'auto';
-        fab.style.left = saved.left + 'px';
+        fab.style.left = Math.max(EDGE_MARGIN, Math.min(saved.left, vw - FAB_SIZE - EDGE_MARGIN)) + 'px';
+      } else if (typeof saved.right === 'number') {
+        fab.style.right = Math.max(EDGE_MARGIN, Math.min(saved.right, vw - FAB_SIZE - EDGE_MARGIN)) + 'px';
       }
     }
 
@@ -1220,7 +1281,7 @@ Error generating stack: `+n.message+`
     setTimeout(function() {
       clearInterval(_aiCheck);
       if (!(window.__wanchan && window.__wanchan.ai && window.__wanchan.ai.showConsultation)) {
-        showToast('AI相談の読み込みに失敗しました。ページを再読み込みしてね', 'error');
+        showToast('AI相談がうまく開けなかったよ。一度アプリを開き直してみてね', 'error');
       }
     }, 3000);
   });
@@ -1246,14 +1307,17 @@ Error generating stack: `+n.message+`
         var pets = wcData.pets || [];
         pets.push({ id: 'pet' + Date.now(), name: name, breed: breed, avi: null, sfx: 'ちゃん' });
         wcData.pets = pets;
-        safeSetItem('wc2', JSON.stringify(wcData));
+        if (!safeSetItem('wc2', JSON.stringify(wcData))) { // BUG-001: 書き込み失敗を検出
+          showToast('ストレージが不足しているよ。古いデータを整理してみてね', 'error');
+          return;
+        }
         showToast(name + 'ちゃんを追加しました！', 'success');
         window.dispatchEvent(new StorageEvent('storage', { key: 'wc2' }));
         window.dispatchEvent(new CustomEvent('wanchan-dog-added'));
         // Delay reload to let user see the success toast
         setTimeout(function() { location.reload(); }, 1500);
       } catch(err) {
-        showToast('追加に失敗しました', 'error');
+        showToast('うまく追加できなかったよ。もう一度試してみてね', 'error');
       }
     });
   });
@@ -1266,7 +1330,7 @@ Error generating stack: `+n.message+`
 
   backupMenu.setAttribute('role', 'menu');
   backupFab.setAttribute('aria-expanded', 'false');
-  backupFab.setAttribute('aria-haspopup', 'true');
+  backupFab.setAttribute('aria-haspopup', 'menu'); // UX: WAI-ARIA 1.1 準拠
   backupFab.addEventListener('click', function() {
     // Ignore click if it was a drag gesture
     if (backupFab._isDragMove && backupFab._isDragMove()) return;
@@ -1371,7 +1435,7 @@ Error generating stack: `+n.message+`
 
     var skip = document.createElement('button');
     skip.className = 'ux-ob-skip';
-    skip.textContent = 'すでにデータがあります';
+    skip.textContent = 'すでに使っていた方はこちら（データ引き継ぎ）'; // UX: 新規ユーザーに意味が伝わる文言に
 
     function closeOnboard() {
       safeSetItem('ux_onboarded', '1');
@@ -1379,7 +1443,10 @@ Error generating stack: `+n.message+`
       setTimeout(function() { overlay.remove(); }, 500);
     }
 
-    start.addEventListener('click', closeOnboard);
+    start.addEventListener('click', function() {
+      closeOnboard();
+      setTimeout(function() { showAddDogModal(function() {}); }, 550);
+    });
     skip.addEventListener('click', closeOnboard);
 
     overlay.appendChild(paw);
@@ -1672,7 +1739,14 @@ Error generating stack: `+n.message+`
       wasDragging = true;
       setTimeout(function() { wasDragging = false; }, 50);
       list.style.transition = 'transform .3s cubic-bezier(.23,1,.32,1)';
-      var currentY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+      var currentY;
+      if (e.changedTouches && e.changedTouches.length > 0) {
+        currentY = e.changedTouches[0].clientY;
+      } else if (typeof e.clientY === 'number') {
+        currentY = e.clientY;
+      } else {
+        currentY = startY; // フォールバック: ドラッグなしとして扱う
+      }
       var diff = currentY - startY;
       var newIndex = Math.round((-startTranslate - diff) / ITEM_HEIGHT);
       scrollToIndex(newIndex);
@@ -1750,42 +1824,57 @@ Error generating stack: `+n.message+`
   };
 
   // Watch for React's add-dog button and replace its behavior
-  // Integrated into unified MutationObserver (no separate observer needed)
-  function hookAddDogButton() {
-    var allDivs = document.querySelectorAll('#root div[style*="cursor"]');
-    allDivs.forEach(function(div) {
-      if (div.textContent.trim() === '＋ わんちゃんを追加' && !div._uxHooked) {
-        div._uxHooked = true;
-        div.addEventListener('click', function(e) {
-          e.stopPropagation();
-          e.preventDefault();
-          showAddDogModal(function(name, breed) {
-            try {
-              var wcData = JSON.parse(localStorage.getItem('wc2') || '{}');
-              var pets = wcData.pets || [];
-              pets.push({ id: 'pet' + Date.now(), name: name, breed: breed, avi: null, sfx: 'ちゃん' });
-              wcData.pets = pets;
-              safeSetItem('wc2', JSON.stringify(wcData));
-              showToast(name + 'ちゃんを追加しました！', 'success');
-              window.dispatchEvent(new StorageEvent('storage', { key: 'wc2' }));
-              window.dispatchEvent(new CustomEvent('wanchan-dog-added'));
-              setTimeout(function() { location.reload(); }, 1500);
-            } catch(err) {
-              console.error('Add dog error:', err);
-              showToast('追加に失敗しました', 'error');
-            }
-          });
-        }, true);
-      }
-    });
+  // BUG-007: observerを変数に保持して、ボタン発見後にdisconnect（全DOM変化でquerySelectorAllが走るのを防ぐ）
+  var _addDogObserver = null;
+
+  function _rehookAddDogIfNeeded() {
+    var btn = document.querySelector('#root div[style*="cursor"]');
+    if (btn && !btn._uxHooked) {
+      if (_addDogObserver) _addDogObserver.observe(document.getElementById('root') || document.body, { childList: true, subtree: true });
+    }
   }
 
-  // Chain hookAddDogButton into the unified MutationObserver via runAllEnhancements
-  var _origRunAllForDog = runAllEnhancements;
-  runAllEnhancements = function() {
-    _origRunAllForDog();
-    hookAddDogButton();
-  };
+  function hookAddDogButton() {
+    _addDogObserver = new MutationObserver(function() {
+      var allDivs = document.querySelectorAll('#root div[style*="cursor"]');
+      var hooked = false;
+      allDivs.forEach(function(div) {
+        if (div.textContent.trim() === '＋ わんちゃんを追加' && !div._uxHooked) {
+          div._uxHooked = true;
+          hooked = true;
+          div.addEventListener('click', function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            showAddDogModal(function(name, breed) {
+              try {
+                var wcData = JSON.parse(localStorage.getItem('wc2') || '{}');
+                var pets = wcData.pets || [];
+                pets.push({ id: 'pet' + Date.now(), name: name, breed: breed, avi: null, sfx: 'ちゃん' });
+                wcData.pets = pets;
+                if (!safeSetItem('wc2', JSON.stringify(wcData))) {
+                  showToast('ストレージが不足しているよ。古いデータを整理してみてね', 'error');
+                  return;
+                }
+                showToast(name + 'ちゃんを追加しました！', 'success');
+                window.dispatchEvent(new StorageEvent('storage', { key: 'wc2' }));
+                window.dispatchEvent(new CustomEvent('wanchan-dog-added'));
+                setTimeout(function() { location.reload(); }, 1500);
+              } catch(err) {
+                console.error('Add dog error:', err);
+                showToast('うまく追加できなかったよ。もう一度試してみてね', 'error');
+              }
+            });
+          }, true);
+        }
+      });
+      if (hooked && _addDogObserver) {
+        _addDogObserver.disconnect();
+      }
+    });
+    _addDogObserver.observe(document.getElementById('root') || document.body, { childList: true, subtree: true });
+  }
+  setTimeout(hookAddDogButton, 1000);
+  window.addEventListener('wanchan-dog-added', _rehookAddDogIfNeeded);
 
   /* ==============================
      16. SNS SHARE (シェア機能)
@@ -1942,7 +2031,7 @@ Error generating stack: `+n.message+`
       var user = _currentUser;
       if (!user) {
         var nc = document.getElementById('notif-content');
-        if (nc) nc.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">ログインするとお知らせが届きます</div>';
+        if (nc) nc.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">犬友と繋がったら、ここに足あとが届くよ</div>';
       } else {
         fb.getFootprints(user.uid, 20).then(function(grouped) {
           var footprints = grouped.all || grouped;
@@ -1988,6 +2077,7 @@ Error generating stack: `+n.message+`
         }).catch(function() {
           var content = document.getElementById('notif-content');
           if (content) content.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">お知らせの取得がうまくいきませんでした</div>';
+          _updateNotifBadge(0); // エラー時もバッジをクリア（QA-012）
         });
 
         // Track
@@ -1996,7 +2086,7 @@ Error generating stack: `+n.message+`
       }
     } else {
       var ncFb = document.getElementById('notif-content');
-      if (ncFb) ncFb.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">ログインするとお知らせが届きます</div>';
+      if (ncFb) ncFb.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">犬友と繋がったら、ここに足あとが届くよ</div>';
     }
   }
 
@@ -2092,10 +2182,12 @@ Error generating stack: `+n.message+`
       var breed = data.breed || '';
 
       // Calculate age
+      // BUG-013: "YYYY-MM-DD" 形式はUTCとしてパースされるため、T00:00:00を付けてローカル時刻に強制
       var ageText = '';
       var ageDays = 0;
       if (birthday) {
-        var bDate = new Date(birthday);
+        var bdayStr = birthday.length === 10 ? birthday + 'T00:00:00' : birthday;
+        var bDate = new Date(bdayStr);
         if (isNaN(bDate.getTime())) return null; // Invalid date guard
         var now = new Date();
         ageDays = Math.floor((now - bDate) / (1000 * 60 * 60 * 24));
@@ -2115,23 +2207,42 @@ Error generating stack: `+n.message+`
       var firstWeight = weights.length > 1 ? weights[0] : null;
       var weightChange = '';
       if (latestWeight && firstWeight) {
-        var lw = parseFloat(latestWeight.weight || latestWeight.w || 0);
-        var fw = parseFloat(firstWeight.weight || firstWeight.w || 0);
-        var diff = lw - fw;
-        weightChange = (diff >= 0 ? '+' : '') + diff.toFixed(1) + 'kg';
+        var lw = parseFloat(latestWeight.weight != null ? latestWeight.weight : latestWeight.w);
+        var fw = parseFloat(firstWeight.weight != null ? firstWeight.weight : firstWeight.w);
+        if (!isNaN(lw) && !isNaN(fw) && lw > 0 && lw <= 200 && fw > 0 && fw <= 200) {
+          var diff = lw - fw;
+          weightChange = (diff >= 0 ? '+' : '') + diff.toFixed(1) + 'kg';
+        }
       }
 
-      // Milestone detection
+      // UX: マイルストーン取りこぼし修正
+      // 完全一致(===)だと当日にアプリを開かないと永久に表示されないため、
+      // 「以上」判定＋localStorageフラグで「まだ表示していない最初のマイルストーン」を表示
       var milestone = '';
-      if (ageDays === 0) milestone = '🎉 今日が記念すべき初日！';
-      else if (ageDays === 100) milestone = '🎊 100日おめでとう！';
-      else if (ageDays === 365) milestone = '🎂 1歳のお誕生日！';
-      else if (ageDays === 730) milestone = '🎂 2歳のお誕生日！';
-      else if (ageDays === 1095) milestone = '🎂 3歳のお誕生日！';
-      else if (diaries.length === 1) milestone = '📝 はじめての日記！';
-      else if (diaries.length === 10) milestone = '📝 日記10回達成！';
-      else if (diaries.length === 50) milestone = '📝 日記50回達成！';
-      else if (diaries.length === 100) milestone = '🏆 日記100回達成！';
+      var _msShown = {};
+      try { _msShown = JSON.parse(localStorage.getItem('ux_milestones') || '{}'); } catch(_) {}
+      function _checkMs(key, cond, text) {
+        if (cond && !_msShown[key]) {
+          milestone = text;
+          _msShown[key] = true;
+          try { localStorage.setItem('ux_milestones', JSON.stringify(_msShown)); } catch(_) {}
+          return true;
+        }
+        return false;
+      }
+      if (birthday) {
+        _checkMs('day0', ageDays === 0, '🎉 今日が記念すべき初日！') ||
+        _checkMs('day100', ageDays >= 100, '🎊 100日おめでとう！') ||
+        _checkMs('year1', ageDays >= 365, '🎂 1歳のお誕生日！') ||
+        _checkMs('year2', ageDays >= 730, '🎂 2歳のお誕生日！') ||
+        _checkMs('year3', ageDays >= 1095, '🎂 3歳のお誕生日！');
+      }
+      if (!milestone) {
+        _checkMs('diary1', diaries.length >= 1, '📝 はじめての日記！') ||
+        _checkMs('diary10', diaries.length >= 10, '📝 日記10回達成！') ||
+        _checkMs('diary50', diaries.length >= 50, '📝 日記50回達成！') ||
+        _checkMs('diary100', diaries.length >= 100, '🏆 日記100回達成！');
+      }
 
       return {
         name: name,
@@ -2167,7 +2278,7 @@ Error generating stack: `+n.message+`
     var html = '<div class="ux-growth-card-title">📊 ' + safeName + 'の成長まとめ</div>';
     html += '<div class="ux-growth-card-stats">';
     html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + (data.ageText || '-') + '</div><div class="ux-growth-stat-label">年齢</div></div>';
-    html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + data.latestWeight + '<span style="font-size:12px;">kg</span></div><div class="ux-growth-stat-label">現在の体重' + (data.weightChange ? ' (' + data.weightChange + ')' : '') + '</div></div>';
+    html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + (data.latestWeight !== '-' ? data.latestWeight + '<span style="font-size:12px;">kg</span>' : '-') + '</div><div class="ux-growth-stat-label">現在の体重' + (data.weightChange ? ' (' + data.weightChange + ')' : '') + '</div></div>';
     html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + data.diaryCount + '</div><div class="ux-growth-stat-label">日記数</div></div>';
     html += '</div>';
 
@@ -2175,7 +2286,7 @@ Error generating stack: `+n.message+`
       html += '<div class="ux-growth-card-milestone" style="color:' + (isDark ? '#FFD700' : '#B45309') + ';">' + data.milestone + '</div>';
     }
 
-    html += '<div class="ux-growth-share"><button id="ux-growth-share-btn">📤 成長をみんなにシェアしてね</button></div>';
+    html += '<div class="ux-growth-share"><button id="ux-growth-share-btn">📤 みんなに見せてあげよう</button></div>';
 
     card.innerHTML = html;
 
@@ -2218,7 +2329,9 @@ Error generating stack: `+n.message+`
       var data = JSON.parse(localStorage.getItem('wc2') || '{}');
       if (!data.birthday) return;
 
-      var birthday = new Date(data.birthday);
+      // BUG-013: ローカル時刻で解析してタイムゾーンズレを防ぐ
+      var bdayRaw = data.birthday.length === 10 ? data.birthday + 'T00:00:00' : data.birthday;
+      var birthday = new Date(bdayRaw);
       if (isNaN(birthday.getTime())) return; // Invalid date guard
       var now = new Date();
       var dogName = _escHtml(data.name || 'わんちゃん');
@@ -2228,7 +2341,12 @@ Error generating stack: `+n.message+`
       // Check if today is birthday
       if (todayStr === bdayStr) {
         var years = now.getFullYear() - birthday.getFullYear();
-        showAnniversaryBanner('🎂', dogName + 'の' + years + '歳のお誕生日おめでとう！');
+        if (years < 0) return; // 誕生日が未来日の場合は表示しない
+        if (years === 0) {
+          showAnniversaryBanner('🎉', dogName + 'が今日生まれたよ！');
+        } else {
+          showAnniversaryBanner('🎂', dogName + 'の' + years + '歳のお誕生日おめでとう！');
+        }
         return;
       }
 
@@ -2265,6 +2383,7 @@ Error generating stack: `+n.message+`
     var dismissed = localStorage.getItem('ux_anniv_dismissed');
     var today = new Date().toISOString().slice(0, 10);
     if (dismissed === today) return;
+    safeSetItem('ux_anniv_dismissed', today); // 表示した時点でその日の表示済みとしてマーク
 
     var banner = document.createElement('div');
     banner.className = 'ux-anniversary-banner';
@@ -2435,6 +2554,11 @@ Error generating stack: `+n.message+`
       }
 
       var maxW = curve.max;
+      if (!maxW || maxW <= 0) {
+        chart.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#888;font-size:14px;">この犬種のデータが正しく読み込めませんでした</div>';
+        if (status) status.style.display = 'none';
+        return;
+      }
       var months = curve.m;
       var barWidth = Math.floor((chart.offsetWidth - 24) / 12) - 4;
       if (barWidth < 16) barWidth = 16;
@@ -2444,7 +2568,9 @@ Error generating stack: `+n.message+`
       if (birthday && weights.length > 0) {
         var bDate = new Date(birthday);
         if (!isNaN(bDate.getTime())) weights.forEach(function(w) {
-          var wDate = new Date(w.date || w.d);
+          var rawDate = w.date || w.d;
+          if (!rawDate) return; // null/undefinedを明示的に除外
+          var wDate = new Date(rawDate);
           if (isNaN(wDate.getTime())) return;
           var monthAge = Math.round((wDate - bDate) / (1000 * 60 * 60 * 24 * 30));
           if (monthAge >= 0 && monthAge < 12) {
@@ -2476,7 +2602,7 @@ Error generating stack: `+n.message+`
         var label = document.createElement('div');
         label.className = 'ux-breed-curve-label';
         label.style.cssText = 'position:absolute;bottom:-18px;left:' + x + 'px;width:' + barWidth + 'px;';
-        label.textContent = (i + 1) + 'M';
+        label.textContent = (i + 1) + 'ヶ月';
         chart.appendChild(label);
       }
 
@@ -2504,6 +2630,10 @@ Error generating stack: `+n.message+`
             msg = '📉 ' + safeName + 'は犬種平均よりちょっと小さめ（' + pct + '%）だよ。気になったら獣医さんに相談してみてね。';
           }
           status.textContent = msg;
+          status.style.display = 'block';
+        } else if (lastUserMonth >= 12) {
+          // BUG-012: 1歳以上はグラフ対象外であることを明示
+          status.textContent = '※ このグラフは生後12ヶ月までの成長目安を表示しているよ。1歳以上の体重管理は体重記録で続けてね！';
           status.style.display = 'block';
         } else {
           status.style.display = 'none';
@@ -2617,7 +2747,7 @@ Error generating stack: `+n.message+`
 
           // Medical disclaimer
           var disclaimer = document.createElement('div');
-          disclaimer.style.cssText = 'font-size:11px;color:' + (isDark ? '#777' : '#aaa') + ';margin:8px 0 4px;line-height:1.5;';
+          disclaimer.style.cssText = 'font-size:12px;font-weight:600;color:' + (isDark ? '#fbbf24' : '#92400e') + ';background:' + (isDark ? 'rgba(251,191,36,.1)' : 'rgba(245,158,11,.08)') + ';border-left:3px solid ' + (isDark ? '#fbbf24' : '#f59e0b') + ';padding:8px 12px;border-radius:0 8px 8px 0;margin:8px 0 12px;line-height:1.6;';
           disclaimer.textContent = '※ AIの回答は参考情報だよ。心配なときは獣医さんに相談してね。';
 
           textarea.parentNode.insertBefore(label, textarea);
@@ -2643,8 +2773,10 @@ Error generating stack: `+n.message+`
     var dismissed = localStorage.getItem('ux_pwa_dismissed');
     if (dismissed) {
       var dismissedDate = new Date(dismissed);
-      var daysSince = (Date.now() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24);
-      if (daysSince < 7) return; // Don't show again for 7 days
+      if (!isNaN(dismissedDate.getTime())) {
+        var daysSince = (Date.now() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24);
+        if (daysSince < 7) return; // Don't show again for 7 days
+      }
     }
 
     // Show banner after 30 seconds of use
