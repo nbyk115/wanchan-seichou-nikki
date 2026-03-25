@@ -397,11 +397,24 @@ Error generating stack: `+n.message+`
 <body>
 <div id="root"></div>
 <noscript>
-<div style="max-width:400px;margin:60px auto;padding:24px;text-align:center;font-family:'Zen Maru Gothic','Hiragino Sans',sans-serif;color:#3D2C2C;">
-<div style="font-size:64px;margin-bottom:16px;">🐾</div>
-<h1 style="font-size:22px;font-weight:900;margin-bottom:12px;">わんちゃん成長日記</h1>
-<p style="font-size:14px;color:#8A6F6A;line-height:1.8;margin-bottom:20px;">うちの子の毎日を、もっと愛おしく。<br>日記・体重管理・AI健康相談・犬種別成長曲線・犬友コミュニティが無料で使えるよ。</p>
-<p style="font-size:13px;color:#BFA6A0;">このアプリを使うにはJavaScriptを有効にしてね。</p>
+<div style="max-width:480px;margin:40px auto;padding:24px;font-family:'Zen Maru Gothic','Hiragino Sans',sans-serif;color:#3D2C2C;">
+<div style="text-align:center;margin-bottom:24px;">
+<div style="font-size:64px;margin-bottom:12px;">🐾</div>
+<h1 style="font-size:22px;font-weight:900;margin-bottom:8px;">わんちゃん成長日記</h1>
+<p style="font-size:15px;color:#FF7B9C;font-weight:700;">うちの子の毎日を、もっと愛おしく。</p>
+</div>
+<h2 style="font-size:16px;font-weight:900;margin-bottom:12px;">主な機能</h2>
+<ul style="font-size:14px;color:#8A6F6A;line-height:2;list-style:none;padding:0;margin-bottom:20px;">
+<li>📝 <strong>日記・写真記録</strong> — 毎日の小さな成長を写真と一緒に</li>
+<li>⚖️ <strong>体重管理グラフ</strong> — 体重の推移をひと目で確認</li>
+<li>📈 <strong>犬種別成長曲線</strong> — うちの子と犬種平均を比較</li>
+<li>🩹 <strong>AI健康相談</strong> — 気になる症状をAIに相談</li>
+<li>🐕 <strong>犬友コミュニティ</strong> — 足あと・ひとこと・フレンド機能</li>
+<li>📱 <strong>オフライン対応</strong> — 電波がなくても安心して使える</li>
+</ul>
+<h2 style="font-size:16px;font-weight:900;margin-bottom:12px;">対応犬種の成長曲線</h2>
+<p style="font-size:13px;color:#8A6F6A;line-height:1.8;margin-bottom:20px;">チワワ、トイプードル、ミニチュアダックスフンド、ポメラニアン、柴犬、フレンチブルドッグ、ゴールデンレトリバー、ラブラドールレトリバー、ヨークシャーテリア、シーズー、パグ、マルチーズ、ミニチュアシュナウザーの月齢別体重推移データを収録。</p>
+<p style="font-size:13px;color:#BFA6A0;text-align:center;">このアプリを使うにはJavaScriptを有効にしてね。</p>
 </div>
 </noscript>
 <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js');}</script>
@@ -2185,7 +2198,9 @@ Error generating stack: `+n.message+`
           _updateNotifBadge(0);
         }).catch(function() {
           var content = document.getElementById('notif-content');
-          if (content) content.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">お知らせの取得がうまくいきませんでした</div>';
+          if (content) content.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">お知らせの取得がうまくいかなかったよ<br><button id="notif-retry" style="margin-top:12px;padding:10px 20px;border-radius:12px;border:1.5px solid #ddd;background:#fff;color:#333;font-size:13px;cursor:pointer;font-family:inherit;">もう一度試す</button></div>';
+          var retryBtn = document.getElementById('notif-retry');
+          if (retryBtn) retryBtn.addEventListener('click', function() { showNotificationsPanel(); });
           _updateNotifBadge(0); // エラー時もバッジをクリア（QA-012）
         });
 

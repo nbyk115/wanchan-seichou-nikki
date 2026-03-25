@@ -311,7 +311,7 @@ async function markFootprintsRead(uid) {
 async function postIntroduction(targetUid, text) {
   if (!isConfigured || !auth.currentUser) return false;
   if (auth.currentUser.uid === targetUid) {
-    _toast('自分にひとことは書けません', 'error');
+    _toast('自分にはひとことを書けないよ', 'info');
     return false;
   }
   if (!text || text.length === 0 || text.length > 100) {
@@ -391,7 +391,7 @@ async function deleteIntroduction(targetUid, authorUid) {
 }
 
 // ============================================================
-// SOCIAL: Friends (フレンド)
+// SOCIAL: Friends (犬友)
 // ============================================================
 async function sendFriendRequest(targetUid) {
   if (!isConfigured || !auth.currentUser) return;

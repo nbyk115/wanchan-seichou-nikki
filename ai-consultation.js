@@ -532,9 +532,9 @@ function showConsultationModal() {
             } else {
               // Payment module not loaded — show friendly fallback
               if (window.__wanchan && window.__wanchan.showToast) {
-                window.__wanchan.showToast('プレミアム機能は現在準備中です', 'info');
+                window.__wanchan.showToast('もっと楽しくなる機能はただいま準備中だよ', 'info');
               } else {
-                alert('プレミアム機能は現在準備中です');
+                alert('もっと楽しくなる機能はただいま準備中だよ');
               }
             }
           });

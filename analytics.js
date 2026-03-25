@@ -310,6 +310,64 @@ window.addEventListener('wanchan-login', function(e) {
 })();
 
 // ============================================================
+// FUNNEL TRACKING (課金ファネル計測)
+// ============================================================
+function trackPremiumView() {
+  logEvent('premium_modal_view');
+}
+function trackPremiumPlanSelect(planKey) {
+  logEvent('premium_plan_select', { plan: planKey || 'unknown' });
+}
+function trackPremiumPurchaseStart(planKey) {
+  logEvent('premium_purchase_start', { plan: planKey || 'unknown' });
+}
+function trackPremiumPurchaseComplete(planKey, amount) {
+  logEvent('premium_purchase_complete', { plan: planKey || 'unknown', value: amount || 0 });
+}
+function trackPremiumPurchaseFail(planKey, reason) {
+  logEvent('premium_purchase_fail', { plan: planKey || 'unknown', reason: reason || 'unknown' });
+}
+
+// ============================================================
+// RETENTION TRACKING (リテンション計測)
+// ============================================================
+(function trackRetention() {
+  try {
+    var now = Date.now();
+    var installDate = localStorage.getItem('ux_install_date');
+    if (!installDate) {
+      localStorage.setItem('ux_install_date', String(now));
+      logEvent('first_open');
+      return;
+    }
+    var daysSinceInstall = Math.floor((now - parseInt(installDate, 10)) / (1000 * 60 * 60 * 24));
+    // Day 1, 3, 7, 14, 30 リテンション計測
+    var milestones = [1, 3, 7, 14, 30];
+    milestones.forEach(function(d) {
+      var key = 'ux_retention_d' + d;
+      if (daysSinceInstall >= d && !localStorage.getItem(key)) {
+        localStorage.setItem(key, '1');
+        logEvent('retention_day_' + d);
+      }
+    });
+    // 連続利用日数
+    var lastDate = localStorage.getItem('ux_last_active_date') || '';
+    var todayStr = new Date().toISOString().slice(0, 10);
+    var yesterdayStr = new Date(now - 86400000).toISOString().slice(0, 10);
+    var streak = parseInt(localStorage.getItem('ux_streak') || '0', 10);
+    if (lastDate === yesterdayStr) {
+      streak++;
+      localStorage.setItem('ux_streak', String(streak));
+      if ([3, 7, 14, 30].indexOf(streak) !== -1) {
+        logEvent('streak_milestone', { days: streak });
+      }
+    } else if (lastDate !== todayStr) {
+      localStorage.setItem('ux_streak', '1');
+    }
+  } catch (_) {}
+})();
+
+// ============================================================
 // EXPOSE TO APP
 // ============================================================
 // Ensure namespace exists without overwriting other modules' additions
@@ -343,5 +401,11 @@ window.__wanchan.analytics = {
     trackFriendSearchView: trackFriendSearchView,
     trackFriendRequestAccept: trackFriendRequestAccept,
     trackDiaryFeedScroll: trackDiaryFeedScroll,
-    trackBlockReport: trackBlockReport
+    trackBlockReport: trackBlockReport,
+    // Funnel
+    trackPremiumView: trackPremiumView,
+    trackPremiumPlanSelect: trackPremiumPlanSelect,
+    trackPremiumPurchaseStart: trackPremiumPurchaseStart,
+    trackPremiumPurchaseComplete: trackPremiumPurchaseComplete,
+    trackPremiumPurchaseFail: trackPremiumPurchaseFail
   };
