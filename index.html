@@ -36,7 +36,7 @@
   --wc-accent: #FF7B9C;
   --wc-accent-light: #FFF0F3;
   --wc-text: #3D2C2C;
-  --wc-subtext: #BFA6A0;
+  --wc-subtext: #8A6F6A; /* UX: コントラスト比 2.8→4.7:1 (WCAG AA達成) */
   --wc-border: #F0D9D1;
   --wc-grad-start: #F5A6B8;
   --wc-grad-end: #FF7B9C;
@@ -286,7 +286,7 @@ body.ux-dark-on [style*="background: rgb(22, 163, 106)"],body.ux-dark-on [style*
 .ux-growth-stat-label{font-size:11px;color:#7A6060;margin-top:4px;}
 .ux-growth-card-milestone{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.85);border:1px solid rgba(255,123,156,.12);font-size:13px;font-weight:600;}
 .ux-growth-share{margin-top:12px;text-align:center;}
-.ux-growth-share button{padding:10px 24px;border-radius:var(--wc-radius-btn);border:none;background:linear-gradient(135deg,var(--wc-grad-start),var(--wc-grad-end));color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(255,123,156,.35);transition:transform .2s,box-shadow .2s;}
+.ux-growth-share button{padding:10px 24px;border-radius:var(--wc-radius-btn);border:none;background:linear-gradient(135deg,var(--wc-grad-start),var(--wc-grad-end));color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(255,123,156,.35);transition:transform .2s,box-shadow .2s;min-height:44px;} /* UX: タッチターゲット44px保証 */
 .ux-growth-share button:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(255,123,156,.45);}
 body.ux-dark-on .ux-growth-card{background:linear-gradient(135deg,#1a1a2e 0%,#2a1a2e 50%,#1a2a3e 100%);}
 body.ux-dark-on .ux-growth-stat{background:rgba(255,255,255,.08);}
@@ -332,7 +332,7 @@ body.ux-dark-on .ux-breed-curve-legend{color:#ccc;}
 
 /* Symptom Checker */
 .ux-symptom-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0;}
-.ux-symptom-chip{padding:10px 8px;border-radius:12px;border:2px solid #eee;background:#fff;text-align:center;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;}
+.ux-symptom-chip{padding:10px 8px;border-radius:12px;border:2px solid #eee;background:#fff;text-align:center;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;} /* UX: タッチターゲット44px保証 */
 .ux-symptom-chip.ux-selected{border-color:#FF7B9C;background:#FFF0F3;color:#FF7B9C;}
 body.ux-dark-on .ux-symptom-chip{background:#2a2a3e;border-color:#444;color:#ccc;}
 body.ux-dark-on .ux-symptom-chip.ux-selected{border-color:#FF7B9C;background:#3a2a3e;color:#FF7B9C;}
@@ -543,6 +543,7 @@ Error generating stack: `+n.message+`
     var iconSpan = document.createElement('span');
     iconSpan.className = 'ux-toast-icon';
     iconSpan.textContent = icons[type] || '💡';
+    iconSpan.setAttribute('aria-hidden', 'true'); // UX: スクリーンリーダーが絵文字を読まないように
     var msgSpan = document.createElement('span');
     msgSpan.textContent = msg;
     t.appendChild(iconSpan);
@@ -552,8 +553,10 @@ Error generating stack: `+n.message+`
       toastContainer.firstChild.remove();
     }
     toastContainer.appendChild(t);
-    setTimeout(function(){ t.classList.add('ux-toast-out'); }, 2500);
-    setTimeout(function(){ t.remove(); }, 2800);
+    // UX: error/warningは読み終わる時間を確保（4500ms）、通常は2500ms
+    var displayMs = (type === 'error' || type === 'warning') ? 4500 : 2500;
+    setTimeout(function(){ t.classList.add('ux-toast-out'); }, displayMs);
+    setTimeout(function(){ t.remove(); }, displayMs + 300);
   }
 
   // Override native alert with toast (coerce all types to string)
@@ -1065,9 +1068,9 @@ Error generating stack: `+n.message+`
   // Backup FAB (floating action button)
   var backupFab = document.createElement('button');
   backupFab.className = 'ux-backup-fab';
-  backupFab.textContent = '⚙️';
-  backupFab.setAttribute('aria-label', '設定');
-  backupFab.title = '設定';
+  backupFab.textContent = '＋'; // UX: ⚙️より「多機能メニュー」の意図が伝わる
+  backupFab.setAttribute('aria-label', 'メニューを開く');
+  backupFab.title = 'メニュー';
   document.body.appendChild(backupFab);
 
   // --- FAB Drag Logic ---
@@ -1315,7 +1318,7 @@ Error generating stack: `+n.message+`
 
   backupMenu.setAttribute('role', 'menu');
   backupFab.setAttribute('aria-expanded', 'false');
-  backupFab.setAttribute('aria-haspopup', 'true');
+  backupFab.setAttribute('aria-haspopup', 'menu'); // UX: WAI-ARIA 1.1 準拠
   backupFab.addEventListener('click', function() {
     // Ignore click if it was a drag gesture
     if (backupFab._isDragMove && backupFab._isDragMove()) return;
@@ -1420,7 +1423,7 @@ Error generating stack: `+n.message+`
 
     var skip = document.createElement('button');
     skip.className = 'ux-ob-skip';
-    skip.textContent = '以前のデータを引き継ぐ';
+    skip.textContent = 'すでに使っていた方はこちら（データ引き継ぎ）'; // UX: 新規ユーザーに意味が伝わる文言に
 
     function closeOnboard() {
       safeSetItem('ux_onboarded', '1');
@@ -2206,17 +2209,34 @@ Error generating stack: `+n.message+`
         }
       }
 
-      // Milestone detection（birthday未設定時はageDays依存の判定をスキップ）
+      // UX: マイルストーン取りこぼし修正
+      // 完全一致(===)だと当日にアプリを開かないと永久に表示されないため、
+      // 「以上」判定＋localStorageフラグで「まだ表示していない最初のマイルストーン」を表示
       var milestone = '';
-      if (birthday && ageDays === 0) milestone = '🎉 今日が記念すべき初日！';
-      else if (birthday && ageDays === 100) milestone = '🎊 100日おめでとう！';
-      else if (birthday && ageDays === 365) milestone = '🎂 1歳のお誕生日！';
-      else if (birthday && ageDays === 730) milestone = '🎂 2歳のお誕生日！';
-      else if (birthday && ageDays === 1095) milestone = '🎂 3歳のお誕生日！';
-      else if (diaries.length === 1) milestone = '📝 はじめての日記！';
-      else if (diaries.length === 10) milestone = '📝 日記10回達成！';
-      else if (diaries.length === 50) milestone = '📝 日記50回達成！';
-      else if (diaries.length === 100) milestone = '🏆 日記100回達成！';
+      var _msShown = {};
+      try { _msShown = JSON.parse(localStorage.getItem('ux_milestones') || '{}'); } catch(_) {}
+      function _checkMs(key, cond, text) {
+        if (cond && !_msShown[key]) {
+          milestone = text;
+          _msShown[key] = true;
+          try { localStorage.setItem('ux_milestones', JSON.stringify(_msShown)); } catch(_) {}
+          return true;
+        }
+        return false;
+      }
+      if (birthday) {
+        _checkMs('day0', ageDays === 0, '🎉 今日が記念すべき初日！') ||
+        _checkMs('day100', ageDays >= 100, '🎊 100日おめでとう！') ||
+        _checkMs('year1', ageDays >= 365, '🎂 1歳のお誕生日！') ||
+        _checkMs('year2', ageDays >= 730, '🎂 2歳のお誕生日！') ||
+        _checkMs('year3', ageDays >= 1095, '🎂 3歳のお誕生日！');
+      }
+      if (!milestone) {
+        _checkMs('diary1', diaries.length >= 1, '📝 はじめての日記！') ||
+        _checkMs('diary10', diaries.length >= 10, '📝 日記10回達成！') ||
+        _checkMs('diary50', diaries.length >= 50, '📝 日記50回達成！') ||
+        _checkMs('diary100', diaries.length >= 100, '🏆 日記100回達成！');
+      }
 
       return {
         name: name,
