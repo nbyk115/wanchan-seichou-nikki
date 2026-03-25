@@ -10,10 +10,10 @@
  */
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
-import { getAuth, signInWithPopup, signInWithRedirect, signOut, onAuthStateChanged, GoogleAuthProvider }
+import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, GoogleAuthProvider }
   from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, addDoc,
-  query, where, orderBy, limit, serverTimestamp, onSnapshot, deleteDoc, updateDoc, writeBatch }
+  query, where, orderBy, limit, serverTimestamp, onSnapshot, deleteDoc, updateDoc, writeBatch, increment }
   from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
 
 // ============================================================
@@ -36,6 +36,17 @@ if (isConfigured) {
   app = initializeApp(firebaseConfig);
   auth = getAuth(app);
   db = getFirestore(app);
+
+  // リダイレクトログイン後の復帰処理（Safari等のポップアップブロック環境）
+  getRedirectResult(auth).then(async (result) => {
+    if (!result || !result.user) return;
+    await setDoc(doc(db, 'users', result.user.uid), {
+      displayName: result.user.displayName,
+      photoURL: result.user.photoURL,
+      lastLogin: serverTimestamp()
+    }, { merge: true });
+    window.dispatchEvent(new CustomEvent('wanchan-login', { detail: { uid: result.user.uid } }));
+  }).catch(() => {});
 }
 
 // ============================================================
@@ -43,7 +54,7 @@ if (isConfigured) {
 // ============================================================
 async function login() {
   if (!isConfigured) {
-    _toast('Firebase未設定です', 'error');
+    _toast('アプリの準備がまだ完了していないよ。もう少し待ってみてね', 'error');
     return null;
   }
   const provider = new GoogleAuthProvider();
@@ -63,7 +74,11 @@ async function login() {
       await signInWithRedirect(auth, provider);
       return null;
     }
-    if (e.code !== 'auth/popup-closed-by-user') {
+    if (e.code === 'auth/network-request-failed') {
+      _toast('つながりにくいみたい。もう少ししてから試してね', 'error');
+    } else if (e.code === 'auth/too-many-requests') {
+      _toast('何度も試したためしばらく待ってね。少し時間をおいてから試してみてね', 'error');
+    } else if (e.code !== 'auth/popup-closed-by-user') {
       _toast('ログインがうまくいかなかったみたい。もう一度試してね', 'error');
     }
     return null;
@@ -179,7 +194,7 @@ async function leaveFootprint(targetUid) {
     if (existing.exists()) {
       await updateDoc(ref, {
         updatedAt: serverTimestamp(),
-        visitCount: (existing.data().visitCount || 1) + 1,
+        visitCount: increment(1), // アトミック操作（競合状態を防ぐ）
         fromName: auth.currentUser.displayName,
         fromPhoto: auth.currentUser.photoURL
       });
@@ -379,8 +394,12 @@ async function deleteIntroduction(targetUid, authorUid) {
 // ============================================================
 async function sendFriendRequest(targetUid) {
   if (!isConfigured || !auth.currentUser) return;
+  if (auth.currentUser.uid === targetUid) return; // 自己申請ガード
   try {
-    await setDoc(doc(db, 'friendRequests', auth.currentUser.uid + '_' + targetUid), {
+    const ref = doc(db, 'friendRequests', auth.currentUser.uid + '_' + targetUid);
+    const existing = await getDoc(ref);
+    if (existing.exists()) return; // 重複申請ガード
+    await setDoc(ref, {
       from: auth.currentUser.uid,
       fromName: auth.currentUser.displayName,
       to: targetUid,
@@ -444,6 +463,8 @@ async function getFriends(uid) {
 // ============================================================
 async function postComment(entryId, text) {
   if (!isConfigured || !auth.currentUser) return;
+  if (!text || !text.trim()) { _toast('コメントを入力してね', 'error'); return; }
+  if (text.length > 1000) { _toast('1000文字以内で書いてね', 'error'); return; }
   try {
     await addDoc(collection(db, 'comments'), {
       entryId: entryId,
