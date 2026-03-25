@@ -103,18 +103,18 @@ function getPremiumInfo() {
 // ============================================================
 async function createSession(planKey) {
   if (!isKomojuConfigured) {
-    _toast('KOMOJU未設定です', 'error');
+    _toast('決済機能はただいま準備中だよ。もう少し待ってね', 'info');
     return null;
   }
 
   var plan = KOMOJU_CONFIG.plans[planKey];
   if (!plan) {
-    _toast('プランが見つかりません', 'error');
+    _toast('ごめんね、このプランは今利用できないみたい', 'error');
     return null;
   }
 
   if (!KOMOJU_CONFIG.sessionEndpoint) {
-    _toast('決済サーバーが未設定です', 'error');
+    _toast('決済機能はただいま準備中だよ。もう少し待ってね', 'info');
     return null;
   }
 
@@ -155,7 +155,7 @@ async function createSession(planKey) {
     return session;
   } catch (e) {
     console.error('KOMOJU session error:', e);
-    _toast('決済セッションの作成に失敗しました', 'error');
+    _toast('お支払いの準備がうまくいかなかったよ。もう一度試してみてね', 'error');
     return null;
   }
 }
@@ -172,12 +172,12 @@ async function startPayment(planKey) {
     var url = new URL(session.session_url);
     if (!url.hostname.endsWith('komoju.com') && !url.hostname.endsWith('degica.com')) {
       console.error('Unexpected payment URL domain:', url.hostname);
-      _toast('決済URLが不正です', 'error');
+      _toast('お支払いページにうまく進めなかったよ。もう一度試してみてね', 'error');
       return;
     }
   } catch (e) {
     console.error('Invalid payment URL:', session.session_url);
-    _toast('決済URLが不正です', 'error');
+    _toast('お支払いページにうまく進めなかったよ。もう一度試してみてね', 'error');
     return;
   }
   window.location.href = session.session_url;
@@ -204,13 +204,13 @@ async function handlePaymentCallback() {
           body: JSON.stringify({ session_id: sessionId })
         });
         if (!verifyRes.ok) {
-          _toast('決済の検証に失敗しました。サポートにお問い合わせください', 'error');
+          _toast('お支払いの確認がうまくいかなかったよ。サポートに相談してね', 'error');
           console.error('Payment verification failed:', verifyRes.status);
           return;
         }
         var verifyData = await verifyRes.json();
         if (verifyData.status !== 'completed' && verifyData.status !== 'captured') {
-          _toast('決済が完了していません', 'error');
+          _toast('お支払いがまだ完了していないみたい。もう一度確認してね', 'error');
           return;
         }
       } catch (e) {
@@ -228,9 +228,9 @@ async function handlePaymentCallback() {
     setPremiumStatus(plan ? plan.id : planKey, Date.now() + duration);
     _toast('プレミアムプランに登録しました！', 'success');
   } else if (status === 'cancelled') {
-    _toast('決済がキャンセルされました', 'info');
+    _toast('お支払いがキャンセルされたよ', 'info');
   } else if (status === 'failed') {
-    _toast('決済に失敗しました。もう一度お試しください', 'error');
+    _toast('お支払いがうまくいかなかったみたい。もう一度試してみてね', 'error');
   }
 }
 
@@ -326,8 +326,8 @@ function showPremiumModal() {
   var monthlyBtn = document.getElementById('plan-monthly');
   if (monthlyBtn) {
     monthlyBtn.addEventListener('click', function() {
-      if (!isKomojuConfigured) { _toast('決済機能は準備中です', 'info'); return; }
-      if (currentPlan) { _toast('すでにプレミアム会員です', 'info'); return; }
+      if (!isKomojuConfigured) { _toast('決済機能はただいま準備中だよ', 'info'); return; }
+      if (currentPlan) { _toast('もうプレミアムを使っているよ', 'info'); return; }
       startPayment('monthly');
     });
     monthlyBtn.addEventListener('mouseenter', function() { this.style.transform = 'scale(1.02)'; });
@@ -337,8 +337,8 @@ function showPremiumModal() {
   var yearlyBtn = document.getElementById('plan-yearly');
   if (yearlyBtn) {
     yearlyBtn.addEventListener('click', function() {
-      if (!isKomojuConfigured) { _toast('決済機能は準備中です', 'info'); return; }
-      if (currentPlan) { _toast('すでにプレミアム会員です', 'info'); return; }
+      if (!isKomojuConfigured) { _toast('決済機能はただいま準備中だよ', 'info'); return; }
+      if (currentPlan) { _toast('もうプレミアムを使っているよ', 'info'); return; }
       startPayment('yearly');
     });
     yearlyBtn.addEventListener('mouseenter', function() { this.style.transform = 'scale(1.02)'; });

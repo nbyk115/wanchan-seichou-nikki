@@ -180,7 +180,7 @@ async function askAI(question) {
 
   if (!canUseAI()) {
     return {
-      error: '今月の無料相談回数（' + AI_CONFIG.freeLimit + '回）を使い切りました。\nプレミアムにアップグレードすると無制限で使えるよ',
+      error: '今月の無料相談回数（' + AI_CONFIG.freeLimit + '回）を使い切ったよ。\nもっと相談したい？ プレミアムなら何回でも使えるよ',
       limitReached: true
     };
   }
@@ -212,10 +212,10 @@ async function askAI(question) {
     clearTimeout(timeoutId);
 
     if (res.status === 429) {
-      return { error: 'リクエストが多すぎます。少し時間をおいてからお試しください。', rateLimited: true };
+      return { error: 'ちょっと混み合っているみたい。少し時間をおいてからもう一度試してね', rateLimited: true };
     }
     if (res.status === 401 || res.status === 403) {
-      return { error: '認証エラーが発生しました。ページを再読み込みしてください。' };
+      return { error: 'うまくつながらなかったみたい。ページを更新してもう一度試してね' };
     }
     if (!res.ok) {
       throw new Error('API error: ' + res.status);
@@ -324,7 +324,7 @@ function showConsultationModal() {
   // ヘッダー
   html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">';
   html += '<div style="display:flex;align-items:center;gap:10px;">';
-  html += '<span style="font-size:28px;">🩺</span>';
+  html += '<span style="font-size:28px;">🩹</span>';
   html += '<div>';
   html += '<div style="font-size:18px;font-weight:900;">AI健康相談</div>';
   html += '<div style="font-size:12px;color:#636363;">わんちゃんの気になることを聞いてみよう</div>';
@@ -362,7 +362,7 @@ function showConsultationModal() {
   // 入力エリア
   html += '<div style="display:flex;gap:8px;align-items:flex-end;">';
   html += '<textarea id="ai-input" maxlength="500" placeholder="わんちゃんの気になることを書いてね..." style="flex:1;padding:12px 16px;border-radius:16px;border:1.5px solid ' + (isDark ? '#444' : '#e0e0e0') + ';background:' + (isDark ? '#2a2a3e' : '#f8f8f8') + ';font-size:14px;font-family:inherit;resize:none;min-height:48px;max-height:120px;outline:none;color:' + (isDark ? '#e0e0e0' : '#333') + ';" rows="1"></textarea>';
-  html += '<button id="ai-send" style="width:48px;height:48px;border-radius:50%;border:none;background:linear-gradient(135deg,#FF7B9C,#FF5A85);color:#fff;font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;">➤</button>';
+  html += '<button id="ai-send" style="width:48px;height:48px;border-radius:50%;border:none;background:linear-gradient(135deg,#F5A6B8,#FF7B9C);color:#fff;font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;">➤</button>';
   html += '</div>';
 
   // 過去の相談履歴リンク
@@ -472,7 +472,7 @@ function showConsultationModal() {
     if (result.error) {
       answerArea.innerHTML = '<div style="padding:16px;background:' + (isDark ? '#3a2020' : '#FEF2F2') + ';border-radius:16px;font-size:14px;color:' + (isDark ? '#fca5a5' : '#DC2626') + ';line-height:1.7;white-space:pre-wrap;">' + _escapeHtml(result.error) + '</div>';
       if (result.limitReached) {
-        answerArea.innerHTML += '<div style="text-align:center;margin-top:12px;"><button id="ai-upgrade" style="padding:12px 24px;border-radius:14px;border:none;background:linear-gradient(135deg,#FFD700,#FFA500);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">プレミアムにアップグレード</button></div>';
+        answerArea.innerHTML += '<div style="text-align:center;margin-top:12px;"><button id="ai-upgrade" style="padding:12px 24px;border-radius:14px;border:none;background:linear-gradient(135deg,#FFD700,#FFA500);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">もっと楽しくなる機能を見てみる</button></div>';
         var upgradeBtn = document.getElementById('ai-upgrade');
         if (upgradeBtn) {
           upgradeBtn.addEventListener('click', function() {

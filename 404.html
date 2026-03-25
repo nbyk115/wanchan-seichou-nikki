@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>わんちゃん成長日記</title>
+<meta name="theme-color" content="#FFF8F5"/>
+<title>ページが見つからないよ - わんちゃん成長日記</title>
 <script>
 // GitHub Pages SPA redirect: preserve path for client-side routing
 (function() {
   var path = window.location.pathname;
   var base = '/wanchan-seichou-nikki/';
-  // If the path is within the app scope, redirect to index with the path as a query param
   if (path.startsWith(base)) {
     var route = path.slice(base.length);
     if (route && route !== 'index.html') {
@@ -17,28 +17,35 @@
       return;
     }
   }
-  // Default: redirect to app root
   window.location.replace(base);
 })();
 </script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Zen Maru Gothic','Hiragino Sans',sans-serif;background:#FFF8F5;display:flex;align-items:center;justify-content:center;min-height:100dvh;padding:24px;text-align:center;color:#333}
-.c{max-width:320px}.icon{font-size:64px;margin-bottom:16px}
+body{font-family:'Zen Maru Gothic','Hiragino Sans',sans-serif;background:#FFF8F5;display:flex;align-items:center;justify-content:center;min-height:100dvh;padding:24px;text-align:center;color:#3D2C2C}
+.c{max-width:320px}.icon{font-size:64px;margin-bottom:16px;animation:bounce 2s ease-in-out infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 h1{font-size:20px;font-weight:900;margin-bottom:8px}
-p{font-size:14px;color:#636363;line-height:1.7;margin-bottom:24px}
-a{display:inline-block;background:#FF7B9C;color:#fff;text-decoration:none;padding:14px 32px;border-radius:14px;font-size:15px;font-weight:700;font-family:inherit}
+p{font-size:14px;color:#8A6F6A;line-height:1.7;margin-bottom:24px}
+a{display:inline-block;background:linear-gradient(135deg,#F5A6B8,#FF7B9C);color:#fff;text-decoration:none;padding:14px 32px;border-radius:14px;font-size:15px;font-weight:700;font-family:inherit;transition:transform .15s}
 a:active{transform:scale(.97)}
+a:hover{transform:scale(1.02)}
 </style>
 </head>
 <body>
 <noscript>
 <div class="c">
 <div class="icon">🐾</div>
-<h1>ページが見つかりません</h1>
-<p>お探しのページは存在しないか、移動された可能性があります。</p>
+<h1>あれ？ページが見つからないよ</h1>
+<p>探しているページはお引っ越ししちゃったみたい。<br>トップページから探してみてね。</p>
 <a href="/wanchan-seichou-nikki/">トップページへ戻る</a>
 </div>
 </noscript>
+<!-- JS有効時のフォールバック（リダイレクト前に一瞬表示） -->
+<div class="c" id="fallback" style="display:none;">
+<div class="icon">🐾</div>
+<h1>トップページに移動するよ...</h1>
+</div>
+<script>document.getElementById('fallback').style.display='';</script>
 </body>
 </html>

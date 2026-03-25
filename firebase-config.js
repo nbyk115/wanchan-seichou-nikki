@@ -342,7 +342,7 @@ async function postIntroduction(targetUid, text) {
         updatedAt: serverTimestamp()
       });
     }
-    _toast('ひとことを投稿しました', 'success');
+    _toast('ひとことを書きました', 'success');
     return true;
   } catch (e) {
     console.error('postIntroduction failed:', e);

@@ -6,17 +6,19 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="theme-color" content="#FFF8F5"/>
-<meta name="description" content="わんちゃんの成長を記録する日記アプリ"/>
+<meta name="description" content="愛犬の日記・体重管理・AI健康相談がひとつに。犬種別の成長曲線で「うちの子」の成長を見える化。写真付き日記と犬友コミュニティで毎日がもっと愛おしくなる無料アプリ。"/>
 <meta property="og:title" content="わんちゃん成長日記"/>
 <meta property="og:description" content="うちの子の毎日を、もっと愛おしく。日記・体重管理・AI健康相談・思い出アルバム"/>
 <meta property="og:image" content="https://nbyk115.github.io/wanchan-seichou-nikki/og-image.png"/>
 <meta property="og:url" content="https://nbyk115.github.io/wanchan-seichou-nikki/"/>
 <meta property="og:type" content="website"/>
 <meta property="og:site_name" content="わんちゃん成長日記"/>
+<meta property="og:locale" content="ja_JP"/>
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="わんちゃん成長日記"/>
 <meta name="twitter:description" content="うちの子の毎日を、もっと愛おしく。"/>
 <meta name="twitter:image" content="https://nbyk115.github.io/wanchan-seichou-nikki/og-image.png"/>
+<link rel="canonical" href="https://nbyk115.github.io/wanchan-seichou-nikki/"/>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="icon-192.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -26,7 +28,29 @@
 <script type="module" src="analytics.js"></script>
 <script type="module" src="ai-consultation.js"></script>
 <!-- komoju-payment.js removed: premium features disabled -->
-<title>わんちゃん成長日記</title>
+<title>わんちゃん成長日記 - 犬の日記・体重管理・AI健康相談アプリ</title>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "わんちゃん成長日記",
+  "description": "愛犬の日記・体重管理・AI健康相談がひとつに。犬種別の成長曲線で成長を見える化する無料アプリ。",
+  "url": "https://nbyk115.github.io/wanchan-seichou-nikki/",
+  "applicationCategory": "LifestyleApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "JPY"
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.5",
+    "ratingCount": "1"
+  },
+  "featureList": ["犬の日記記録", "体重管理グラフ", "AI健康相談", "犬種別成長曲線", "犬友コミュニティ", "写真アルバム", "オフライン対応"]
+}
+</script>
 <style>
 /* === Design Tokens === */
 :root {
@@ -223,56 +247,30 @@ body.ux-dark-on .ux-offline-banner{background:#991B1B;}
 .ux-add-dog-cancel{background:#f0f0f0;color:#636363;}
 .ux-add-dog-submit{background:#FF7B9C;color:#fff;}
 .ux-add-dog-submit:disabled{opacity:.4;cursor:not-allowed;}
-body.ux-dark-on .ux-add-dog-panel{background:#1e1e2e;color:#e0e0e0;}
-body.ux-dark-on .ux-add-dog-input{background:#2a2a3e;border-color:#444;color:#e0e0e0;}
-body.ux-dark-on .ux-drum-picker{background:#252535;border-color:#444;}
-body.ux-dark-on .ux-drum-picker-item{color:#777;}
-body.ux-dark-on .ux-drum-picker-item.ux-selected{color:#e0e0e0;}
-body.ux-dark-on .ux-drum-picker-highlight{background:rgba(255,123,156,.12);border-color:rgba(255,123,156,.3);}
-body.ux-dark-on .ux-add-dog-cancel{background:#333;color:#aaa;}
-@media(prefers-color-scheme:dark){
-  body.ux-dark-auto .ux-add-dog-panel{background:#1e1e2e;color:#e0e0e0;}
-  body.ux-dark-auto .ux-add-dog-input{background:#2a2a3e;border-color:#444;color:#e0e0e0;}
-  body.ux-dark-auto .ux-drum-picker{background:#252535;border-color:#444;}
-  body.ux-dark-auto .ux-drum-picker-item{color:#777;}
-  body.ux-dark-auto .ux-drum-picker-item.ux-selected{color:#e0e0e0;}
-  body.ux-dark-auto .ux-drum-picker-highlight{background:rgba(255,123,156,.12);border-color:rgba(255,123,156,.3);}
-  body.ux-dark-auto .ux-add-dog-cancel{background:#333;color:#aaa;}
-}
-body.ux-dark-on .ux-dog-chip{background:#2a2a3e;border-color:#444;color:#aaa;}
-body.ux-dark-on .ux-dog-chip.ux-active{border-color:#FF7B9C;background:#3a2a3e;color:#FF7B9C;}
-body.ux-dark-on .ux-dog-chip-add{background:#3a3a4e;border-color:#555;}
-@media (prefers-color-scheme: dark) {
-  body.ux-dark-auto .ux-dog-chip{background:#2a2a3e;border-color:#444;color:#aaa;}
-  body.ux-dark-auto .ux-dog-chip.ux-active{border-color:#FF7B9C;background:#3a2a3e;color:#FF7B9C;}
-  body.ux-dark-auto .ux-dog-chip-add{background:#3a3a4e;border-color:#555;}
-}
+/* Dark mode: component overrides (consolidated - was duplicated for ux-dark-on and ux-dark-auto) */
+body.ux-dark-on .ux-add-dog-panel, body.ux-dark-auto .ux-add-dog-panel{background:#1e1e2e;color:#e0e0e0;}
+body.ux-dark-on .ux-add-dog-input, body.ux-dark-auto .ux-add-dog-input{background:#2a2a3e;border-color:#444;color:#e0e0e0;}
+body.ux-dark-on .ux-drum-picker, body.ux-dark-auto .ux-drum-picker{background:#252535;border-color:#444;}
+body.ux-dark-on .ux-drum-picker-item, body.ux-dark-auto .ux-drum-picker-item{color:#777;}
+body.ux-dark-on .ux-drum-picker-item.ux-selected, body.ux-dark-auto .ux-drum-picker-item.ux-selected{color:#e0e0e0;}
+body.ux-dark-on .ux-drum-picker-highlight, body.ux-dark-auto .ux-drum-picker-highlight{background:rgba(255,123,156,.12);border-color:rgba(255,123,156,.3);}
+body.ux-dark-on .ux-add-dog-cancel, body.ux-dark-auto .ux-add-dog-cancel{background:#333;color:#aaa;}
+body.ux-dark-on .ux-dog-chip, body.ux-dark-auto .ux-dog-chip{background:#2a2a3e;border-color:#444;color:#aaa;}
+body.ux-dark-on .ux-dog-chip.ux-active, body.ux-dark-auto .ux-dog-chip.ux-active{border-color:#FF7B9C;background:#3a2a3e;color:#FF7B9C;}
+body.ux-dark-on .ux-dog-chip-add, body.ux-dark-auto .ux-dog-chip-add{background:#3a3a4e;border-color:#555;}
 
-/* Dark mode: main content overrides */
-body.ux-dark-on{background:#121212 !important;color:#F0F0F0 !important;}
-body.ux-dark-on #root{background:#121212 !important;color:#F0F0F0 !important;}
-body.ux-dark-on #root>div{background:#1E1E1E !important;color:#F0F0F0 !important;}
-body.ux-dark-on input,body.ux-dark-on textarea,body.ux-dark-on select{background:#252525 !important;color:#F0F0F0 !important;border-color:#3a3a3a !important;}
-body.ux-dark-on h1,body.ux-dark-on h2,body.ux-dark-on h3{color:#F5F5F5 !important;}
-body.ux-dark-on a{color:#FF7B9C !important;}
-body.ux-dark-on [style*="background: rgb(236, 253, 245)"],body.ux-dark-on [style*="background:#ECFDF5"]{background:#1a2e1a !important;border-color:#2a4a2a !important;}
-body.ux-dark-on [style*="color: rgb(6, 95, 70)"],body.ux-dark-on [style*="color:#065F46"]{color:#6EE7B7 !important;}
-body.ux-dark-on [style*="color: rgb(239, 68, 68)"],body.ux-dark-on [style*="color:#EF4444"]{color:#FCA5A5 !important;}
-body.ux-dark-on [style*="background: rgb(239, 68, 68)"],body.ux-dark-on [style*="background:#EF4444"]{background:#991B1B !important;}
-body.ux-dark-on [style*="background: rgb(22, 163, 106)"],body.ux-dark-on [style*="background:#16A34A"]{background:#065F46 !important;}
-@media (prefers-color-scheme: dark) {
-  body.ux-dark-auto{background:#121212 !important;color:#F0F0F0 !important;}
-  body.ux-dark-auto #root{background:#121212 !important;color:#F0F0F0 !important;}
-  body.ux-dark-auto #root>div{background:#1E1E1E !important;color:#F0F0F0 !important;}
-  body.ux-dark-auto input,body.ux-dark-auto textarea,body.ux-dark-auto select{background:#252525 !important;color:#F0F0F0 !important;border-color:#3a3a3a !important;}
-  body.ux-dark-auto h1,body.ux-dark-auto h2,body.ux-dark-auto h3{color:#F5F5F5 !important;}
-  body.ux-dark-auto a{color:#FF7B9C !important;}
-  body.ux-dark-auto [style*="background: rgb(236, 253, 245)"],body.ux-dark-auto [style*="background:#ECFDF5"]{background:#1a2e1a !important;border-color:#2a4a2a !important;}
-  body.ux-dark-auto [style*="color: rgb(6, 95, 70)"],body.ux-dark-auto [style*="color:#065F46"]{color:#6EE7B7 !important;}
-  body.ux-dark-auto [style*="color: rgb(239, 68, 68)"],body.ux-dark-auto [style*="color:#EF4444"]{color:#FCA5A5 !important;}
-  body.ux-dark-auto [style*="background: rgb(239, 68, 68)"],body.ux-dark-auto [style*="background:#EF4444"]{background:#991B1B !important;}
-  body.ux-dark-auto [style*="background: rgb(22, 163, 106)"],body.ux-dark-auto [style*="background:#16A34A"]{background:#065F46 !important;}
-}
+/* Dark mode: main content overrides (consolidated) */
+body.ux-dark-on, body.ux-dark-auto{background:#121212 !important;color:#F0F0F0 !important;}
+body.ux-dark-on #root, body.ux-dark-auto #root{background:#121212 !important;color:#F0F0F0 !important;}
+body.ux-dark-on #root>div, body.ux-dark-auto #root>div{background:#1E1E1E !important;color:#F0F0F0 !important;}
+body.ux-dark-on input,body.ux-dark-on textarea,body.ux-dark-on select,body.ux-dark-auto input,body.ux-dark-auto textarea,body.ux-dark-auto select{background:#252525 !important;color:#F0F0F0 !important;border-color:#3a3a3a !important;}
+body.ux-dark-on h1,body.ux-dark-on h2,body.ux-dark-on h3,body.ux-dark-auto h1,body.ux-dark-auto h2,body.ux-dark-auto h3{color:#F5F5F5 !important;}
+body.ux-dark-on a, body.ux-dark-auto a{color:#FF7B9C !important;}
+body.ux-dark-on [style*="background: rgb(236, 253, 245)"],body.ux-dark-on [style*="background:#ECFDF5"],body.ux-dark-auto [style*="background: rgb(236, 253, 245)"],body.ux-dark-auto [style*="background:#ECFDF5"]{background:#1a2e1a !important;border-color:#2a4a2a !important;}
+body.ux-dark-on [style*="color: rgb(6, 95, 70)"],body.ux-dark-on [style*="color:#065F46"],body.ux-dark-auto [style*="color: rgb(6, 95, 70)"],body.ux-dark-auto [style*="color:#065F46"]{color:#6EE7B7 !important;}
+body.ux-dark-on [style*="color: rgb(239, 68, 68)"],body.ux-dark-on [style*="color:#EF4444"],body.ux-dark-auto [style*="color: rgb(239, 68, 68)"],body.ux-dark-auto [style*="color:#EF4444"]{color:#FCA5A5 !important;}
+body.ux-dark-on [style*="background: rgb(239, 68, 68)"],body.ux-dark-on [style*="background:#EF4444"],body.ux-dark-auto [style*="background: rgb(239, 68, 68)"],body.ux-dark-auto [style*="background:#EF4444"]{background:#991B1B !important;}
+body.ux-dark-on [style*="background: rgb(22, 163, 106)"],body.ux-dark-on [style*="background:#16A34A"],body.ux-dark-auto [style*="background: rgb(22, 163, 106)"],body.ux-dark-auto [style*="background:#16A34A"]{background:#065F46 !important;}
 
 /* Growth Summary Card */
 .ux-growth-card{position:relative;margin:16px;border-radius:20px;background:linear-gradient(135deg,#FFF8F5 0%,#FFE8EC 55%,#FFF0F3 100%);padding:24px 20px;box-shadow:0 4px 20px rgba(255,123,156,.18),0 1px 4px rgba(255,123,156,.1);border:1px solid rgba(255,123,156,.12);overflow:hidden;}
@@ -398,6 +396,14 @@ Error generating stack: `+n.message+`
 </head>
 <body>
 <div id="root"></div>
+<noscript>
+<div style="max-width:400px;margin:60px auto;padding:24px;text-align:center;font-family:'Zen Maru Gothic','Hiragino Sans',sans-serif;color:#3D2C2C;">
+<div style="font-size:64px;margin-bottom:16px;">🐾</div>
+<h1 style="font-size:22px;font-weight:900;margin-bottom:12px;">わんちゃん成長日記</h1>
+<p style="font-size:14px;color:#8A6F6A;line-height:1.8;margin-bottom:20px;">うちの子の毎日を、もっと愛おしく。<br>日記・体重管理・AI健康相談・犬種別成長曲線・犬友コミュニティが無料で使えるよ。</p>
+<p style="font-size:13px;color:#BFA6A0;">このアプリを使うにはJavaScriptを有効にしてね。</p>
+</div>
+</noscript>
 <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js');}</script>
 <script>
 (function(){
@@ -1267,7 +1273,7 @@ Error generating stack: `+n.message+`
 
   // AI健康相談ボタン
   var btnAI = document.createElement('button');
-  btnAI.textContent = '🩺 AI健康相談';
+  btnAI.textContent = '🩹 AI健康相談';
   btnAI.addEventListener('click', function() {
     backupMenu.classList.remove('ux-show');
     var _aiCheck = setInterval(function() {

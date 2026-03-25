@@ -1,13 +1,15 @@
 {
-  "name": "わんちゃん成長日記",
+  "name": "わんちゃん成長日記 - 犬の日記・体重管理",
   "short_name": "わんちゃん日記",
-  "description": "うちの子の毎日を、もっと愛おしく。日記・体重管理・AI健康相談・思い出アルバム",
+  "description": "愛犬の日記・体重管理・AI健康相談がひとつに。犬種別の成長曲線で「うちの子」の成長を見える化。写真付き日記と犬友コミュニティで毎日がもっと愛おしくなる無料アプリ。",
+  "id": "/wanchan-seichou-nikki/",
   "start_url": "/wanchan-seichou-nikki/",
   "scope": "/wanchan-seichou-nikki/",
   "display": "standalone",
   "background_color": "#FFF8F5",
   "theme_color": "#FFF8F5",
   "orientation": "portrait",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "icon-192.png",
