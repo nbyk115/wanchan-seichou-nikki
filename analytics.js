@@ -33,7 +33,7 @@ const ANALYTICS_CONFIG = {
   //   ※ measurementId が表示されない場合:
   //      Analytics → 有効にする を先に実行してからウェブアプリを再確認
   //   ※ Firebase Analytics は完全無料（GA4ベース、イベント数・ユーザー数の課金なし）
-  measurementId: 'G-XXXXXXXXXX'  // TODO: Firebaseコンソールから取得した実際の値に置き換える
+  measurementId: 'G-G4YK4WGZPQ'
 };
 
 // ============================================================

@@ -25,7 +25,8 @@ const firebaseConfig = {
   projectId: "wanchan-diary",
   storageBucket: "wanchan-diary.firebasestorage.app",
   messagingSenderId: "151633084436",
-  appId: "1:151633084436:web:ac8ffa692e4ba1839a2701"
+  appId: "1:151633084436:web:ac8ffa692e4ba1839a2701",
+  measurementId: "G-G4YK4WGZPQ"
 };
 
 // Skip initialization if config is not set
