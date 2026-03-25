@@ -1084,12 +1084,15 @@ Error generating stack: `+n.message+`
     // Restore saved position
     var saved = null;
     try { saved = JSON.parse(localStorage.getItem('ux_fab_pos')); } catch(e) {}
-    if (saved && typeof saved.bottom === 'number' && typeof saved.right === 'number') {
-      fab.style.bottom = saved.bottom + 'px';
-      fab.style.right = saved.right + 'px';
-      if (typeof saved.side === 'string' && saved.side === 'left') {
+    if (saved && typeof saved.bottom === 'number') {
+      var vw = window.innerWidth, vh = window.innerHeight;
+      var safeBottom = Math.max(EDGE_MARGIN, Math.min(saved.bottom, vh - FAB_SIZE - EDGE_MARGIN));
+      fab.style.bottom = safeBottom + 'px';
+      if (typeof saved.side === 'string' && saved.side === 'left' && typeof saved.left === 'number') {
         fab.style.right = 'auto';
-        fab.style.left = saved.left + 'px';
+        fab.style.left = Math.max(EDGE_MARGIN, Math.min(saved.left, vw - FAB_SIZE - EDGE_MARGIN)) + 'px';
+      } else if (typeof saved.right === 'number') {
+        fab.style.right = Math.max(EDGE_MARGIN, Math.min(saved.right, vw - FAB_SIZE - EDGE_MARGIN)) + 'px';
       }
     }
 
@@ -1718,7 +1721,14 @@ Error generating stack: `+n.message+`
       wasDragging = true;
       setTimeout(function() { wasDragging = false; }, 50);
       list.style.transition = 'transform .3s cubic-bezier(.23,1,.32,1)';
-      var currentY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+      var currentY;
+      if (e.changedTouches && e.changedTouches.length > 0) {
+        currentY = e.changedTouches[0].clientY;
+      } else if (typeof e.clientY === 'number') {
+        currentY = e.clientY;
+      } else {
+        currentY = startY; // フォールバック: ドラッグなしとして扱う
+      }
       var diff = currentY - startY;
       var newIndex = Math.round((-startTranslate - diff) / ITEM_HEIGHT);
       scrollToIndex(newIndex);
@@ -2035,6 +2045,7 @@ Error generating stack: `+n.message+`
         }).catch(function() {
           var content = document.getElementById('notif-content');
           if (content) content.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">お知らせの取得がうまくいきませんでした</div>';
+          _updateNotifBadge(0); // エラー時もバッジをクリア（QA-012）
         });
 
         // Track
@@ -2161,19 +2172,21 @@ Error generating stack: `+n.message+`
       var firstWeight = weights.length > 1 ? weights[0] : null;
       var weightChange = '';
       if (latestWeight && firstWeight) {
-        var lw = parseFloat(latestWeight.weight || latestWeight.w || 0);
-        var fw = parseFloat(firstWeight.weight || firstWeight.w || 0);
-        var diff = lw - fw;
-        weightChange = (diff >= 0 ? '+' : '') + diff.toFixed(1) + 'kg';
+        var lw = parseFloat(latestWeight.weight != null ? latestWeight.weight : latestWeight.w);
+        var fw = parseFloat(firstWeight.weight != null ? firstWeight.weight : firstWeight.w);
+        if (!isNaN(lw) && !isNaN(fw) && lw > 0 && lw <= 200 && fw > 0 && fw <= 200) {
+          var diff = lw - fw;
+          weightChange = (diff >= 0 ? '+' : '') + diff.toFixed(1) + 'kg';
+        }
       }
 
-      // Milestone detection
+      // Milestone detection（birthday未設定時はageDays依存の判定をスキップ）
       var milestone = '';
-      if (ageDays === 0) milestone = '🎉 今日が記念すべき初日！';
-      else if (ageDays === 100) milestone = '🎊 100日おめでとう！';
-      else if (ageDays === 365) milestone = '🎂 1歳のお誕生日！';
-      else if (ageDays === 730) milestone = '🎂 2歳のお誕生日！';
-      else if (ageDays === 1095) milestone = '🎂 3歳のお誕生日！';
+      if (birthday && ageDays === 0) milestone = '🎉 今日が記念すべき初日！';
+      else if (birthday && ageDays === 100) milestone = '🎊 100日おめでとう！';
+      else if (birthday && ageDays === 365) milestone = '🎂 1歳のお誕生日！';
+      else if (birthday && ageDays === 730) milestone = '🎂 2歳のお誕生日！';
+      else if (birthday && ageDays === 1095) milestone = '🎂 3歳のお誕生日！';
       else if (diaries.length === 1) milestone = '📝 はじめての日記！';
       else if (diaries.length === 10) milestone = '📝 日記10回達成！';
       else if (diaries.length === 50) milestone = '📝 日記50回達成！';
@@ -2274,7 +2287,12 @@ Error generating stack: `+n.message+`
       // Check if today is birthday
       if (todayStr === bdayStr) {
         var years = now.getFullYear() - birthday.getFullYear();
-        showAnniversaryBanner('🎂', dogName + 'の' + years + '歳のお誕生日おめでとう！');
+        if (years < 0) return; // 誕生日が未来日の場合は表示しない
+        if (years === 0) {
+          showAnniversaryBanner('🎉', dogName + 'が今日生まれたよ！');
+        } else {
+          showAnniversaryBanner('🎂', dogName + 'の' + years + '歳のお誕生日おめでとう！');
+        }
         return;
       }
 
@@ -2311,6 +2329,7 @@ Error generating stack: `+n.message+`
     var dismissed = localStorage.getItem('ux_anniv_dismissed');
     var today = new Date().toISOString().slice(0, 10);
     if (dismissed === today) return;
+    safeSetItem('ux_anniv_dismissed', today); // 表示した時点でその日の表示済みとしてマーク
 
     var banner = document.createElement('div');
     banner.className = 'ux-anniversary-banner';
@@ -2453,6 +2472,11 @@ Error generating stack: `+n.message+`
       }
 
       var maxW = curve.max;
+      if (!maxW || maxW <= 0) {
+        chart.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#888;font-size:14px;">この犬種のデータが正しく読み込めませんでした</div>';
+        if (status) status.style.display = 'none';
+        return;
+      }
       var months = curve.m;
       var barWidth = Math.floor((chart.offsetWidth - 24) / 12) - 4;
       if (barWidth < 16) barWidth = 16;
@@ -2462,7 +2486,9 @@ Error generating stack: `+n.message+`
       if (birthday && weights.length > 0) {
         var bDate = new Date(birthday);
         if (!isNaN(bDate.getTime())) weights.forEach(function(w) {
-          var wDate = new Date(w.date || w.d);
+          var rawDate = w.date || w.d;
+          if (!rawDate) return; // null/undefinedを明示的に除外
+          var wDate = new Date(rawDate);
           if (isNaN(wDate.getTime())) return;
           var monthAge = Math.round((wDate - bDate) / (1000 * 60 * 60 * 24 * 30));
           if (monthAge >= 0 && monthAge < 12) {
@@ -2661,8 +2687,10 @@ Error generating stack: `+n.message+`
     var dismissed = localStorage.getItem('ux_pwa_dismissed');
     if (dismissed) {
       var dismissedDate = new Date(dismissed);
-      var daysSince = (Date.now() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24);
-      if (daysSince < 7) return; // Don't show again for 7 days
+      if (!isNaN(dismissedDate.getTime())) {
+        var daysSince = (Date.now() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24);
+        if (daysSince < 7) return; // Don't show again for 7 days
+      }
     }
 
     // Show banner after 30 seconds of use

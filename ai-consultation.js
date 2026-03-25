@@ -364,6 +364,7 @@ function showConsultationModal() {
     var btn = document.getElementById('qq-' + i);
     if (btn) {
       btn.addEventListener('click', function() {
+        if (_isSubmitting) return; // 送信中は無視（QA-001）
         input.value = qq.q;
         input.dispatchEvent(new Event('input'));
         _submitQuestion();
@@ -393,9 +394,18 @@ function showConsultationModal() {
   // Focus input
   setTimeout(function() { input.focus(); }, 300);
 
+  var _isSubmitting = false; // 二重送信防止フラグ（QA-001）
+
   async function _submitQuestion() {
     var question = input.value.trim();
-    if (!question) return;
+    if (!question || _isSubmitting) return;
+    _isSubmitting = true;
+
+    // クイックボタンも無効化
+    quickQuestions.forEach(function(_, i) {
+      var b = document.getElementById('qq-' + i);
+      if (b) b.disabled = true;
+    });
 
     // Show loading
     answerArea.innerHTML = '<div style="text-align:center;padding:24px;"><div class="ux-spinner" style="width:32px;height:32px;border-width:3px;color:#FF7B9C;margin:0 auto 12px;"></div><div style="font-size:13px;color:#636363;">考え中...</div></div>';
@@ -404,6 +414,13 @@ function showConsultationModal() {
     input.disabled = true;
 
     var result = await askAI(question);
+
+    _isSubmitting = false;
+    // クイックボタン再有効化
+    quickQuestions.forEach(function(_, i) {
+      var b = document.getElementById('qq-' + i);
+      if (b) b.disabled = false;
+    });
 
     // Guard: modal may have been removed by browser back during async call
     if (!document.getElementById('wanchan-ai-modal')) return;
