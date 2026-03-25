@@ -4,7 +4,7 @@
     { "source": "/api/payment/create-session", "destination": "/api/payment/create-session" },
     { "source": "/api/payment/verify", "destination": "/api/payment/verify" },
     { "source": "/api/payment/webhook", "destination": "/api/payment/webhook" },
-    { "source": "/((?!api/)(?!.*\\.).*)", "destination": "/index.html" }
+    { "source": "/((?!api/)(?!legal|contact|premium)(?!.*\\.).*)", "destination": "/index.html" }
   ],
   "headers": [
     {
