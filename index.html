@@ -51,6 +51,54 @@
   "featureList": ["犬の日記記録", "体重管理グラフ", "AI健康相談", "犬種別成長曲線", "犬友コミュニティ", "写真アルバム", "オフライン対応"]
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "わんちゃん成長日記は無料で使えますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい、基本機能は全て無料で使えます。日記記録、体重管理、犬種別成長曲線、写真アルバム、犬友コミュニティが無料で利用できます。AI健康相談は月5回まで無料です。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "対応している犬種は何ですか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "成長曲線データは13犬種に対応しています。チワワ、トイプードル、ミニチュアダックスフンド、ポメラニアン、柴犬、フレンチブルドッグ、ゴールデンレトリバー、ラブラドールレトリバー、ヨークシャーテリア、シーズー、パグ、マルチーズ、ミニチュアシュナウザーの月齢別体重推移を収録しています。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "オフラインでも使えますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい、PWA（プログレッシブウェブアプリ）として動作するため、インターネットに接続していなくても日記の記録や閲覧ができます。オンラインに戻った際にクラウドと自動同期されます。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "AI健康相談はどのような相談ができますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "犬の健康に関する一般的な相談ができます。嘔吐、下痢、食欲不振、皮膚トラブルなど、気になる症状についてAIアドバイザーに相談できます。ただし獣医療行為の代替ではなく、深刻な症状の場合は動物病院への受診を案内します。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "多頭飼いに対応していますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい、複数のわんちゃんを登録して切り替えながら管理できます。それぞれの犬の日記、体重記録、成長曲線を個別に管理できます。"
+      }
+    }
+  ]
+}
+</script>
 <style>
 /* === Design Tokens === */
 :root {
@@ -611,10 +659,56 @@ Error generating stack: `+n.message+`
   })();
 
   /* ==============================
-     2. ENHANCED DELETE CONFIRMATION
+     2. ENHANCED DELETE CONFIRMATION + UNDO
      ============================== */
-  // The app uses a custom `.ask()` pattern for deletions.
-  // We don't override window.confirm to avoid breaking synchronous return values.
+  // Soft-delete Undo: show a "元に戻す" toast after data deletion
+  var _undoData = null;
+  var _undoTimer = null;
+
+  function showUndoToast(message, restoreCallback) {
+    // Clear previous undo
+    if (_undoTimer) { clearTimeout(_undoTimer); _undoTimer = null; }
+
+    var toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);z-index:10003;background:#333;color:#fff;padding:12px 20px;border-radius:14px;font-size:14px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 20px rgba(0,0,0,.3);animation:ux-toast-in .3s ease;max-width:calc(100% - 32px);';
+    toast.innerHTML = '<span>' + message + '</span><button id="ux-undo-btn" style="background:#FF7B9C;color:#fff;border:none;padding:8px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">元に戻す</button>';
+    document.body.appendChild(toast);
+
+    document.getElementById('ux-undo-btn').addEventListener('click', function() {
+      if (restoreCallback) restoreCallback();
+      toast.remove();
+      showToast('元に戻したよ', 'success');
+    });
+
+    _undoTimer = setTimeout(function() {
+      toast.style.opacity = '0';
+      toast.style.transition = 'opacity .3s';
+      setTimeout(function() { toast.remove(); }, 300);
+      _undoData = null;
+    }, 5000);
+  }
+
+  // Watch for wc2 data shrinkage (diary/entry deletion)
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'wc2' && e.oldValue && e.newValue) {
+      try {
+        var oldData = JSON.parse(e.oldValue);
+        var newData = JSON.parse(e.newValue);
+        var oldEntries = (oldData.diaries || oldData.entries || []).length;
+        var newEntries = (newData.diaries || newData.entries || []).length;
+        if (oldEntries > newEntries) {
+          _undoData = e.oldValue;
+          showUndoToast('日記を削除しました', function() {
+            if (_undoData) {
+              safeSetItem('wc2', _undoData);
+              _undoData = null;
+              setTimeout(function() { location.reload(); }, 500);
+            }
+          });
+        }
+      } catch(_) {}
+    }
+  });
 
   /* ==============================
      3. ACCESSIBILITY ENHANCEMENTS
@@ -2446,6 +2540,56 @@ Error generating stack: `+n.message+`
   });
 
   /* ==============================
+     20b. ACTION-BASED MILESTONES (行動ベースマイルストーン)
+     ============================== */
+  function checkActionMilestones() {
+    try {
+      var data = JSON.parse(localStorage.getItem('wc2') || '{}');
+      var name = data.name || 'わんちゃん';
+      var milestoneKey = 'ux_action_ms';
+      var shown = {};
+      try { shown = JSON.parse(localStorage.getItem(milestoneKey) || '{}'); } catch(_) {}
+
+      var milestones = [
+        { id: 'first_diary', check: function() { return (data.diaries || data.entries || []).length >= 1; }, text: '📝 初めての日記を書いたよ！', emoji: '🎉' },
+        { id: 'diary_10', check: function() { return (data.diaries || data.entries || []).length >= 10; }, text: '📝 日記が10件になったよ！すごい！', emoji: '🏆' },
+        { id: 'diary_50', check: function() { return (data.diaries || data.entries || []).length >= 50; }, text: '📝 日記50件達成！' + name + 'との思い出がたくさん', emoji: '👑' },
+        { id: 'weight_5', check: function() { return (data.weights || []).length >= 5; }, text: '⚖️ 体重記録5回目！成長が見えてきたね', emoji: '📊' },
+        { id: 'weight_20', check: function() { return (data.weights || []).length >= 20; }, text: '⚖️ 体重記録20回達成！健康管理バッチリ', emoji: '🌟' }
+      ];
+
+      milestones.forEach(function(ms) {
+        if (!shown[ms.id] && ms.check()) {
+          shown[ms.id] = Date.now();
+          try { localStorage.setItem(milestoneKey, JSON.stringify(shown)); } catch(_) {}
+          // 初回のマイルストーンのみバナー表示（1日1件まで）
+          var todayKey = 'ux_ms_today';
+          if (localStorage.getItem(todayKey) === new Date().toISOString().slice(0, 10)) return;
+          try { localStorage.setItem(todayKey, new Date().toISOString().slice(0, 10)); } catch(_) {}
+
+          var banner = document.createElement('div');
+          banner.style.cssText = 'position:fixed;top:env(safe-area-inset-top,16px);left:50%;transform:translateX(-50%);z-index:9999;background:linear-gradient(135deg,#FFD700,#FFA500);color:#fff;padding:14px 24px;border-radius:16px;font-size:14px;font-weight:700;box-shadow:0 4px 20px rgba(255,165,0,.3);animation:ux-page-in .4s ease;max-width:calc(100% - 32px);text-align:center;';
+          banner.innerHTML = '<span style="font-size:20px;">' + ms.emoji + '</span> ' + _escHtml(ms.text);
+          document.body.appendChild(banner);
+          setTimeout(function() {
+            banner.style.opacity = '0';
+            banner.style.transition = 'opacity .5s';
+            setTimeout(function() { banner.remove(); }, 500);
+          }, 5000);
+
+          var an = window.__wanchan && window.__wanchan.analytics;
+          if (an && an.logEvent) an.logEvent('action_milestone', { id: ms.id });
+        }
+      });
+    } catch(e) {}
+  }
+  // データ変更時にチェック
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'wc2') setTimeout(checkActionMilestones, 1000);
+  });
+  setTimeout(checkActionMilestones, 3000);
+
+  /* ==============================
      21. ANNIVERSARY REMINDER (記念日リマインダー) - Feature C
      ============================== */
   function checkAnniversary() {
@@ -2552,6 +2696,90 @@ Error generating stack: `+n.message+`
   }
 
   setTimeout(checkAnniversary, 2000);
+
+  /* ==============================
+     21b. MEMORY TIME CAPSULE (思い出タイムカプセル)
+     ============================== */
+  function showTimeCapsule() {
+    try {
+      var data = JSON.parse(localStorage.getItem('wc2') || '{}');
+      var diaries = data.diaries || data.entries || [];
+      if (diaries.length < 5) return; // 日記5件未満はスキップ
+
+      var now = new Date();
+      var capsules = [];
+
+      diaries.forEach(function(entry) {
+        var entryDate = new Date(entry.date || entry.d);
+        if (isNaN(entryDate.getTime())) return;
+        var diffDays = Math.floor((now - entryDate) / (1000 * 60 * 60 * 24));
+
+        // 1ヶ月前、3ヶ月前、6ヶ月前、1年前の±2日以内
+        var labels = [
+          { days: 30, label: '1ヶ月前の今日' },
+          { days: 90, label: '3ヶ月前の今日' },
+          { days: 180, label: '半年前の今日' },
+          { days: 365, label: '1年前の今日' }
+        ];
+        labels.forEach(function(m) {
+          if (Math.abs(diffDays - m.days) <= 2) {
+            capsules.push({ entry: entry, label: m.label, daysAgo: diffDays });
+          }
+        });
+      });
+
+      if (capsules.length === 0) return;
+
+      // 最も近い1件を表示
+      var capsule = capsules[0];
+      var name = data.name || 'わんちゃん';
+      var isDark = _isDark();
+
+      var card = document.createElement('div');
+      card.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:9999;max-width:340px;width:calc(100% - 32px);background:' + (isDark ? 'linear-gradient(135deg,#2a1a2e,#1e1e2e)' : 'linear-gradient(135deg,#FFF8F5,#FFE8EC)') + ';border-radius:20px;padding:16px 20px;box-shadow:0 8px 32px rgba(255,123,156,.25);border:1px solid rgba(255,123,156,.15);animation:ux-page-in .4s ease;';
+
+      var text = capsule.entry.text || capsule.entry.t || '';
+      var preview = text.substring(0, 60) + (text.length > 60 ? '...' : '');
+
+      card.innerHTML = '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">'
+        + '<span style="font-size:24px;">💝</span>'
+        + '<div style="font-size:13px;font-weight:700;color:' + (isDark ? '#F5A6B8' : '#FF7B9C') + ';">' + capsule.label + 'の' + _escHtml(name) + '</div>'
+        + '<button id="tc-close" style="margin-left:auto;background:none;border:none;font-size:16px;cursor:pointer;color:#888;">✕</button>'
+        + '</div>'
+        + '<div style="font-size:13px;color:' + (isDark ? '#ccc' : '#636363') + ';line-height:1.7;">' + _escHtml(preview) + '</div>';
+
+      document.body.appendChild(card);
+
+      document.getElementById('tc-close').addEventListener('click', function() {
+        card.style.opacity = '0';
+        card.style.transition = 'opacity .3s';
+        setTimeout(function() { card.remove(); }, 300);
+      });
+
+      // 10秒後に自動消去
+      setTimeout(function() {
+        if (card.parentNode) {
+          card.style.opacity = '0';
+          card.style.transition = 'opacity .3s';
+          setTimeout(function() { card.remove(); }, 300);
+        }
+      }, 10000);
+
+      // Analytics
+      var an = window.__wanchan && window.__wanchan.analytics;
+      if (an && an.logEvent) an.logEvent('time_capsule_shown', { label: capsule.label, days_ago: capsule.daysAgo });
+
+      // 1日1回まで
+      try { localStorage.setItem('ux_tc_last', new Date().toISOString().slice(0, 10)); } catch(_) {}
+    } catch(e) {}
+  }
+
+  // 1日1回、ページ読み込み5秒後に表示
+  setTimeout(function() {
+    var lastShown = localStorage.getItem('ux_tc_last') || '';
+    var today = new Date().toISOString().slice(0, 10);
+    if (lastShown !== today) showTimeCapsule();
+  }, 5000);
 
   /* ==============================
      22. BREED GROWTH CURVE (犬種別成長曲線) - Feature B
