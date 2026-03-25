@@ -790,12 +790,31 @@ Error generating stack: `+n.message+`
         autoSaveTimers[key] = setTimeout(function() {
           if (ta.value.trim()) {
             safeSetItem(key, ta.value);
+            // 保存済みインジケータを表示
+            _showSaveIndicator(ta);
           } else {
-            try { localStorage.removeItem(key); } catch(_) {} // BUG-004: removeItem もエラーハンドリング
+            try { localStorage.removeItem(key); } catch(_) {}
           }
         }, 2000);
       });
     });
+  }
+
+  // Auto-save indicator
+  function _showSaveIndicator(textarea) {
+    var existing = textarea.parentNode && textarea.parentNode.querySelector('.ux-save-indicator');
+    if (existing) { existing.remove(); }
+    var ind = document.createElement('div');
+    ind.className = 'ux-save-indicator';
+    ind.textContent = '✓ 保存済み';
+    ind.style.cssText = 'font-size:11px;color:#10B981;position:absolute;right:8px;bottom:4px;pointer-events:none;opacity:1;transition:opacity .5s;';
+    // Position relative parent
+    if (textarea.parentNode) {
+      textarea.parentNode.style.position = 'relative';
+      textarea.parentNode.appendChild(ind);
+      setTimeout(function() { ind.style.opacity = '0'; }, 1500);
+      setTimeout(function() { ind.remove(); }, 2200);
+    }
   }
 
   // Clear draft after successful form submission

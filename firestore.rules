@@ -93,11 +93,20 @@ service cloud.firestore {
     }
 
     // Premium status: サーバー(Admin SDK)のみ書き込み、本人のみ読み取り
-    // クライアントからの書き込みは一切禁止（改竄防止）
-    // Webhook/verify API が Admin SDK 経由で書き込む
     match /premium/{userId} {
       allow read: if request.auth != null && request.auth.uid == userId;
-      allow write: if false; // Admin SDK only (サーバーサイド専用)
+      allow write: if false; // Admin SDK only
+    }
+
+    // AI usage tracking: サーバー(Admin SDK)のみ書き込み、本人のみ読み取り
+    match /aiUsage/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if false; // Admin SDK only
+    }
+
+    // AI response cache: サーバーのみ読み書き（クライアントアクセス不可）
+    match /aiCache/{cacheId} {
+      allow read, write: if false; // Admin SDK only
     }
 
     // Comments: anyone logged in can create, anyone can read, author can delete

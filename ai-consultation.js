@@ -389,6 +389,7 @@ function showConsultationModal() {
   html += '<textarea id="ai-input" maxlength="500" placeholder="わんちゃんの気になることを書いてね..." style="flex:1;padding:12px 16px;border-radius:16px;border:1.5px solid ' + (isDark ? '#444' : '#e0e0e0') + ';background:' + (isDark ? '#2a2a3e' : '#f8f8f8') + ';font-size:14px;font-family:inherit;resize:none;min-height:48px;max-height:120px;outline:none;color:' + (isDark ? '#e0e0e0' : '#333') + ';" rows="1"></textarea>';
   html += '<button id="ai-send" style="width:48px;height:48px;border-radius:50%;border:none;background:linear-gradient(135deg,#F5A6B8,#FF7B9C);color:#fff;font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;">➤</button>';
   html += '</div>';
+  html += '<div id="ai-char-count" style="text-align:right;font-size:11px;color:#aaa;margin-top:4px;">0 / 500</div>';
 
   // 過去の相談履歴リンク
   var history = getHistory();
@@ -420,6 +421,16 @@ function showConsultationModal() {
   input.addEventListener('input', function() {
     this.style.height = 'auto';
     this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+  });
+
+  // Character counter
+  var charCount = document.getElementById('ai-char-count');
+  input.addEventListener('input', function() {
+    var len = input.value.length;
+    if (charCount) {
+      charCount.textContent = len + ' / 500';
+      charCount.style.color = len >= 450 ? '#EF4444' : len >= 350 ? '#F59E0B' : '#aaa';
+    }
   });
 
   // Quick question buttons
@@ -470,8 +481,8 @@ function showConsultationModal() {
       if (b) b.disabled = true;
     });
 
-    // Show loading
-    answerArea.innerHTML = '<div style="text-align:center;padding:24px;"><div class="ux-spinner" style="width:32px;height:32px;border-width:3px;color:#FF7B9C;margin:0 auto 12px;"></div><div style="font-size:13px;color:#636363;">考え中...</div></div>';
+    // Show loading (paw animation for brand consistency)
+    answerArea.innerHTML = '<div style="text-align:center;padding:24px;"><div style="font-size:28px;animation:ux-paw-walk 1.2s ease-in-out infinite;">🐾</div><div style="font-size:13px;color:#636363;margin-top:8px;">考え中...</div></div><style>@keyframes ux-paw-walk{0%,100%{transform:translateX(0) rotate(0deg)}25%{transform:translateX(-8px) rotate(-8deg)}75%{transform:translateX(8px) rotate(8deg)}}</style>';
     sendBtn.disabled = true;
     sendBtn.style.opacity = '0.5';
     input.disabled = true;
@@ -495,7 +506,20 @@ function showConsultationModal() {
     input.style.height = 'auto';
 
     if (result.error) {
-      answerArea.innerHTML = '<div style="padding:16px;background:' + (isDark ? '#3a2020' : '#FEF2F2') + ';border-radius:16px;font-size:14px;color:' + (isDark ? '#fca5a5' : '#DC2626') + ';line-height:1.7;white-space:pre-wrap;">' + _escapeHtml(result.error) + '</div>';
+      var errorHtml = '<div style="padding:16px;background:' + (isDark ? '#3a2020' : '#FEF2F2') + ';border-radius:16px;font-size:14px;color:' + (isDark ? '#fca5a5' : '#DC2626') + ';line-height:1.7;white-space:pre-wrap;">' + _escapeHtml(result.error) + '</div>';
+      // エラー時に「もう一度試す」ボタンを表示（limitReached以外）
+      if (!result.limitReached) {
+        errorHtml += '<div style="text-align:center;margin-top:10px;"><button id="ai-retry" style="padding:10px 20px;border-radius:12px;border:1.5px solid ' + (isDark ? '#555' : '#ddd') + ';background:' + (isDark ? '#2a2a3e' : '#fff') + ';color:' + (isDark ? '#e0e0e0' : '#333') + ';font-size:13px;cursor:pointer;font-family:inherit;">もう一度試す</button></div>';
+      }
+      answerArea.innerHTML = errorHtml;
+      // Retry button handler
+      var retryBtn = document.getElementById('ai-retry');
+      if (retryBtn) {
+        retryBtn.addEventListener('click', function() {
+          input.value = question;
+          _submitQuestion();
+        });
+      }
       if (result.limitReached) {
         answerArea.innerHTML += '<div style="text-align:center;margin-top:12px;"><button id="ai-upgrade" style="padding:12px 24px;border-radius:14px;border:none;background:linear-gradient(135deg,#FFD700,#FFA500);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">もっと楽しくなる機能を見てみる</button></div>';
         var upgradeBtn = document.getElementById('ai-upgrade');
