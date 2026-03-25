@@ -27,7 +27,7 @@
 <script type="module" src="firebase-config.js"></script>
 <script type="module" src="analytics.js"></script>
 <script type="module" src="ai-consultation.js"></script>
-<!-- komoju-payment.js removed: premium features disabled -->
+<script type="module" src="komoju-payment.js"></script>
 <title>わんちゃん成長日記 - 犬の日記・体重管理・AI健康相談アプリ</title>
 <script type="application/ld+json">
 {
@@ -862,6 +862,28 @@ Error generating stack: `+n.message+`
      ============================== */
   var debounceTimer;
 
+  // Form validation enhancement: add min/max to number inputs, prevent future dates
+  function enhanceFormValidation() {
+    // 体重入力に min/max/step 制約を追加
+    document.querySelectorAll('#root input[type="number"]:not([data-ux-validated])').forEach(function(input) {
+      input.setAttribute('data-ux-validated', '1');
+      // 体重入力を推定（placeholder や周辺テキストから判断）
+      var context = (input.placeholder || '') + (input.parentNode ? input.parentNode.textContent || '' : '');
+      if (context.match(/体重|kg|キロ|weight/i)) {
+        if (!input.min) input.min = '0.1';
+        if (!input.max) input.max = '100';
+        if (!input.step) input.step = '0.1';
+      }
+    });
+    // 日付入力に未来日防止の max を追加
+    document.querySelectorAll('#root input[type="date"]:not([data-ux-validated])').forEach(function(input) {
+      input.setAttribute('data-ux-validated', '1');
+      if (!input.max) {
+        input.max = new Date().toISOString().slice(0, 10);
+      }
+    });
+  }
+
   function runAllEnhancements() {
     // Guard: skip if #root is empty or detached (e.g., during browser back/bfcache restore)
     var root = document.getElementById('root');
@@ -871,6 +893,7 @@ Error generating stack: `+n.message+`
       enableLazyLoading();
       enableAutoSave();
       enhanceScrolling();
+      enhanceFormValidation();
     } catch(e) {
       // Swallow errors from stale DOM references during navigation
     }
@@ -1484,6 +1507,67 @@ Error generating stack: `+n.message+`
     trapFocus(overlay, closeOnboard);
     autoFocusOverlay(overlay);
   }
+
+  /* ==============================
+     14a-2. COACHMARKS (初回機能ガイド)
+     ============================== */
+  function showCoachmarks() {
+    if (localStorage.getItem('ux_coachmarks_done')) return;
+
+    var tips = [
+      { icon: '📝', title: 'ここで日記を書けるよ', desc: '毎日の小さな成長を写真と一緒に記録しよう' },
+      { icon: '⚖️', title: '体重も記録できるよ', desc: '犬種別の成長曲線と比べて「うちの子」の成長を確認' },
+      { icon: '🩹', title: '困ったらAI相談', desc: '⚙️ボタンから「AI健康相談」を選んでね' }
+    ];
+
+    var currentTip = 0;
+    var isDark = _isDark();
+
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10002;display:flex;align-items:center;justify-content:center;animation:ux-fade-in .3s ease;';
+
+    function renderTip() {
+      var tip = tips[currentTip];
+      var isLast = currentTip === tips.length - 1;
+      overlay.innerHTML = '<div style="background:' + (isDark ? '#1e1e2e' : '#fff') + ';border-radius:24px;padding:32px 24px;max-width:300px;text-align:center;animation:ux-page-in .3s ease;">'
+        + '<div style="font-size:48px;margin-bottom:12px;">' + tip.icon + '</div>'
+        + '<div style="font-size:17px;font-weight:900;color:' + (isDark ? '#e0e0e0' : '#333') + ';margin-bottom:8px;">' + tip.title + '</div>'
+        + '<div style="font-size:13px;color:#8A6F6A;line-height:1.7;margin-bottom:20px;">' + tip.desc + '</div>'
+        + '<div style="display:flex;gap:6px;justify-content:center;margin-bottom:16px;">'
+        + tips.map(function(_, i) { return '<div style="width:8px;height:8px;border-radius:50%;background:' + (i === currentTip ? '#FF7B9C' : (isDark ? '#444' : '#ddd')) + ';"></div>'; }).join('')
+        + '</div>'
+        + '<button id="cm-next" style="width:100%;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,#F5A6B8,#FF7B9C);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">' + (isLast ? 'はじめよう！' : '次へ →') + '</button>'
+        + '</div>';
+
+      document.getElementById('cm-next').addEventListener('click', function() {
+        if (isLast) {
+          try { localStorage.setItem('ux_coachmarks_done', '1'); } catch(_) {}
+          overlay.style.opacity = '0';
+          overlay.style.transition = 'opacity .3s';
+          setTimeout(function() { overlay.remove(); }, 300);
+        } else {
+          currentTip++;
+          renderTip();
+        }
+      });
+    }
+
+    // スキップ（オーバーレイクリックで閉じる）
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) {
+        try { localStorage.setItem('ux_coachmarks_done', '1'); } catch(_) {}
+        overlay.remove();
+      }
+    });
+
+    renderTip();
+    document.body.appendChild(overlay);
+  }
+
+  // オンボーディング完了後にコーチマーク表示（初回のみ）
+  window.addEventListener('wanchan-dog-added', function() {
+    setTimeout(showCoachmarks, 2000);
+  });
 
   // Show onboarding for genuinely new users only
   setTimeout(showOnboarding, 600);
