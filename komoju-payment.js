@@ -13,8 +13,8 @@
 // ============================================================
 const KOMOJU_CONFIG = {
   publishableKey: 'pk_test_2egwjzbogaqk3c42rl78guhi',
-  // セッション作成用エンドポイント（自前サーバーまたは Cloud Functions）
-  sessionEndpoint: '',
+  // セッション作成用エンドポイント（Vercel Serverless Functions）
+  sessionEndpoint: '/api/payment/create-session',
   plans: {
     monthly: {
       id: 'wanchan_premium_monthly',
@@ -45,58 +45,110 @@ const KOMOJU_CONFIG = {
 const isKomojuConfigured = KOMOJU_CONFIG.publishableKey !== 'YOUR_PUBLISHABLE_KEY';
 
 // ============================================================
-// PREMIUM STATE
+// PREMIUM STATE (Firestore参照 + localStorageキャッシュ)
+//
+// 信頼の源泉: Firestore `premium/{uid}` ドキュメント
+// - Webhook/verify で書き込み → クライアントはリードオンリー
+// - localStorageはオフラインキャッシュ用（改竄されてもFirestoreで上書き）
 // ============================================================
-function isPremium() {
+
+// Firestoreからプレミアム状態をフェッチしてキャッシュに保存
+var _premiumCache = null; // { planId, expiresAt, fetchedAt }
+
+async function _fetchPremiumFromFirestore() {
   try {
-    var data = localStorage.getItem('wanchan_premium');
-    if (!data) return false;
-    var parsed = JSON.parse(data);
-    if (!parsed || !parsed.expiresAt) return false;
-    // 簡易改竄検知（チェックサム検証）
-    if (parsed._cs !== undefined && parsed._cs !== _computeChecksum(parsed)) {
-      console.warn('Premium status checksum mismatch - possible tampering');
-      return false;
+    var fb = window.__wanchan && window.__wanchan.firebase;
+    if (!fb || !fb.isConfigured) return null;
+    // firebase-config.js が expose する Firestore doc/getDoc を利用
+    // onAuth コールバック内で呼ぶため auth.currentUser は存在する前提
+    var auth = fb._getAuth && fb._getAuth();
+    if (!auth || !auth.currentUser) return null;
+
+    var uid = auth.currentUser.uid;
+    var db = fb._getDb && fb._getDb();
+    if (!db) return null;
+
+    // dynamic import を避け、firebase-config.js が既に読み込んだ Firestore SDK を利用
+    var firestore = await import('https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js');
+    var snap = await firestore.getDoc(firestore.doc(db, 'premium', uid));
+
+    if (!snap.exists()) {
+      _premiumCache = { planId: null, expiresAt: 0, fetchedAt: Date.now() };
+      _syncCacheToLocalStorage();
+      return _premiumCache;
     }
-    return Date.now() < parsed.expiresAt;
-  } catch (e) {
-    return false;
-  }
-}
 
-function setPremiumStatus(planId, expiresAt) {
-  try {
-    var data = {
-      planId: planId,
-      activatedAt: Date.now(),
-      expiresAt: expiresAt
+    var data = snap.data();
+    var expiresAtMs = data.expiresAt
+      ? (data.expiresAt.toMillis ? data.expiresAt.toMillis() : data.expiresAt)
+      : 0;
+
+    _premiumCache = {
+      planId: data.planId || data.planKey || null,
+      planKey: data.planKey || null,
+      expiresAt: expiresAtMs,
+      activatedAt: data.activatedAt
+        ? (data.activatedAt.toMillis ? data.activatedAt.toMillis() : data.activatedAt)
+        : 0,
+      fetchedAt: Date.now()
     };
-    // 簡易改竄検知用チェックサム（完全な保護にはサーバーサイド検証が必要）
-    data._cs = _computeChecksum(data);
-    localStorage.setItem('wanchan_premium', JSON.stringify(data));
+    _syncCacheToLocalStorage();
+    return _premiumCache;
   } catch (e) {
-    console.error('Failed to save premium status:', e);
+    console.warn('Premium Firestore fetch failed, using cache:', e.message);
+    return null;
   }
 }
 
-function _computeChecksum(data) {
-  var str = String(data.planId) + '|' + String(data.activatedAt) + '|' + String(data.expiresAt) + '|wanchan2024';
-  var hash = 0;
-  for (var i = 0; i < str.length; i++) {
-    hash = ((hash << 5) - hash) + str.charCodeAt(i);
-    hash |= 0;
-  }
-  return hash;
+function _syncCacheToLocalStorage() {
+  if (!_premiumCache) return;
+  try {
+    localStorage.setItem('wanchan_premium', JSON.stringify(_premiumCache));
+  } catch (e) {}
 }
 
-function getPremiumInfo() {
+function _loadCacheFromLocalStorage() {
   try {
     var data = localStorage.getItem('wanchan_premium');
-    return data ? JSON.parse(data) : null;
+    if (!data) return null;
+    return JSON.parse(data);
   } catch (e) {
     return null;
   }
 }
+
+/**
+ * プレミアム判定（同期版 — UIレンダリング用）
+ * キャッシュがあればキャッシュを参照。なければlocalStorageフォールバック。
+ * 正確な判定が必要な場合は isPremiumAsync() を使用。
+ */
+function isPremium() {
+  var cache = _premiumCache || _loadCacheFromLocalStorage();
+  if (!cache || !cache.expiresAt) return false;
+  return Date.now() < cache.expiresAt;
+}
+
+/**
+ * プレミアム判定（非同期版 — Firestoreから最新状態を取得）
+ * 決済完了後のコールバックやゲーティング処理で使用。
+ */
+async function isPremiumAsync() {
+  var cache = await _fetchPremiumFromFirestore();
+  if (!cache) {
+    // Firestore到達不能時はローカルキャッシュにフォールバック
+    return isPremium();
+  }
+  return Date.now() < cache.expiresAt;
+}
+
+function getPremiumInfo() {
+  return _premiumCache || _loadCacheFromLocalStorage();
+}
+
+// ログイン時にFirestoreからプレミアム状態を自動取得
+window.addEventListener('wanchan-login', function() {
+  _fetchPremiumFromFirestore().catch(function() {});
+});
 
 // ============================================================
 // KOMOJU SESSION
@@ -198,7 +250,7 @@ async function handlePaymentCallback() {
     // サーバーサイドでセッションを検証（URLパラメータだけでは偽装可能）
     if (KOMOJU_CONFIG.sessionEndpoint) {
       try {
-        var verifyRes = await fetch(KOMOJU_CONFIG.sessionEndpoint + '/verify', {
+        var verifyRes = await fetch('/api/payment/verify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ session_id: sessionId })
@@ -222,10 +274,8 @@ async function handlePaymentCallback() {
       console.warn('SECURITY WARNING: No sessionEndpoint configured. Payment status not verified server-side.');
     }
 
-    var planKey = params.get('plan') || 'monthly';
-    var plan = KOMOJU_CONFIG.plans[planKey];
-    var duration = planKey === 'yearly' ? 365 * 24 * 60 * 60 * 1000 : 30 * 24 * 60 * 60 * 1000;
-    setPremiumStatus(plan ? plan.id : planKey, Date.now() + duration);
+    // verify API が Firestore に書き込み済み → クライアントはFirestoreからキャッシュ更新
+    await _fetchPremiumFromFirestore();
     _toast('プレミアムプランに登録しました！', 'success');
   } else if (status === 'cancelled') {
     _toast('お支払いがキャンセルされたよ', 'info');
@@ -362,6 +412,7 @@ Object.assign(window.__wanchan, {
   payment: {
     isConfigured: isKomojuConfigured,
     isPremium: isPremium,
+    isPremiumAsync: isPremiumAsync,
     getPremiumInfo: getPremiumInfo,
     showPremiumModal: showPremiumModal,
     renderPremiumBadge: renderPremiumBadge,

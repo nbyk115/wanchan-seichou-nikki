@@ -530,6 +530,13 @@ window.__wanchan.firebase = {
     login: login,
     logout: logout,
     onAuth: onAuth,
+    // 他モジュール（komoju-payment.js等）からFirestore/Authインスタンスを取得するためのヘルパー
+    _getAuth: function() { return auth; },
+    _getDb: function() { return db; },
+    _getIdToken: async function() {
+      try { return auth && auth.currentUser ? await auth.currentUser.getIdToken() : null; }
+      catch (_) { return null; }
+    },
     syncToCloud: syncToCloud,
     syncFromCloud: syncFromCloud,
     leaveFootprint: leaveFootprint,
