@@ -1717,6 +1717,11 @@ Error generating stack: `+n.message+`
     setTimeout(showCoachmarks, 2000);
   });
 
+  // 初回訪問時（オンボーディング済み＆コーチマーク未完了）にも3秒後に発動
+  if (localStorage.getItem('ux_onboarded') && !localStorage.getItem('ux_coachmarks_done')) {
+    setTimeout(showCoachmarks, 3000);
+  }
+
   // Show onboarding for genuinely new users only
   setTimeout(showOnboarding, 600);
 
@@ -2538,8 +2543,26 @@ Error generating stack: `+n.message+`
     html += '<div class="ux-growth-card-stats">';
     html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + (data.ageText || '-') + '</div><div class="ux-growth-stat-label">年齢</div></div>';
     html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + (data.latestWeight !== '-' ? data.latestWeight + '<span style="font-size:12px;">kg</span>' : '-') + '</div><div class="ux-growth-stat-label">現在の体重' + (data.weightChange ? ' (' + data.weightChange + ')' : '') + '</div></div>';
-    html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + data.diaryCount + '</div><div class="ux-growth-stat-label">日記数</div></div>';
+    // 日記数マイルストーン絵文字
+    var diaryMilestoneEmoji = '';
+    if (data.diaryCount >= 100) {
+      diaryMilestoneEmoji = ' 🏆';
+    } else if (data.diaryCount >= 50) {
+      diaryMilestoneEmoji = ' 🎉';
+    } else if (data.diaryCount >= 10) {
+      diaryMilestoneEmoji = ' ⭐';
+    }
+    html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + data.diaryCount + diaryMilestoneEmoji + '</div><div class="ux-growth-stat-label">日記数</div></div>';
     html += '</div>';
+
+    // 日記数マイルストーンメッセージ
+    if (data.diaryCount === 100) {
+      html += '<div class="ux-growth-card-milestone" style="color:#E11D48;text-align:center;font-size:14px;font-weight:700;margin:8px 0;animation:ux-fade-in .5s ease;">🏆 100日記達成！すごい！' + _escHtml(data.name) + 'との思い出がいっぱいだね</div>';
+    } else if (data.diaryCount === 50) {
+      html += '<div class="ux-growth-card-milestone" style="color:#D97706;text-align:center;font-size:14px;font-weight:700;margin:8px 0;animation:ux-fade-in .5s ease;">🎉 50日記達成！' + _escHtml(data.name) + 'との素敵な記録だね</div>';
+    } else if (data.diaryCount === 10) {
+      html += '<div class="ux-growth-card-milestone" style="color:#7C3AED;text-align:center;font-size:14px;font-weight:700;margin:8px 0;animation:ux-fade-in .5s ease;">⭐ 10日記達成！記録の習慣がついてきたね</div>';
+    }
 
     if (data.milestone) {
       html += '<div class="ux-growth-card-milestone" style="color:' + (isDark ? '#FFD700' : '#B45309') + ';">' + data.milestone + '</div>';
