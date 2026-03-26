@@ -329,8 +329,17 @@ function isRateLimited(ip) {
 // HANDLER
 // ============================================================
 module.exports = async function handler(req, res) {
-  // CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // CORS — 本番では自ドメインに制限
+  const allowedOrigins = [
+    'https://nbyk115.github.io',
+    'https://wanchan-seichou-nikki.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:5173'
+  ];
+  const origin = req.headers.origin || '';
+  if (allowedOrigins.some(function(o) { return origin.startsWith(o); })) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(204).end();

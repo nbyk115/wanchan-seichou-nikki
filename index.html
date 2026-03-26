@@ -43,11 +43,6 @@
     "price": "0",
     "priceCurrency": "JPY"
   },
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.5",
-    "ratingCount": "1"
-  },
   "featureList": ["犬の日記記録", "体重管理グラフ", "AI健康相談", "犬種別成長曲線", "犬友コミュニティ", "写真アルバム", "オフライン対応"]
 }
 </script>
@@ -2526,6 +2521,13 @@ Error generating stack: `+n.message+`
 
     if (data.milestone) {
       html += '<div class="ux-growth-card-milestone" style="color:' + (isDark ? '#FFD700' : '#B45309') + ';">' + data.milestone + '</div>';
+    }
+
+    // ストリーク表示
+    var streak = parseInt(localStorage.getItem('ux_streak') || '0', 10);
+    if (streak >= 2) {
+      var streakEmoji = streak >= 30 ? '👑' : streak >= 14 ? '🌟' : streak >= 7 ? '🔥' : '✨';
+      html += '<div style="text-align:center;font-size:13px;font-weight:700;color:' + (isDark ? '#FFD700' : '#B45309') + ';margin:8px 0;">' + streakEmoji + ' ' + streak + '日連続記録中！</div>';
     }
 
     html += '<div class="ux-growth-share"><button id="ux-growth-share-btn">📤 みんなに見せてあげよう</button></div>';
