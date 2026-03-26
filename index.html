@@ -2555,13 +2555,18 @@ Error generating stack: `+n.message+`
     html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + data.diaryCount + diaryMilestoneEmoji + '</div><div class="ux-growth-stat-label">日記数</div></div>';
     html += '</div>';
 
-    // 日記数マイルストーンメッセージ
-    if (data.diaryCount === 100) {
+    // 日記数マイルストーンメッセージ（>=で判定し、一度表示したらフラグ管理）
+    var _dms = {};
+    try { _dms = JSON.parse(localStorage.getItem('ux_diary_ms') || '{}'); } catch(_){}
+    if (data.diaryCount >= 100 && !_dms.d100) {
       html += '<div class="ux-growth-card-milestone" style="color:#E11D48;text-align:center;font-size:14px;font-weight:700;margin:8px 0;animation:ux-fade-in .5s ease;">🏆 100日記達成！すごい！' + _escHtml(data.name) + 'との思い出がいっぱいだね</div>';
-    } else if (data.diaryCount === 50) {
+      _dms.d100 = 1; try { localStorage.setItem('ux_diary_ms', JSON.stringify(_dms)); } catch(_){}
+    } else if (data.diaryCount >= 50 && !_dms.d50) {
       html += '<div class="ux-growth-card-milestone" style="color:#D97706;text-align:center;font-size:14px;font-weight:700;margin:8px 0;animation:ux-fade-in .5s ease;">🎉 50日記達成！' + _escHtml(data.name) + 'との素敵な記録だね</div>';
-    } else if (data.diaryCount === 10) {
+      _dms.d50 = 1; try { localStorage.setItem('ux_diary_ms', JSON.stringify(_dms)); } catch(_){}
+    } else if (data.diaryCount >= 10 && !_dms.d10) {
       html += '<div class="ux-growth-card-milestone" style="color:#7C3AED;text-align:center;font-size:14px;font-weight:700;margin:8px 0;animation:ux-fade-in .5s ease;">⭐ 10日記達成！記録の習慣がついてきたね</div>';
+      _dms.d10 = 1; try { localStorage.setItem('ux_diary_ms', JSON.stringify(_dms)); } catch(_){}
     }
 
     if (data.milestone) {
