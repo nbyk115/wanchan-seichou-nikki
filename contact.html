@@ -22,6 +22,20 @@ a{color:#FF7B9C;text-decoration:none}
 .back{display:inline-block;margin-top:24px;padding:12px 24px;background:#f0e0d8;color:#3D2C2C;border-radius:14px;font-weight:700;font-size:14px}
 .thanks{display:none;text-align:center;padding:40px 20px}
 .thanks .icon{font-size:64px;margin-bottom:16px}
+.footer{margin-top:40px;padding-top:20px;border-top:1px solid #f0e0d8;text-align:center}
+.footer nav{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;font-size:13px}
+.footer a{color:#8A6F6A;text-decoration:none}
+.footer a:hover{color:#FF7B9C}
+.footer .copy{font-size:11px;color:#b0a09a;margin-top:12px}
+@media(prefers-color-scheme:dark){
+  body{background:#1a1210;color:#e8d8d0}
+  label{color:#e8d8d0}
+  input,textarea,select{background:#2a1e1a;border-color:#3d2e28;color:#e8d8d0}
+  .info{background:#2a1e1a;color:#a89490}
+  .footer{border-top-color:#3d2e28}
+  .footer a{color:#a89490}
+  .footer .copy{color:#6a5a54}
+}
 </style>
 </head>
 <body>
@@ -80,7 +94,15 @@ document.getElementById('contact-form').addEventListener('submit', function(e) {
 });
 </script>
 
-<a href="/wanchan-seichou-nikki/" class="back">← トップページへ戻る</a>
+<footer class="footer">
+<nav>
+<a href="/wanchan-seichou-nikki/">トップページ</a>
+<a href="premium.html">プレミアムプラン</a>
+<a href="legal.html">特定商取引法</a>
+<a href="privacy.html">プライバシーポリシー</a>
+</nav>
+<p class="copy">&copy; 2025 わんちゃん成長日記</p>
+</footer>
 </div>
 </body>
 </html>

@@ -148,6 +148,8 @@ img{max-width:100%;height:auto;}
 
 /* Loading spinner (utility class for future use) */
 .ux-spinner{display:inline-block;width:20px;height:20px;border:2.5px solid rgba(0,0,0,.1);border-top-color:currentColor;border-radius:50%;animation:ux-spin .6s linear infinite;}
+.ux-skeleton{background:linear-gradient(90deg,#f0e0d8 25%,#f8ece6 50%,#f0e0d8 75%);background-size:200% 100%;animation:ux-shimmer 1.5s ease-in-out infinite;border-radius:12px;min-height:20px;}
+@keyframes ux-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 @keyframes ux-spin{to{transform:rotate(360deg);}}
 
 /* Accessibility: Focus Visible */
@@ -1249,6 +1251,23 @@ Error generating stack: `+n.message+`
   backupFab.setAttribute('aria-label', 'メニューを開く');
   backupFab.title = 'メニュー';
   document.body.appendChild(backupFab);
+
+  // FAB tooltip for first-time users
+  if (!localStorage.getItem('ux_fab_tooltip_shown')) {
+    setTimeout(function() {
+      var tooltip = document.createElement('div');
+      tooltip.style.cssText = 'position:fixed;bottom:150px;right:16px;background:#333;color:#fff;padding:10px 16px;border-radius:12px;font-size:13px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.3);animation:ux-fade-in .3s ease;z-index:9998;white-space:nowrap;';
+      tooltip.innerHTML = '👆 タップでメニューが開くよ<div style="position:absolute;bottom:-6px;right:20px;width:12px;height:12px;background:#333;transform:rotate(45deg);"></div>';
+      document.body.appendChild(tooltip);
+      try { localStorage.setItem('ux_fab_tooltip_shown', '1'); } catch(_) {}
+      setTimeout(function() {
+        tooltip.style.opacity = '0';
+        tooltip.style.transition = 'opacity .5s';
+        setTimeout(function() { tooltip.remove(); }, 500);
+      }, 4000);
+      backupFab.addEventListener('click', function() { tooltip.remove(); }, { once: true });
+    }, 3000);
+  }
 
   // --- FAB Drag Logic ---
   (function() {
