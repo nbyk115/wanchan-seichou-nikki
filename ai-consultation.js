@@ -299,6 +299,8 @@ function _localFallback(question) {
     answer = '犬種や年齢によって必要な運動量は異なるけど、一般的には1日2回、各15〜30分程度のお散歩が目安だよ。\n\n子犬は無理させず短めに、シニア犬はゆっくりペースでね。暑い日は早朝・夕方以降に、アスファルトの温度にも注意してあげてね。';
   } else if (q.includes('皮膚') || q.includes('かゆ') || q.includes('フケ') || q.includes('湿疹')) {
     answer = 'わんちゃんの皮膚トラブルは、アレルギー・乾燥・ノミ/ダニ・真菌感染など原因は様々だよ。\n\nまずは患部を清潔に保ち、掻きすぎないよう注意してあげてね。広範囲に広がる・脱毛がある・悪臭がする場合は、早めに動物病院で診てもらってね。';
+  } else if (q.includes('歯磨き') || q.includes('歯') || q.includes('口臭') || q.includes('デンタル')) {
+    answer = 'わんちゃんの歯磨きは、歯周病予防のためにとても大切だよ。\n\nまずは口を触ることに慣れさせて、ご褒美と一緒に少しずつステップアップしてね。犬用歯ブラシと歯磨きペーストを使って、奥歯の外側を重点的に磨くのがコツだよ。嫌がる場合は歯磨きガムやデンタルトイから始めるのもおすすめだよ。';
   } else if (q.includes('ワクチン') || q.includes('予防接種')) {
     answer = 'わんちゃんのワクチンは、混合ワクチン（5種〜9種）と狂犬病ワクチンがあるよ。\n\n子犬は生後2〜4ヶ月に2〜3回の混合ワクチン接種が推奨されているよ。狂犬病ワクチンは法律で年1回の接種が義務づけられているんだ。かかりつけの動物病院でスケジュールを相談してみてね。';
   } else {
@@ -374,7 +376,9 @@ function showConsultationModal() {
     { label: '🤮 吐いた', q: 'うちの子が吐いてしまいました。どうしたらいいですか？' },
     { label: '💩 下痢', q: 'うちの子が下痢をしています。対処法を教えてください。' },
     { label: '🍽️ 食欲がない', q: 'うちの子が食欲がありません。考えられる原因は？' },
-    { label: '🐾 皮膚が気になる', q: 'うちの子の皮膚が荒れています。何が原因でしょうか？' }
+    { label: '🐾 皮膚が気になる', q: 'うちの子の皮膚が荒れています。何が原因でしょうか？' },
+    { label: '🚶 散歩の量は？', q: 'うちの子に必要な散歩の時間や距離はどのくらいですか？' },
+    { label: '🪥 歯磨きのコツ', q: '犬の歯磨きのやり方やコツを教えてください。嫌がる場合はどうすればいいですか？' }
   ];
   quickQuestions.forEach(function(qq, i) {
     html += '<button id="qq-' + i + '" style="padding:8px 14px;border-radius:20px;border:1.5px solid ' + (isDark ? '#444' : '#e0e0e0') + ';background:' + (isDark ? '#2a2a3e' : '#fff') + ';font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:' + (isDark ? '#ccc' : '#555') + ';">' + qq.label + '</button>';
@@ -481,13 +485,27 @@ function showConsultationModal() {
       if (b) b.disabled = true;
     });
 
-    // Show loading (paw animation for brand consistency)
-    answerArea.innerHTML = '<div style="text-align:center;padding:24px;"><div style="font-size:28px;animation:ux-paw-walk 1.2s ease-in-out infinite;">🐾</div><div style="font-size:13px;color:#636363;margin-top:8px;">考え中...</div></div><style>@keyframes ux-paw-walk{0%,100%{transform:translateX(0) rotate(0deg)}25%{transform:translateX(-8px) rotate(-8deg)}75%{transform:translateX(8px) rotate(8deg)}}</style>';
+    // Show loading (paw animation for brand consistency) with progressive messages
+    answerArea.innerHTML = '<div style="text-align:center;padding:24px;"><div style="font-size:28px;animation:ux-paw-walk 1.2s ease-in-out infinite;">🐾</div><div id="ai-loading-msg" style="font-size:13px;color:#636363;margin-top:8px;">考え中...</div></div><style>@keyframes ux-paw-walk{0%,100%{transform:translateX(0) rotate(0deg)}25%{transform:translateX(-8px) rotate(-8deg)}75%{transform:translateX(8px) rotate(8deg)}}</style>';
     sendBtn.disabled = true;
     sendBtn.style.opacity = '0.5';
     input.disabled = true;
 
+    // 段階的ローディングメッセージ: 待ち時間の体感を軽減
+    var _loadingTimer1 = setTimeout(function() {
+      var msgEl = document.getElementById('ai-loading-msg');
+      if (msgEl) msgEl.textContent = 'もう少しだよ...';
+    }, 3000);
+    var _loadingTimer2 = setTimeout(function() {
+      var msgEl = document.getElementById('ai-loading-msg');
+      if (msgEl) msgEl.textContent = 'ちょっと時間かかっているみたい...';
+    }, 8000);
+
     var result = await askAI(question);
+
+    // ローディングタイマーのクリーンアップ
+    clearTimeout(_loadingTimer1);
+    clearTimeout(_loadingTimer2);
 
     _isSubmitting = false;
     // クイックボタン再有効化
@@ -552,7 +570,7 @@ function showConsultationModal() {
       var fallbackMsg = result.timeoutWarning
         ? result.timeoutWarning
         : result.fallback
-          ? '※ AIには接続されていません。以下は「よくある回答例」です（定型文）。'
+          ? 'AIがお休み中のため、よくある質問から回答しているよ'
           : '';
       var fallbackNotice = fallbackMsg
         ? '<div style="margin-bottom:8px;padding:8px 12px;border-radius:10px;background:' + (isDark ? '#2a2a1a' : '#FFFBEB') + ';font-size:11px;color:' + (isDark ? '#fcd34d' : '#92400E') + ';text-align:center;">' + _escapeHtml(fallbackMsg) + '</div>'
