@@ -271,13 +271,13 @@ async function askAI(question) {
   } catch (e) {
     console.error('AI consultation error:', e);
     if (e.name === 'AbortError') {
-      var fb = _localFallback(question);
-      fb.timeoutWarning = '回答の取得に時間がかかったため、定型文で回答しています。時間をおいて再度お試しください。';
-      return fb;
+      var fallbackTimeout = _localFallback(question);
+      fallbackTimeout.timeoutWarning = '回答に少し時間がかかっちゃったので、まずはよくある質問から回答するね。もう一度試してみてね。';
+      return fallbackTimeout;
     }
-    var fb = _localFallback(question);
-    fb.timeoutWarning = 'ネットワークエラーのため、定型文で回答しています。';
-    return fb;
+    var fallbackNetwork = _localFallback(question);
+    fallbackNetwork.timeoutWarning = '通信がうまくいかなかったので、まずはよくある質問から回答するね。電波の良いところでもう一度試してみてね。';
+    return fallbackNetwork;
   }
 }
 
@@ -570,7 +570,7 @@ function showConsultationModal() {
       var fallbackMsg = result.timeoutWarning
         ? result.timeoutWarning
         : result.fallback
-          ? 'AIがお休み中のため、よくある質問から回答しているよ'
+          ? 'よくある質問から回答しているよ。詳しくはもう一度聞いてみてね'
           : '';
       var fallbackNotice = fallbackMsg
         ? '<div style="margin-bottom:8px;padding:8px 12px;border-radius:10px;background:' + (isDark ? '#2a2a1a' : '#FFFBEB') + ';font-size:11px;color:' + (isDark ? '#fcd34d' : '#92400E') + ';text-align:center;">' + _escapeHtml(fallbackMsg) + '</div>'

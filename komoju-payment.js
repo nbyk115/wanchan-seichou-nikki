@@ -250,9 +250,18 @@ async function handlePaymentCallback() {
     // サーバーサイドでセッションを検証（URLパラメータだけでは偽装可能）
     if (KOMOJU_CONFIG.sessionEndpoint) {
       try {
+        // 認証ヘッダーを付与（サーバー側でユーザー特定に必要）
+        var verifyHeaders = { 'Content-Type': 'application/json' };
+        try {
+          var fb = window.__wanchan && window.__wanchan.firebase;
+          if (fb && fb._getIdToken) {
+            var idToken = await fb._getIdToken();
+            if (idToken) verifyHeaders['Authorization'] = 'Bearer ' + idToken;
+          }
+        } catch (_authErr) {}
         var verifyRes = await fetch('/api/payment/verify', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: verifyHeaders,
           body: JSON.stringify({ session_id: sessionId })
         });
         if (!verifyRes.ok) {

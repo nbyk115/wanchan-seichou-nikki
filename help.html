@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#FFF8F5"/>
+<meta name="description" content="わんちゃん成長日記の使い方ガイド。日記の書き方、体重記録、AI健康相談、犬友機能の使い方をわかりやすく解説。"/>
+<title>使い方ガイド - わんちゃん成長日記</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Zen Maru Gothic','Hiragino Sans',sans-serif;background:#FFF8F5;color:#3D2C2C;line-height:1.8}
+.container{max-width:600px;margin:0 auto;padding:24px 20px 60px}
+h1{font-size:20px;font-weight:900;margin-bottom:8px;text-align:center}
+.sub{font-size:14px;color:#8A6F6A;text-align:center;margin-bottom:24px}
+h2{font-size:17px;font-weight:900;margin:28px 0 12px;display:flex;align-items:center;gap:8px}
+.card{background:#fff;border-radius:16px;padding:20px;margin-bottom:12px;box-shadow:0 2px 8px rgba(255,123,156,.08);border:1px solid #f0e0d8}
+.card-title{font-size:15px;font-weight:900;margin-bottom:8px;color:#FF7B9C}
+.card p{font-size:13px;color:#636363}
+.faq{margin-bottom:8px}
+.faq summary{font-size:14px;font-weight:700;padding:14px 16px;background:#fff;border-radius:14px;cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;border:1px solid #f0e0d8}
+.faq summary::before{content:'❓';font-size:16px}
+.faq summary::after{content:'▼';margin-left:auto;font-size:10px;color:#aaa;transition:transform .2s}
+.faq[open] summary::after{transform:rotate(180deg)}
+.faq .answer{padding:12px 16px;font-size:13px;color:#636363;line-height:1.8}
+a{color:#FF7B9C;text-decoration:none}
+.footer{margin-top:40px;padding-top:20px;border-top:1px solid #f0e0d8;text-align:center}
+.footer nav{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;font-size:13px}
+.footer a{color:#8A6F6A}
+.footer a:hover{color:#FF7B9C}
+.footer .copy{font-size:11px;color:#b0a09a;margin-top:12px}
+@media(prefers-color-scheme:dark){
+  body{background:#1a1210;color:#e8d8d0}
+  .card{background:#2a1e1a;border-color:#3d2e28}
+  .card p{color:#a89490}
+  .faq summary{background:#2a1e1a;border-color:#3d2e28;color:#e8d8d0}
+  .faq .answer{color:#a89490}
+  .footer{border-top-color:#3d2e28}
+  .footer a{color:#a89490}
+  .footer .copy{color:#6a5a54}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🐾 使い方ガイド</h1>
+<p class="sub">わんちゃん成長日記の機能をかんたんに紹介するよ</p>
+
+<h2>📝 基本の使い方</h2>
+
+<div class="card">
+<div class="card-title">1. わんちゃんを登録</div>
+<p>アプリを開いたら、まず「はじめる」をタップ。わんちゃんの名前と犬種を入力すると、専用の日記がスタートするよ。多頭飼いの場合は後から追加もできるよ。</p>
+</div>
+
+<div class="card">
+<div class="card-title">2. 日記を書く</div>
+<p>毎日の出来事を写真と一緒に記録しよう。下書きは自動で保存されるから、途中で閉じても安心だよ。</p>
+</div>
+
+<div class="card">
+<div class="card-title">3. 体重を記録</div>
+<p>体重を定期的に記録すると、グラフで成長の推移が見えるよ。犬種別の成長曲線と比較して、うちの子の成長を確認しよう。</p>
+</div>
+
+<div class="card">
+<div class="card-title">4. AI健康相談</div>
+<p>気になる症状があるときは、メニュー（＋ボタン）から「AI健康相談」を選んでね。月5回まで無料で相談できるよ。クイックボタンで「吐いた」「下痢」などよくある相談もすぐに聞けるよ。</p>
+</div>
+
+<div class="card">
+<div class="card-title">5. 犬友とつながる</div>
+<p>Googleログインすると、犬友ひろばが使えるようになるよ。他の飼い主さんの日記に足あとを残したり、ひとこと紹介文を書いたりできるよ。</p>
+</div>
+
+<h2>❓ よくある質問</h2>
+
+<details class="faq">
+<summary>無料で使えますか？</summary>
+<div class="answer">はい！日記・体重管理・犬種別成長曲線・犬友コミュニティは全て無料で使えるよ。AI健康相談は月5回まで無料、プレミアムなら無制限で使えるよ。</div>
+</details>
+
+<details class="faq">
+<summary>データはどこに保存されますか？</summary>
+<div class="answer">基本的にはお使いのスマートフォンのブラウザに保存されるよ。Googleログインすると、クラウド（Firebase）にも自動同期されるので、機種変更しても安心だよ。</div>
+</details>
+
+<details class="faq">
+<summary>オフラインでも使えますか？</summary>
+<div class="answer">はい！電波がなくても日記の記録や閲覧ができるよ。オンラインに戻った時に自動で同期されるよ。</div>
+</details>
+
+<details class="faq">
+<summary>多頭飼いに対応していますか？</summary>
+<div class="answer">対応しているよ！メニューから「わんちゃんを追加」で何頭でも登録できるよ。画面上部のチップで簡単に切り替えられるよ。</div>
+</details>
+
+<details class="faq">
+<summary>AI相談の回答は信頼できますか？</summary>
+<div class="answer">AIの回答はあくまで参考情報だよ。深刻な症状がある場合は必ず獣医さんに相談してね。AIは具体的な薬の名前や投薬量は回答しないように設計されているよ。</div>
+</details>
+
+<details class="faq">
+<summary>ホーム画面に追加するには？</summary>
+<div class="answer"><strong>iPhone:</strong> Safariで開いて、共有ボタン（□↑）→「ホーム画面に追加」<br><strong>Android:</strong> Chromeで開いて、メニュー（⋮）→「ホーム画面に追加」またはインストールバナーをタップ</div>
+</details>
+
+<details class="faq">
+<summary>データを引き継ぐには？</summary>
+<div class="answer">Googleログインしていれば、新しい端末で同じGoogleアカウントでログインするだけで自動的にデータが同期されるよ。ログインしていない場合は、メニューからデータをエクスポート→新端末でインポートしてね。</div>
+</details>
+
+<footer class="footer">
+<nav>
+<a href="/wanchan-seichou-nikki/">トップページ</a>
+<a href="premium.html">プレミアムプラン</a>
+<a href="contact.html">お問い合わせ</a>
+<a href="legal.html">特定商取引法</a>
+<a href="privacy.html">プライバシーポリシー</a>
+<a href="terms.html">利用規約</a>
+</nav>
+<p class="copy">&copy; 2026 わんちゃん成長日記</p>
+</footer>
+</div>
+</body>
+</html>

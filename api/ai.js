@@ -28,7 +28,15 @@ function getAdmin() {
   if (_admin) return _admin;
   const admin = require('firebase-admin');
   if (!admin.apps.length) {
-    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
+      throw new Error('FIREBASE_SERVICE_ACCOUNT environment variable is not set');
+    }
+    let serviceAccount;
+    try {
+      serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    } catch (parseErr) {
+      throw new Error('FIREBASE_SERVICE_ACCOUNT is not valid JSON: ' + parseErr.message);
+    }
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount)
     });
@@ -318,6 +326,12 @@ function isRateLimited(ip) {
   const entry = _rateLimitMap.get(ip);
   if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW) {
     _rateLimitMap.set(ip, { windowStart: now, count: 1 });
+    // 期限切れエントリを定期的にクリーンアップ（メモリリーク防止）
+    if (_rateLimitMap.size > 1000) {
+      for (const [key, val] of _rateLimitMap) {
+        if (now - val.windowStart > RATE_LIMIT_WINDOW) _rateLimitMap.delete(key);
+      }
+    }
     return false;
   }
   entry.count++;
@@ -337,7 +351,8 @@ module.exports = async function handler(req, res) {
     'http://localhost:5173'
   ];
   const origin = req.headers.origin || '';
-  if (allowedOrigins.some(function(o) { return origin.startsWith(o); })) {
+  // 完全一致 or パス付きの場合のみ許可（startsWith単独だと https://nbyk115.github.io.evil.com を許してしまう）
+  if (allowedOrigins.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
   }
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');

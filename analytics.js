@@ -24,14 +24,6 @@ const ANALYTICS_CONFIG = {
   //   3. 「マイアプリ」セクション → ウェブアプリ を選択
   //   4. 「SDK の設定と構成」に表示される measurementId (G-XXXXXXXXXX 形式) をコピー
   //   ※ measurementId が表示されない場合: Analytics → 有効にする を先に実行
-  // Firebase Analytics は完全無料（GA4ベース、イベント数制限なし）
-  // 取得手順:
-  //   1. https://console.firebase.google.com/ → wanchan-diary プロジェクト
-  //   2. プロジェクト設定（歯車アイコン）→ 全般
-  //   3. 「マイアプリ」セクション → ウェブアプリ を選択
-  //   4. 「SDK の設定と構成」に表示される measurementId (G-XXXXXXXXXX 形式) をコピー
-  //   ※ measurementId が表示されない場合:
-  //      Analytics → 有効にする を先に実行してからウェブアプリを再確認
   //   ※ Firebase Analytics は完全無料（GA4ベース、イベント数・ユーザー数の課金なし）
   measurementId: 'G-G4YK4WGZPQ'
 };
@@ -368,6 +360,35 @@ function trackPremiumPurchaseFail(planKey, reason) {
 })();
 
 // ============================================================
+// REFERRAL TRACKING (紹介コード基盤)
+// ============================================================
+(function trackReferral() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var ref = params.get('ref');
+    var utm_source = params.get('utm_source');
+    var utm_medium = params.get('utm_medium');
+    var utm_campaign = params.get('utm_campaign');
+
+    if (ref && !localStorage.getItem('ux_referrer')) {
+      localStorage.setItem('ux_referrer', ref);
+      logEvent('referral_visit', { referrer_code: ref });
+    }
+    if (utm_source) {
+      logEvent('campaign_visit', {
+        utm_source: utm_source || '',
+        utm_medium: utm_medium || '',
+        utm_campaign: utm_campaign || ''
+      });
+    }
+  } catch(_) {}
+})();
+
+function trackReferralShare(code) {
+  logEvent('referral_share', { referrer_code: code || '' });
+}
+
+// ============================================================
 // EXPOSE TO APP
 // ============================================================
 // Ensure namespace exists without overwriting other modules' additions
@@ -407,5 +428,7 @@ window.__wanchan.analytics = {
     trackPremiumPlanSelect: trackPremiumPlanSelect,
     trackPremiumPurchaseStart: trackPremiumPurchaseStart,
     trackPremiumPurchaseComplete: trackPremiumPurchaseComplete,
-    trackPremiumPurchaseFail: trackPremiumPurchaseFail
+    trackPremiumPurchaseFail: trackPremiumPurchaseFail,
+    // Referral
+    trackReferralShare: trackReferralShare
   };
