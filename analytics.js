@@ -24,14 +24,6 @@ const ANALYTICS_CONFIG = {
   //   3. 「マイアプリ」セクション → ウェブアプリ を選択
   //   4. 「SDK の設定と構成」に表示される measurementId (G-XXXXXXXXXX 形式) をコピー
   //   ※ measurementId が表示されない場合: Analytics → 有効にする を先に実行
-  // Firebase Analytics は完全無料（GA4ベース、イベント数制限なし）
-  // 取得手順:
-  //   1. https://console.firebase.google.com/ → wanchan-diary プロジェクト
-  //   2. プロジェクト設定（歯車アイコン）→ 全般
-  //   3. 「マイアプリ」セクション → ウェブアプリ を選択
-  //   4. 「SDK の設定と構成」に表示される measurementId (G-XXXXXXXXXX 形式) をコピー
-  //   ※ measurementId が表示されない場合:
-  //      Analytics → 有効にする を先に実行してからウェブアプリを再確認
   //   ※ Firebase Analytics は完全無料（GA4ベース、イベント数・ユーザー数の課金なし）
   measurementId: 'G-G4YK4WGZPQ'
 };

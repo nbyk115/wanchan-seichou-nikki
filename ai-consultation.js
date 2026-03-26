@@ -271,13 +271,13 @@ async function askAI(question) {
   } catch (e) {
     console.error('AI consultation error:', e);
     if (e.name === 'AbortError') {
-      var fb = _localFallback(question);
-      fb.timeoutWarning = '回答に少し時間がかかっちゃったので、まずはよくある質問から回答するね。もう一度試してみてね。';
-      return fb;
+      var fallbackTimeout = _localFallback(question);
+      fallbackTimeout.timeoutWarning = '回答に少し時間がかかっちゃったので、まずはよくある質問から回答するね。もう一度試してみてね。';
+      return fallbackTimeout;
     }
-    var fb = _localFallback(question);
-    fb.timeoutWarning = '通信がうまくいかなかったので、まずはよくある質問から回答するね。電波の良いところでもう一度試してみてね。';
-    return fb;
+    var fallbackNetwork = _localFallback(question);
+    fallbackNetwork.timeoutWarning = '通信がうまくいかなかったので、まずはよくある質問から回答するね。電波の良いところでもう一度試してみてね。';
+    return fallbackNetwork;
   }
 }
 

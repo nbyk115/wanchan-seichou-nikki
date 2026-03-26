@@ -695,7 +695,7 @@ Error generating stack: `+n.message+`
 
     var toast = document.createElement('div');
     toast.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);z-index:10003;background:#333;color:#fff;padding:12px 20px;border-radius:14px;font-size:14px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 20px rgba(0,0,0,.3);animation:ux-toast-in .3s ease;max-width:calc(100% - 32px);';
-    toast.innerHTML = '<span>' + message + '</span><button id="ux-undo-btn" style="background:#FF7B9C;color:#fff;border:none;padding:8px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">元に戻す</button>';
+    toast.innerHTML = '<span>' + _escHtml(message) + '</span><button id="ux-undo-btn" style="background:#FF7B9C;color:#fff;border:none;padding:8px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">元に戻す</button>';
     document.body.appendChild(toast);
 
     document.getElementById('ux-undo-btn').addEventListener('click', function() {

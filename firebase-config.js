@@ -14,7 +14,7 @@ import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, signOu
   from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, addDoc,
   query, where, orderBy, limit, serverTimestamp, onSnapshot, deleteDoc, updateDoc, writeBatch, increment,
-  enableIndexedDbPersistence }
+  persistentLocalCache, persistentSingleTabManager, initializeFirestore }
   from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
 
 // ============================================================
@@ -37,18 +37,16 @@ let app, auth, db;
 if (isConfigured) {
   app = initializeApp(firebaseConfig);
   auth = getAuth(app);
-  db = getFirestore(app);
-
-  // Firestoreオフライン永続化（IndexedDB）
-  enableIndexedDbPersistence(db).catch(function(err) {
-    if (err.code === 'failed-precondition') {
-      // 複数タブが開いている場合は1つのタブでのみ有効
-      console.warn('Firestore persistence: multiple tabs open');
-    } else if (err.code === 'unimplemented') {
-      // ブラウザがIndexedDBをサポートしていない
-      console.warn('Firestore persistence: not supported');
-    }
-  });
+  // enableIndexedDbPersistence は v10+ で非推奨。initializeFirestore + persistentLocalCache に移行。
+  try {
+    db = initializeFirestore(app, {
+      localCache: persistentLocalCache({ tabManager: persistentSingleTabManager() })
+    });
+  } catch (persistErr) {
+    // 永続化がサポートされないブラウザ or 既に初期化済みの場合はフォールバック
+    console.warn('Firestore persistent cache unavailable, using default:', persistErr.message);
+    db = getFirestore(app);
+  }
 
   // リダイレクトログイン後の復帰処理（Safari等のポップアップブロック環境）
   getRedirectResult(auth).then(async (result) => {
@@ -203,25 +201,30 @@ async function leaveFootprint(targetUid) {
   const ref = doc(db, 'footprints', docId);
 
   try {
-    const existing = await getDoc(ref);
-    if (existing.exists()) {
-      // increment() を使ってrace conditionを回避（アトミック操作）
+    // まず updateDoc を試行（存在しない場合は NOT_FOUND で失敗するのでフォールバック）
+    // これにより getDoc→判定→write の TOCTOU 競合窓を排除
+    try {
       await updateDoc(ref, {
         updatedAt: serverTimestamp(),
-        visitCount: increment(1), // アトミック操作（競合状態を防ぐ）
+        visitCount: increment(1),
         fromName: auth.currentUser.displayName,
         fromPhoto: auth.currentUser.photoURL
       });
-    } else {
-      await setDoc(ref, {
-        from: auth.currentUser.uid,
-        fromName: auth.currentUser.displayName,
-        fromPhoto: auth.currentUser.photoURL,
-        to: targetUid,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-        visitCount: 1
-      });
+    } catch (updateErr) {
+      // ドキュメントが存在しない場合は NOT_FOUND — 新規作成にフォールバック
+      if (updateErr.code === 'not-found') {
+        await setDoc(ref, {
+          from: auth.currentUser.uid,
+          fromName: auth.currentUser.displayName,
+          fromPhoto: auth.currentUser.photoURL,
+          to: targetUid,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          visitCount: 1
+        });
+      } else {
+        throw updateErr;
+      }
     }
   } catch (e) {
     console.error('leaveFootprint failed:', e);
