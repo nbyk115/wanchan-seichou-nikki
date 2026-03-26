@@ -145,6 +145,7 @@ img{max-width:100%;height:auto;}
 .ux-spinner{display:inline-block;width:20px;height:20px;border:2.5px solid rgba(0,0,0,.1);border-top-color:currentColor;border-radius:50%;animation:ux-spin .6s linear infinite;}
 .ux-skeleton{background:linear-gradient(90deg,#f0e0d8 25%,#f8ece6 50%,#f0e0d8 75%);background-size:200% 100%;animation:ux-shimmer 1.5s ease-in-out infinite;border-radius:12px;min-height:20px;}
 @keyframes ux-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes ux-confetti-fall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
 @keyframes ux-spin{to{transform:rotate(360deg);}}
 
 /* Accessibility: Focus Visible */
@@ -485,6 +486,27 @@ Error generating stack: `+n.message+`
     var div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
+  }
+
+  // Confetti celebration effect (lightweight, no library)
+  function _launchConfetti() {
+    var container = document.createElement('div');
+    container.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:10004;overflow:hidden;';
+    var colors = ['#FF7B9C','#FFD700','#F5A6B8','#4FC3F7','#81C784','#FF8A65','#BA68C8'];
+    var shapes = ['●','♥','★','🐾'];
+    for (var i = 0; i < 40; i++) {
+      var p = document.createElement('div');
+      var x = Math.random() * 100;
+      var delay = Math.random() * 0.8;
+      var dur = 1.5 + Math.random() * 1.5;
+      var size = 8 + Math.random() * 12;
+      var rot = Math.random() * 720 - 360;
+      p.textContent = shapes[Math.floor(Math.random() * shapes.length)];
+      p.style.cssText = 'position:absolute;top:-20px;left:' + x + '%;font-size:' + size + 'px;color:' + colors[i % colors.length] + ';animation:ux-confetti-fall ' + dur + 's ease-out ' + delay + 's forwards;opacity:0;';
+      container.appendChild(p);
+    }
+    document.body.appendChild(container);
+    setTimeout(function() { container.remove(); }, 4000);
   }
 
   // Current authenticated user cache (set via firebase onAuth listener)
@@ -2597,6 +2619,8 @@ Error generating stack: `+n.message+`
           banner.style.cssText = 'position:fixed;top:env(safe-area-inset-top,16px);left:50%;transform:translateX(-50%);z-index:9999;background:linear-gradient(135deg,#FFD700,#FFA500);color:#fff;padding:14px 24px;border-radius:16px;font-size:14px;font-weight:700;box-shadow:0 4px 20px rgba(255,165,0,.3);animation:ux-page-in .4s ease;max-width:calc(100% - 32px);text-align:center;';
           banner.innerHTML = '<span style="font-size:20px;">' + ms.emoji + '</span> ' + _escHtml(ms.text);
           document.body.appendChild(banner);
+          // 祝福confetti演出
+          _launchConfetti();
           setTimeout(function() {
             banner.style.opacity = '0';
             banner.style.transition = 'opacity .5s';
@@ -2719,6 +2743,8 @@ Error generating stack: `+n.message+`
     // Track
     var an = window.__wanchan && window.__wanchan.analytics;
     if (an && an.logEvent) an.logEvent('anniversary_shown', { text: text });
+    // 祝福confetti演出
+    _launchConfetti();
   }
 
   setTimeout(checkAnniversary, 2000);

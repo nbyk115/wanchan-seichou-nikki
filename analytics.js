@@ -368,6 +368,35 @@ function trackPremiumPurchaseFail(planKey, reason) {
 })();
 
 // ============================================================
+// REFERRAL TRACKING (紹介コード基盤)
+// ============================================================
+(function trackReferral() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var ref = params.get('ref');
+    var utm_source = params.get('utm_source');
+    var utm_medium = params.get('utm_medium');
+    var utm_campaign = params.get('utm_campaign');
+
+    if (ref && !localStorage.getItem('ux_referrer')) {
+      localStorage.setItem('ux_referrer', ref);
+      logEvent('referral_visit', { referrer_code: ref });
+    }
+    if (utm_source) {
+      logEvent('campaign_visit', {
+        utm_source: utm_source || '',
+        utm_medium: utm_medium || '',
+        utm_campaign: utm_campaign || ''
+      });
+    }
+  } catch(_) {}
+})();
+
+function trackReferralShare(code) {
+  logEvent('referral_share', { referrer_code: code || '' });
+}
+
+// ============================================================
 // EXPOSE TO APP
 // ============================================================
 // Ensure namespace exists without overwriting other modules' additions
@@ -407,5 +436,7 @@ window.__wanchan.analytics = {
     trackPremiumPlanSelect: trackPremiumPlanSelect,
     trackPremiumPurchaseStart: trackPremiumPurchaseStart,
     trackPremiumPurchaseComplete: trackPremiumPurchaseComplete,
-    trackPremiumPurchaseFail: trackPremiumPurchaseFail
+    trackPremiumPurchaseFail: trackPremiumPurchaseFail,
+    // Referral
+    trackReferralShare: trackReferralShare
   };

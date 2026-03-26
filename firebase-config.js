@@ -13,7 +13,8 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebas
 import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, GoogleAuthProvider }
   from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, addDoc,
-  query, where, orderBy, limit, serverTimestamp, onSnapshot, deleteDoc, updateDoc, writeBatch, increment }
+  query, where, orderBy, limit, serverTimestamp, onSnapshot, deleteDoc, updateDoc, writeBatch, increment,
+  enableIndexedDbPersistence }
   from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
 
 // ============================================================
@@ -37,6 +38,17 @@ if (isConfigured) {
   app = initializeApp(firebaseConfig);
   auth = getAuth(app);
   db = getFirestore(app);
+
+  // Firestoreオフライン永続化（IndexedDB）
+  enableIndexedDbPersistence(db).catch(function(err) {
+    if (err.code === 'failed-precondition') {
+      // 複数タブが開いている場合は1つのタブでのみ有効
+      console.warn('Firestore persistence: multiple tabs open');
+    } else if (err.code === 'unimplemented') {
+      // ブラウザがIndexedDBをサポートしていない
+      console.warn('Firestore persistence: not supported');
+    }
+  });
 
   // リダイレクトログイン後の復帰処理（Safari等のポップアップブロック環境）
   getRedirectResult(auth).then(async (result) => {
