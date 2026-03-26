@@ -10,10 +10,10 @@
  */
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
-import { getAuth, signInWithPopup, signInWithRedirect, signOut, onAuthStateChanged, GoogleAuthProvider }
+import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, GoogleAuthProvider }
   from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, addDoc,
-  query, where, orderBy, limit, serverTimestamp, onSnapshot, deleteDoc, updateDoc, writeBatch }
+  query, where, orderBy, limit, serverTimestamp, onSnapshot, deleteDoc, updateDoc, writeBatch, increment }
   from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
 
 // ============================================================
@@ -25,7 +25,8 @@ const firebaseConfig = {
   projectId: "wanchan-diary",
   storageBucket: "wanchan-diary.firebasestorage.app",
   messagingSenderId: "151633084436",
-  appId: "1:151633084436:web:ac8ffa692e4ba1839a2701"
+  appId: "1:151633084436:web:ac8ffa692e4ba1839a2701",
+  measurementId: "G-G4YK4WGZPQ"
 };
 
 // Skip initialization if config is not set
@@ -36,6 +37,17 @@ if (isConfigured) {
   app = initializeApp(firebaseConfig);
   auth = getAuth(app);
   db = getFirestore(app);
+
+  // リダイレクトログイン後の復帰処理（Safari等のポップアップブロック環境）
+  getRedirectResult(auth).then(async (result) => {
+    if (!result || !result.user) return;
+    await setDoc(doc(db, 'users', result.user.uid), {
+      displayName: result.user.displayName,
+      photoURL: result.user.photoURL,
+      lastLogin: serverTimestamp()
+    }, { merge: true });
+    window.dispatchEvent(new CustomEvent('wanchan-login', { detail: { uid: result.user.uid } }));
+  }).catch(() => {});
 }
 
 // ============================================================
@@ -43,7 +55,7 @@ if (isConfigured) {
 // ============================================================
 async function login() {
   if (!isConfigured) {
-    _toast('Firebase未設定です', 'error');
+    _toast('アプリの準備がまだ完了していないよ。もう少し待ってみてね', 'error');
     return null;
   }
   const provider = new GoogleAuthProvider();
@@ -55,6 +67,7 @@ async function login() {
       photoURL: result.user.photoURL,
       lastLogin: serverTimestamp()
     }, { merge: true });
+    window.dispatchEvent(new CustomEvent('wanchan-login', { detail: { uid: result.user.uid } }));
     return result.user;
   } catch (e) {
     if (e.code === 'auth/popup-blocked' || e.code === 'auth/cancelled-popup-request') {
@@ -62,8 +75,12 @@ async function login() {
       await signInWithRedirect(auth, provider);
       return null;
     }
-    if (e.code !== 'auth/popup-closed-by-user') {
-      _toast('ログインに失敗しました', 'error');
+    if (e.code === 'auth/network-request-failed') {
+      _toast('つながりにくいみたい。もう少ししてから試してね', 'error');
+    } else if (e.code === 'auth/too-many-requests') {
+      _toast('何度も試したためしばらく待ってね。少し時間をおいてから試してみてね', 'error');
+    } else if (e.code !== 'auth/popup-closed-by-user') {
+      _toast('ログインがうまくいかなかったみたい。もう一度試してね', 'error');
     }
     return null;
   }
@@ -159,48 +176,232 @@ async function syncFromCloud(uid) {
 }
 
 // ============================================================
-// SOCIAL: Footprints (あしあと)
+// SOCIAL: Footprints v2 (あしあと — マージ対応)
 // ============================================================
+
+/**
+ * 足あとを残す（同一訪問者はマージ — mixi仕様準拠）
+ * ドキュメントID: {targetUid}_{visitorUid}
+ */
 async function leaveFootprint(targetUid) {
   if (!isConfigured || !auth.currentUser) return;
+  if (auth.currentUser.uid === targetUid) return; // 自分には足あとを残さない
+
+  const docId = targetUid + '_' + auth.currentUser.uid;
+  const ref = doc(db, 'footprints', docId);
+
   try {
-    await addDoc(collection(db, 'footprints'), {
-      from: auth.currentUser.uid,
-      fromName: auth.currentUser.displayName,
-      fromPhoto: auth.currentUser.photoURL,
-      to: targetUid,
-      createdAt: serverTimestamp()
-    });
+    const existing = await getDoc(ref);
+    if (existing.exists()) {
+      // increment() を使ってrace conditionを回避（アトミック操作）
+      await updateDoc(ref, {
+        updatedAt: serverTimestamp(),
+        visitCount: increment(1), // アトミック操作（競合状態を防ぐ）
+        fromName: auth.currentUser.displayName,
+        fromPhoto: auth.currentUser.photoURL
+      });
+    } else {
+      await setDoc(ref, {
+        from: auth.currentUser.uid,
+        fromName: auth.currentUser.displayName,
+        fromPhoto: auth.currentUser.photoURL,
+        to: targetUid,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        visitCount: 1
+      });
+    }
   } catch (e) {
     console.error('leaveFootprint failed:', e);
   }
 }
 
+/**
+ * 足あとを取得（日付グルーピング対応）
+ * 返り値: { today: [...], yesterday: [...], thisWeek: [...], all: [...] }
+ */
 async function getFootprints(uid, max) {
-  if (!isConfigured) return [];
+  if (!isConfigured) return { today: [], yesterday: [], thisWeek: [], all: [] };
   try {
     max = max || 30;
     const q = query(
       collection(db, 'footprints'),
       where('to', '==', uid),
-      orderBy('createdAt', 'desc'),
+      orderBy('updatedAt', 'desc'),
       limit(max)
     );
     const snap = await getDocs(q);
-    return snap.docs.map(function(d) { return { id: d.id, ...d.data() }; });
+    const items = snap.docs.map(function(d) { return { id: d.id, ...d.data() }; });
+
+    var now = new Date();
+    var todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    var yesterdayStart = todayStart - 86400000;
+    var weekStart = todayStart - (now.getDay() * 86400000);
+    var grouped = { today: [], yesterday: [], thisWeek: [], all: items };
+
+    items.forEach(function(fp) {
+      var ts = fp.updatedAt
+        ? (fp.updatedAt.seconds ? fp.updatedAt.seconds * 1000 : fp.updatedAt)
+        : 0;
+      if (ts >= todayStart) grouped.today.push(fp);
+      else if (ts >= yesterdayStart) grouped.yesterday.push(fp);
+      else if (ts >= weekStart) grouped.thisWeek.push(fp);
+    });
+
+    return grouped;
   } catch (e) {
     console.error('getFootprints failed:', e);
-    return [];
+    return { today: [], yesterday: [], thisWeek: [], all: [] };
+  }
+}
+
+/**
+ * 新着足あと数を取得（既読管理）
+ */
+async function getUnreadFootprintCount(uid) {
+  if (!isConfigured) return 0;
+  try {
+    var statusSnap = await getDoc(doc(db, 'footprintReadStatus', uid));
+    var lastReadAt = (statusSnap.exists() && statusSnap.data().lastReadAt)
+      ? statusSnap.data().lastReadAt : null;
+
+    var q;
+    if (lastReadAt) {
+      q = query(
+        collection(db, 'footprints'),
+        where('to', '==', uid),
+        where('updatedAt', '>', lastReadAt),
+        orderBy('updatedAt', 'desc'),
+        limit(30)
+      );
+    } else {
+      q = query(
+        collection(db, 'footprints'),
+        where('to', '==', uid),
+        orderBy('updatedAt', 'desc'),
+        limit(30)
+      );
+    }
+    var snap = await getDocs(q);
+    return snap.size;
+  } catch (e) {
+    console.error('getUnreadFootprintCount failed:', e);
+    return 0;
+  }
+}
+
+/**
+ * 足あとを既読にする
+ */
+async function markFootprintsRead(uid) {
+  if (!isConfigured) return;
+  try {
+    await setDoc(doc(db, 'footprintReadStatus', uid), { lastReadAt: serverTimestamp() });
+  } catch (e) {
+    console.error('markFootprintsRead failed:', e);
   }
 }
 
 // ============================================================
-// SOCIAL: Friends (フレンド)
+// SOCIAL: Introductions (ひとこと紹介文)
+// ============================================================
+
+/**
+ * ひとこと紹介文を投稿・更新（1ユーザーにつき1件、100文字以内）
+ */
+async function postIntroduction(targetUid, text) {
+  if (!isConfigured || !auth.currentUser) return false;
+  if (auth.currentUser.uid === targetUid) {
+    _toast('自分にはひとことを書けないよ', 'info');
+    return false;
+  }
+  if (!text || text.length === 0 || text.length > 100) {
+    _toast('1〜100文字で書いてね', 'error');
+    return false;
+  }
+
+  var docId = targetUid + '_' + auth.currentUser.uid;
+  var ref = doc(db, 'introductions', docId);
+
+  try {
+    var existing = await getDoc(ref);
+    if (existing.exists()) {
+      await updateDoc(ref, {
+        text: text,
+        updatedAt: serverTimestamp(),
+        authorName: auth.currentUser.displayName,
+        authorPhoto: auth.currentUser.photoURL
+      });
+    } else {
+      await setDoc(ref, {
+        targetUid: targetUid,
+        authorUid: auth.currentUser.uid,
+        authorName: auth.currentUser.displayName,
+        authorPhoto: auth.currentUser.photoURL,
+        text: text,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+    }
+    _toast('ひとことを書きました', 'success');
+    return true;
+  } catch (e) {
+    console.error('postIntroduction failed:', e);
+    _toast('ひとことがうまく届かなかったよ。もう一度試してみてね', 'error');
+    return false;
+  }
+}
+
+/**
+ * 対象ユーザーの紹介文一覧を取得
+ */
+async function getIntroductions(targetUid, max) {
+  if (!isConfigured) return [];
+  try {
+    max = max || 20;
+    var q = query(
+      collection(db, 'introductions'),
+      where('targetUid', '==', targetUid),
+      orderBy('updatedAt', 'desc'),
+      limit(max)
+    );
+    var snap = await getDocs(q);
+    return snap.docs.map(function(d) { return { id: d.id, ...d.data() }; });
+  } catch (e) {
+    console.error('getIntroductions failed:', e);
+    return [];
+  }
+}
+
+/**
+ * 紹介文を削除（著者本人 or 対象ユーザー本人）
+ */
+async function deleteIntroduction(targetUid, authorUid) {
+  if (!isConfigured || !auth.currentUser) return;
+  var uid = auth.currentUser.uid;
+  if (uid !== authorUid && uid !== targetUid) return;
+
+  try {
+    var docId = targetUid + '_' + authorUid;
+    await deleteDoc(doc(db, 'introductions', docId));
+    _toast('ひとことを削除しました', 'info');
+  } catch (e) {
+    console.error('deleteIntroduction failed:', e);
+    _toast('うまく削除できなかったよ。もう一度試してみてね', 'error');
+  }
+}
+
+// ============================================================
+// SOCIAL: Friends (犬友)
 // ============================================================
 async function sendFriendRequest(targetUid) {
   if (!isConfigured || !auth.currentUser) return;
+  if (auth.currentUser.uid === targetUid) return; // 自己申請ガード
   try {
-    await setDoc(doc(db, 'friendRequests', auth.currentUser.uid + '_' + targetUid), {
+    const ref = doc(db, 'friendRequests', auth.currentUser.uid + '_' + targetUid);
+    const existing = await getDoc(ref);
+    if (existing.exists()) return; // 重複申請ガード
+    await setDoc(ref, {
       from: auth.currentUser.uid,
       fromName: auth.currentUser.displayName,
       to: targetUid,
@@ -208,7 +409,7 @@ async function sendFriendRequest(targetUid) {
       createdAt: serverTimestamp()
     });
   } catch (e) {
-    _toast('フレンド申請に失敗しました', 'error');
+    _toast('犬友申請がうまくいかなかったよ。もう一度試してみてね', 'error');
     console.error('sendFriendRequest failed:', e);
   }
 }
@@ -229,7 +430,7 @@ async function acceptFriendRequest(requestId, fromUid) {
     });
     await batch.commit();
   } catch (e) {
-    _toast('フレンド承認に失敗しました', 'error');
+    _toast('犬友承認がうまくいかなかったよ。もう一度試してみてね', 'error');
     console.error('acceptFriendRequest failed:', e);
   }
 }
@@ -245,14 +446,15 @@ async function getFriends(uid) {
       const friendUid = users[0] === uid ? users[1] : users[0];
       if (friendUids.indexOf(friendUid) === -1) friendUids.push(friendUid);
     });
-    const friends = [];
-    for (const fuid of friendUids) {
+    // 並列取得でN+1クエリ問題を解消
+    const friends = await Promise.all(friendUids.map(async function(fuid) {
       try {
         const uSnap = await getDoc(doc(db, 'users', fuid));
-        if (uSnap.exists()) friends.push({ uid: fuid, ...uSnap.data() });
+        if (uSnap.exists()) return { uid: fuid, ...uSnap.data() };
       } catch (_) {}
-    }
-    return friends;
+      return null;
+    }));
+    return friends.filter(Boolean);
   } catch (e) {
     console.error('getFriends failed:', e);
     return [];
@@ -264,6 +466,8 @@ async function getFriends(uid) {
 // ============================================================
 async function postComment(entryId, text) {
   if (!isConfigured || !auth.currentUser) return;
+  if (!text || !text.trim()) { _toast('コメントを入力してね', 'error'); return; }
+  if (text.length > 1000) { _toast('1000文字以内で書いてね', 'error'); return; }
   try {
     await addDoc(collection(db, 'comments'), {
       entryId: entryId,
@@ -274,7 +478,7 @@ async function postComment(entryId, text) {
       createdAt: serverTimestamp()
     });
   } catch (e) {
-    _toast('コメント投稿に失敗しました', 'error');
+    _toast('コメントがうまく届かなかったよ。もう一度試してみてね', 'error');
     console.error('postComment failed:', e);
   }
 }
@@ -306,6 +510,8 @@ function onCommentsUpdate(entryId, cb) {
   );
   return onSnapshot(q, function(snap) {
     cb(snap.docs.map(function(d) { return { id: d.id, ...d.data() }; }));
+  }, function(err) {
+    console.error('onCommentsUpdate error:', err);
   });
 }
 
@@ -318,25 +524,36 @@ function _toast(msg, type) {
 // ============================================================
 // EXPOSE TO APP
 // ============================================================
-window.__wanchan = window.__wanchan || {};
-Object.assign(window.__wanchan, {
-  firebase: {
+// Ensure namespace exists without overwriting other modules' additions
+if (!window.__wanchan) window.__wanchan = {};
+window.__wanchan.firebase = {
     isConfigured: isConfigured,
     login: login,
     logout: logout,
     onAuth: onAuth,
+    // 他モジュール（komoju-payment.js等）からFirestore/Authインスタンスを取得するためのヘルパー
+    _getAuth: function() { return auth; },
+    _getDb: function() { return db; },
+    _getIdToken: async function() {
+      try { return auth && auth.currentUser ? await auth.currentUser.getIdToken() : null; }
+      catch (_) { return null; }
+    },
     syncToCloud: syncToCloud,
     syncFromCloud: syncFromCloud,
     leaveFootprint: leaveFootprint,
     getFootprints: getFootprints,
+    getUnreadFootprintCount: getUnreadFootprintCount,
+    markFootprintsRead: markFootprintsRead,
+    postIntroduction: postIntroduction,
+    getIntroductions: getIntroductions,
+    deleteIntroduction: deleteIntroduction,
     sendFriendRequest: sendFriendRequest,
     acceptFriendRequest: acceptFriendRequest,
     getFriends: getFriends,
     postComment: postComment,
     getComments: getComments,
     onCommentsUpdate: onCommentsUpdate
-  }
-});
+  };
 
 // ============================================================
 // AUTO-SYNC ON LOGIN
@@ -364,7 +581,12 @@ if (isConfigured) {
       if (synced) {
         _toast('クラウドからデータを同期しました', 'info');
       }
-      _syncInterval = setInterval(function() { syncToCloud(user.uid).catch(function() {}); }, 30000);
+      // Only sync when tab is visible (save battery/Firestore costs)
+      _syncInterval = setInterval(function() {
+        if (document.visibilityState !== 'hidden') {
+          syncToCloud(user.uid).catch(function() {});
+        }
+      }, 30000);
     } else {
       _currentUid = null;
       _isFirstAuth = false;
@@ -385,10 +607,8 @@ if (isConfigured) {
       try {
         var data = _getAppData();
         var json = JSON.stringify(data);
-        if (json !== _lastSyncHash && navigator.sendBeacon) {
-          // Send a minimal beacon to indicate data needs sync on next load
-          navigator.sendBeacon('data:text/plain,sync');
-          // Mark that we have unsent changes
+        if (json !== _lastSyncHash) {
+          // Mark that we have unsent changes (will sync on next load)
           try { localStorage.setItem('ux_pending_sync', '1'); } catch (_) {}
         }
       } catch (_) {}

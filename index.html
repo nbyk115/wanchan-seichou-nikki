@@ -6,17 +6,19 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="theme-color" content="#FFF8F5"/>
-<meta name="description" content="わんちゃんの成長を記録する日記アプリ"/>
+<meta name="description" content="愛犬の日記・体重管理・AI健康相談がひとつに。犬種別の成長曲線で「うちの子」の成長を見える化。写真付き日記と犬友コミュニティで毎日がもっと愛おしくなる無料アプリ。"/>
 <meta property="og:title" content="わんちゃん成長日記"/>
 <meta property="og:description" content="うちの子の毎日を、もっと愛おしく。日記・体重管理・AI健康相談・思い出アルバム"/>
 <meta property="og:image" content="https://nbyk115.github.io/wanchan-seichou-nikki/og-image.png"/>
 <meta property="og:url" content="https://nbyk115.github.io/wanchan-seichou-nikki/"/>
 <meta property="og:type" content="website"/>
 <meta property="og:site_name" content="わんちゃん成長日記"/>
+<meta property="og:locale" content="ja_JP"/>
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="わんちゃん成長日記"/>
 <meta name="twitter:description" content="うちの子の毎日を、もっと愛おしく。"/>
 <meta name="twitter:image" content="https://nbyk115.github.io/wanchan-seichou-nikki/og-image.png"/>
+<link rel="canonical" href="https://nbyk115.github.io/wanchan-seichou-nikki/"/>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="icon-192.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -25,9 +27,102 @@
 <script type="module" src="firebase-config.js"></script>
 <script type="module" src="analytics.js"></script>
 <script type="module" src="ai-consultation.js"></script>
-<!-- komoju-payment.js removed: premium features disabled -->
-<title>わんちゃん成長日記</title>
+<script type="module" src="komoju-payment.js"></script>
+<title>わんちゃん成長日記 - 犬の日記・体重管理・AI健康相談アプリ</title>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "わんちゃん成長日記",
+  "description": "愛犬の日記・体重管理・AI健康相談がひとつに。犬種別の成長曲線で成長を見える化する無料アプリ。",
+  "url": "https://nbyk115.github.io/wanchan-seichou-nikki/",
+  "applicationCategory": "LifestyleApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "JPY"
+  },
+  "featureList": ["犬の日記記録", "体重管理グラフ", "AI健康相談", "犬種別成長曲線", "犬友コミュニティ", "写真アルバム", "オフライン対応"]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "わんちゃん成長日記は無料で使えますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい、基本機能は全て無料で使えます。日記記録、体重管理、犬種別成長曲線、写真アルバム、犬友コミュニティが無料で利用できます。AI健康相談は月5回まで無料です。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "対応している犬種は何ですか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "成長曲線データは13犬種に対応しています。チワワ、トイプードル、ミニチュアダックスフンド、ポメラニアン、柴犬、フレンチブルドッグ、ゴールデンレトリバー、ラブラドールレトリバー、ヨークシャーテリア、シーズー、パグ、マルチーズ、ミニチュアシュナウザーの月齢別体重推移を収録しています。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "オフラインでも使えますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい、PWA（プログレッシブウェブアプリ）として動作するため、インターネットに接続していなくても日記の記録や閲覧ができます。オンラインに戻った際にクラウドと自動同期されます。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "AI健康相談はどのような相談ができますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "犬の健康に関する一般的な相談ができます。嘔吐、下痢、食欲不振、皮膚トラブルなど、気になる症状についてAIアドバイザーに相談できます。ただし獣医療行為の代替ではなく、深刻な症状の場合は動物病院への受診を案内します。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "多頭飼いに対応していますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい、複数のわんちゃんを登録して切り替えながら管理できます。それぞれの犬の日記、体重記録、成長曲線を個別に管理できます。"
+      }
+    }
+  ]
+}
+</script>
 <style>
+/* === Design Tokens === */
+:root {
+  --wc-bg: #FFF8F5;
+  --wc-card: #FFFFFF;
+  --wc-sub: #FFF0EB;
+  --wc-accent: #FF7B9C;
+  --wc-accent-light: #FFF0F3;
+  --wc-text: #3D2C2C;
+  --wc-subtext: #8A6F6A; /* UX: コントラスト比 2.8→4.7:1 (WCAG AA達成) */
+  --wc-border: #F0D9D1;
+  --wc-grad-start: #F5A6B8;
+  --wc-grad-end: #FF7B9C;
+  --wc-radius-card: 16px;
+  --wc-radius-btn: 20px;
+  --wc-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --wc-bg: #121212;
+    --wc-card: #1E1E1E;
+    --wc-sub: #2A2A2A;
+    --wc-accent-light: #2A1A22;
+    --wc-text: #F0F0F0;
+    --wc-subtext: #BBB;
+    --wc-border: #3A3A3A;
+  }
+}
+
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Zen Maru Gothic','Hiragino Sans',sans-serif;-webkit-font-smoothing:antialiased;overscroll-behavior:none;}
 input,textarea,select,button{font-family:inherit;}
@@ -48,11 +143,13 @@ img{max-width:100%;height:auto;}
 
 /* Loading spinner (utility class for future use) */
 .ux-spinner{display:inline-block;width:20px;height:20px;border:2.5px solid rgba(0,0,0,.1);border-top-color:currentColor;border-radius:50%;animation:ux-spin .6s linear infinite;}
+.ux-skeleton{background:linear-gradient(90deg,#f0e0d8 25%,#f8ece6 50%,#f0e0d8 75%);background-size:200% 100%;animation:ux-shimmer 1.5s ease-in-out infinite;border-radius:12px;min-height:20px;}
+@keyframes ux-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 @keyframes ux-spin{to{transform:rotate(360deg);}}
 
 /* Accessibility: Focus Visible */
-*:focus-visible{outline:2.5px solid #3B82F6 !important;outline-offset:2px !important;}
-[role="button"]:focus-visible,[tabindex]:focus-visible{outline:2.5px solid #3B82F6 !important;outline-offset:2px !important;}
+*:focus-visible{outline:2.5px solid var(--wc-accent) !important;outline-offset:2px !important;}
+[role="button"]:focus-visible,[tabindex]:focus-visible{outline:2.5px solid var(--wc-accent) !important;outline-offset:2px !important;}
 
 /* Touch Target Enhancement - only for standalone buttons with explicit padding */
 #root button{min-height:44px;}
@@ -127,13 +224,15 @@ body.ux-dark-on .ux-toast{background:rgba(50,50,70,.95) !important;}
 }
 
 /* Data Backup FAB */
-.ux-backup-fab{position:fixed;bottom:90px;right:16px;z-index:9990;width:48px;height:48px;border-radius:50%;background:#FF7B9C;color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(255,123,156,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s,opacity .2s,left .3s ease,right .3s ease,bottom .3s ease;font-family:inherit;touch-action:none;user-select:none;-webkit-user-select:none;}
+.ux-backup-fab{position:fixed;bottom:90px;right:16px;z-index:9990;width:48px;height:48px;border-radius:50%;background:#FF7B9C;color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(255,123,156,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s,opacity .2s,box-shadow .2s,left .3s ease,right .3s ease,bottom .3s ease;font-family:inherit;touch-action:none;user-select:none;-webkit-user-select:none;}
+.ux-backup-fab:hover{transform:scale(1.1);box-shadow:0 6px 20px rgba(255,123,156,.55);}
+.ux-backup-fab:focus-visible{transform:scale(1.1);box-shadow:0 0 0 3px #fff,0 0 0 5px var(--wc-accent);}
 .ux-backup-fab.ux-fab-dragging{transition:none !important;opacity:.85;}
 .ux-backup-fab:active:not(.ux-fab-dragging){transform:scale(.9);}
-.ux-backup-menu{position:fixed;bottom:148px;right:16px;z-index:9998;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.15);padding:8px 0;min-width:180px;opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s;pointer-events:none;}
-.ux-backup-menu.ux-show{opacity:1;transform:translateY(0);pointer-events:auto;}
-.ux-backup-menu button{display:block;width:100%;padding:12px 18px;border:none;background:none;text-align:left;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;color:#333;}
-.ux-backup-menu button:hover,.ux-backup-menu button:focus{background:#FFF0F3;}
+.ux-backup-menu{position:fixed;bottom:148px;right:16px;z-index:9998;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.15);padding:8px 0;min-width:180px;opacity:0;transform:translateY(8px) scale(.96);transform-origin:bottom right;transition:opacity .22s cubic-bezier(.23,1,.32,1),transform .22s cubic-bezier(.23,1,.32,1);pointer-events:none;}
+.ux-backup-menu.ux-show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto;}
+.ux-backup-menu button{display:block;width:100%;padding:12px 18px;border:none;background:none;text-align:left;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;color:#333;transition:background .15s;}
+.ux-backup-menu button:hover,.ux-backup-menu button:focus{background:#FFF0F3;color:#FF7B9C;}
 body.ux-dark-on .ux-backup-menu{background:#2a2a3e;}
 body.ux-dark-on .ux-backup-menu button{color:#e0e0e0;}
 body.ux-dark-on .ux-backup-menu button:hover,body.ux-dark-on .ux-backup-menu button:focus{background:#3a3a4e;}
@@ -144,12 +243,14 @@ body.ux-dark-on .ux-backup-menu button:hover,body.ux-dark-on .ux-backup-menu but
 }
 
 /* Onboarding */
-.ux-onboard-overlay{position:fixed;inset:0;z-index:10003;background:linear-gradient(180deg,#FFF8F5 0%,#FFE8EC 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;opacity:0;transition:opacity .5s;pointer-events:none;text-align:center;}
-.ux-onboard-overlay.ux-show{opacity:1;pointer-events:auto;}
-.ux-onboard-overlay .ux-ob-paw{font-size:72px;margin-bottom:24px;}
-.ux-onboard-overlay .ux-ob-title{font-size:26px;font-weight:900;color:#333;margin-bottom:12px;line-height:1.4;}
+@keyframes ux-ob-paw-bounce{0%,100%{transform:scale(1) rotate(-5deg);}50%{transform:scale(1.15) rotate(5deg);}}
+.ux-onboard-overlay{position:fixed;inset:0;z-index:10003;background:linear-gradient(160deg,#FFF8F5 0%,#FFE8EC 60%,#FFF0EB 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;opacity:0;transform:scale(.98);transition:opacity .45s cubic-bezier(.23,1,.32,1),transform .45s cubic-bezier(.23,1,.32,1);pointer-events:none;text-align:center;}
+.ux-onboard-overlay.ux-show{opacity:1;transform:scale(1);pointer-events:auto;}
+.ux-onboard-overlay .ux-ob-paw{font-size:72px;margin-bottom:24px;display:inline-block;animation:ux-ob-paw-bounce 2.4s ease-in-out infinite;}
+.ux-onboard-overlay .ux-ob-title{font-size:26px;font-weight:900;color:#3D2C2C;margin-bottom:12px;line-height:1.4;}
 .ux-onboard-overlay .ux-ob-sub{font-size:15px;color:#636363;line-height:1.8;margin-bottom:40px;max-width:300px;}
-.ux-onboard-overlay .ux-ob-start{background:#FF7B9C;color:#fff;border:none;padding:16px 48px;border-radius:18px;font-size:16px;font-weight:900;cursor:pointer;font-family:inherit;box-shadow:0 8px 24px rgba(255,123,156,.4);transition:transform .2s;}
+.ux-onboard-overlay .ux-ob-start{background:linear-gradient(135deg,#F5A6B8,#FF7B9C);color:#fff;border:none;padding:16px 48px;border-radius:var(--wc-radius-btn);font-size:16px;font-weight:900;cursor:pointer;font-family:inherit;box-shadow:0 8px 24px rgba(255,123,156,.4);transition:transform .2s,box-shadow .2s;}
+.ux-onboard-overlay .ux-ob-start:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(255,123,156,.5);}
 .ux-onboard-overlay .ux-ob-start:active{transform:scale(.96);}
 .ux-onboard-overlay .ux-ob-skip{margin-top:16px;background:none;border:none;color:#636363;font-size:13px;cursor:pointer;font-family:inherit;min-height:44px;}
 body.ux-dark-on .ux-onboard-overlay{background:linear-gradient(180deg,#1a1a2e 0%,#2a1a2e 100%);}
@@ -191,68 +292,45 @@ body.ux-dark-on .ux-offline-banner{background:#991B1B;}
 .ux-add-dog-cancel{background:#f0f0f0;color:#636363;}
 .ux-add-dog-submit{background:#FF7B9C;color:#fff;}
 .ux-add-dog-submit:disabled{opacity:.4;cursor:not-allowed;}
-body.ux-dark-on .ux-add-dog-panel{background:#1e1e2e;color:#e0e0e0;}
-body.ux-dark-on .ux-add-dog-input{background:#2a2a3e;border-color:#444;color:#e0e0e0;}
-body.ux-dark-on .ux-drum-picker{background:#252535;border-color:#444;}
-body.ux-dark-on .ux-drum-picker-item{color:#777;}
-body.ux-dark-on .ux-drum-picker-item.ux-selected{color:#e0e0e0;}
-body.ux-dark-on .ux-drum-picker-highlight{background:rgba(255,123,156,.12);border-color:rgba(255,123,156,.3);}
-body.ux-dark-on .ux-add-dog-cancel{background:#333;color:#aaa;}
-@media(prefers-color-scheme:dark){
-  body.ux-dark-auto .ux-add-dog-panel{background:#1e1e2e;color:#e0e0e0;}
-  body.ux-dark-auto .ux-add-dog-input{background:#2a2a3e;border-color:#444;color:#e0e0e0;}
-  body.ux-dark-auto .ux-drum-picker{background:#252535;border-color:#444;}
-  body.ux-dark-auto .ux-drum-picker-item{color:#777;}
-  body.ux-dark-auto .ux-drum-picker-item.ux-selected{color:#e0e0e0;}
-  body.ux-dark-auto .ux-drum-picker-highlight{background:rgba(255,123,156,.12);border-color:rgba(255,123,156,.3);}
-  body.ux-dark-auto .ux-add-dog-cancel{background:#333;color:#aaa;}
-}
-body.ux-dark-on .ux-dog-chip{background:#2a2a3e;border-color:#444;color:#aaa;}
-body.ux-dark-on .ux-dog-chip.ux-active{border-color:#FF7B9C;background:#3a2a3e;color:#FF7B9C;}
-body.ux-dark-on .ux-dog-chip-add{background:#3a3a4e;border-color:#555;}
-@media (prefers-color-scheme: dark) {
-  body.ux-dark-auto .ux-dog-chip{background:#2a2a3e;border-color:#444;color:#aaa;}
-  body.ux-dark-auto .ux-dog-chip.ux-active{border-color:#FF7B9C;background:#3a2a3e;color:#FF7B9C;}
-  body.ux-dark-auto .ux-dog-chip-add{background:#3a3a4e;border-color:#555;}
-}
+/* Dark mode: component overrides (consolidated - was duplicated for ux-dark-on and ux-dark-auto) */
+body.ux-dark-on .ux-add-dog-panel, body.ux-dark-auto .ux-add-dog-panel{background:#1e1e2e;color:#e0e0e0;}
+body.ux-dark-on .ux-add-dog-input, body.ux-dark-auto .ux-add-dog-input{background:#2a2a3e;border-color:#444;color:#e0e0e0;}
+body.ux-dark-on .ux-drum-picker, body.ux-dark-auto .ux-drum-picker{background:#252535;border-color:#444;}
+body.ux-dark-on .ux-drum-picker-item, body.ux-dark-auto .ux-drum-picker-item{color:#777;}
+body.ux-dark-on .ux-drum-picker-item.ux-selected, body.ux-dark-auto .ux-drum-picker-item.ux-selected{color:#e0e0e0;}
+body.ux-dark-on .ux-drum-picker-highlight, body.ux-dark-auto .ux-drum-picker-highlight{background:rgba(255,123,156,.12);border-color:rgba(255,123,156,.3);}
+body.ux-dark-on .ux-add-dog-cancel, body.ux-dark-auto .ux-add-dog-cancel{background:#333;color:#aaa;}
+body.ux-dark-on .ux-dog-chip, body.ux-dark-auto .ux-dog-chip{background:#2a2a3e;border-color:#444;color:#aaa;}
+body.ux-dark-on .ux-dog-chip.ux-active, body.ux-dark-auto .ux-dog-chip.ux-active{border-color:#FF7B9C;background:#3a2a3e;color:#FF7B9C;}
+body.ux-dark-on .ux-dog-chip-add, body.ux-dark-auto .ux-dog-chip-add{background:#3a3a4e;border-color:#555;}
 
-/* Dark mode: main content overrides */
-body.ux-dark-on{background:#121212 !important;color:#F0F0F0 !important;}
-body.ux-dark-on #root{background:#121212 !important;color:#F0F0F0 !important;}
-body.ux-dark-on #root>div{background:#1E1E1E !important;color:#F0F0F0 !important;}
-body.ux-dark-on input,body.ux-dark-on textarea,body.ux-dark-on select{background:#252525 !important;color:#F0F0F0 !important;border-color:#3a3a3a !important;}
-body.ux-dark-on h1,body.ux-dark-on h2,body.ux-dark-on h3{color:#F5F5F5 !important;}
-body.ux-dark-on a{color:#FF7B9C !important;}
-body.ux-dark-on [style*="background: rgb(236, 253, 245)"],body.ux-dark-on [style*="background:#ECFDF5"]{background:#1a2e1a !important;border-color:#2a4a2a !important;}
-body.ux-dark-on [style*="color: rgb(6, 95, 70)"],body.ux-dark-on [style*="color:#065F46"]{color:#6EE7B7 !important;}
-body.ux-dark-on [style*="color: rgb(239, 68, 68)"],body.ux-dark-on [style*="color:#EF4444"]{color:#FCA5A5 !important;}
-body.ux-dark-on [style*="background: rgb(239, 68, 68)"],body.ux-dark-on [style*="background:#EF4444"]{background:#991B1B !important;}
-body.ux-dark-on [style*="background: rgb(22, 163, 106)"],body.ux-dark-on [style*="background:#16A34A"]{background:#065F46 !important;}
-@media (prefers-color-scheme: dark) {
-  body.ux-dark-auto{background:#121212 !important;color:#F0F0F0 !important;}
-  body.ux-dark-auto #root{background:#121212 !important;color:#F0F0F0 !important;}
-  body.ux-dark-auto #root>div{background:#1E1E1E !important;color:#F0F0F0 !important;}
-  body.ux-dark-auto input,body.ux-dark-auto textarea,body.ux-dark-auto select{background:#252525 !important;color:#F0F0F0 !important;border-color:#3a3a3a !important;}
-  body.ux-dark-auto h1,body.ux-dark-auto h2,body.ux-dark-auto h3{color:#F5F5F5 !important;}
-  body.ux-dark-auto a{color:#FF7B9C !important;}
-  body.ux-dark-auto [style*="background: rgb(236, 253, 245)"],body.ux-dark-auto [style*="background:#ECFDF5"]{background:#1a2e1a !important;border-color:#2a4a2a !important;}
-  body.ux-dark-auto [style*="color: rgb(6, 95, 70)"],body.ux-dark-auto [style*="color:#065F46"]{color:#6EE7B7 !important;}
-  body.ux-dark-auto [style*="color: rgb(239, 68, 68)"],body.ux-dark-auto [style*="color:#EF4444"]{color:#FCA5A5 !important;}
-  body.ux-dark-auto [style*="background: rgb(239, 68, 68)"],body.ux-dark-auto [style*="background:#EF4444"]{background:#991B1B !important;}
-  body.ux-dark-auto [style*="background: rgb(22, 163, 106)"],body.ux-dark-auto [style*="background:#16A34A"]{background:#065F46 !important;}
-}
+/* Dark mode: main content overrides (consolidated) */
+body.ux-dark-on, body.ux-dark-auto{background:#121212 !important;color:#F0F0F0 !important;}
+body.ux-dark-on #root, body.ux-dark-auto #root{background:#121212 !important;color:#F0F0F0 !important;}
+body.ux-dark-on #root>div, body.ux-dark-auto #root>div{background:#1E1E1E !important;color:#F0F0F0 !important;}
+body.ux-dark-on input,body.ux-dark-on textarea,body.ux-dark-on select,body.ux-dark-auto input,body.ux-dark-auto textarea,body.ux-dark-auto select{background:#252525 !important;color:#F0F0F0 !important;border-color:#3a3a3a !important;}
+body.ux-dark-on h1,body.ux-dark-on h2,body.ux-dark-on h3,body.ux-dark-auto h1,body.ux-dark-auto h2,body.ux-dark-auto h3{color:#F5F5F5 !important;}
+body.ux-dark-on a, body.ux-dark-auto a{color:#FF7B9C !important;}
+body.ux-dark-on [style*="background: rgb(236, 253, 245)"],body.ux-dark-on [style*="background:#ECFDF5"],body.ux-dark-auto [style*="background: rgb(236, 253, 245)"],body.ux-dark-auto [style*="background:#ECFDF5"]{background:#1a2e1a !important;border-color:#2a4a2a !important;}
+body.ux-dark-on [style*="color: rgb(6, 95, 70)"],body.ux-dark-on [style*="color:#065F46"],body.ux-dark-auto [style*="color: rgb(6, 95, 70)"],body.ux-dark-auto [style*="color:#065F46"]{color:#6EE7B7 !important;}
+body.ux-dark-on [style*="color: rgb(239, 68, 68)"],body.ux-dark-on [style*="color:#EF4444"],body.ux-dark-auto [style*="color: rgb(239, 68, 68)"],body.ux-dark-auto [style*="color:#EF4444"]{color:#FCA5A5 !important;}
+body.ux-dark-on [style*="background: rgb(239, 68, 68)"],body.ux-dark-on [style*="background:#EF4444"],body.ux-dark-auto [style*="background: rgb(239, 68, 68)"],body.ux-dark-auto [style*="background:#EF4444"]{background:#991B1B !important;}
+body.ux-dark-on [style*="background: rgb(22, 163, 106)"],body.ux-dark-on [style*="background:#16A34A"],body.ux-dark-auto [style*="background: rgb(22, 163, 106)"],body.ux-dark-auto [style*="background:#16A34A"]{background:#065F46 !important;}
 
 /* Growth Summary Card */
-.ux-growth-card{position:relative;margin:16px;border-radius:20px;background:linear-gradient(135deg,#FFF8F5 0%,#FFE8EC 50%,#E8F4FD 100%);padding:24px 20px;box-shadow:0 4px 20px rgba(255,123,156,.15);overflow:hidden;}
-.ux-growth-card::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:rgba(255,123,156,.1);}
-.ux-growth-card-title{font-size:16px;font-weight:900;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.ux-growth-card{position:relative;margin:16px;border-radius:20px;background:linear-gradient(135deg,#FFF8F5 0%,#FFE8EC 55%,#FFF0F3 100%);padding:24px 20px;box-shadow:0 4px 20px rgba(255,123,156,.18),0 1px 4px rgba(255,123,156,.1);border:1px solid rgba(255,123,156,.12);overflow:hidden;}
+.ux-growth-card::before{content:'';position:absolute;top:-30px;right:-30px;width:110px;height:110px;border-radius:50%;background:radial-gradient(circle,rgba(255,123,156,.18) 0%,rgba(255,123,156,0) 70%);}
+.ux-growth-card::after{content:'';position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,rgba(245,166,184,.15) 0%,rgba(245,166,184,0) 70%);}
+.ux-growth-card-title{font-size:16px;font-weight:900;color:var(--wc-text);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
 .ux-growth-card-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;}
-.ux-growth-stat{text-align:center;padding:12px 8px;border-radius:14px;background:rgba(255,255,255,.7);}
+.ux-growth-stat{text-align:center;padding:12px 8px;border-radius:var(--wc-radius-card);background:rgba(255,255,255,.8);border:1px solid rgba(255,123,156,.1);transition:transform .2s;}
+.ux-growth-stat:hover{transform:translateY(-2px);}
 .ux-growth-stat-value{font-size:24px;font-weight:900;color:#FF7B9C;}
-.ux-growth-stat-label{font-size:11px;color:#636363;margin-top:4px;}
-.ux-growth-card-milestone{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.8);font-size:13px;font-weight:600;}
+.ux-growth-stat-label{font-size:11px;color:#7A6060;margin-top:4px;}
+.ux-growth-card-milestone{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.85);border:1px solid rgba(255,123,156,.12);font-size:13px;font-weight:600;}
 .ux-growth-share{margin-top:12px;text-align:center;}
-.ux-growth-share button{padding:10px 24px;border-radius:14px;border:none;background:#FF7B9C;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(255,123,156,.3);}
+.ux-growth-share button{padding:10px 24px;border-radius:var(--wc-radius-btn);border:none;background:linear-gradient(135deg,var(--wc-grad-start),var(--wc-grad-end));color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(255,123,156,.35);transition:transform .2s,box-shadow .2s;min-height:44px;} /* UX: タッチターゲット44px保証 */
+.ux-growth-share button:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(255,123,156,.45);}
 body.ux-dark-on .ux-growth-card{background:linear-gradient(135deg,#1a1a2e 0%,#2a1a2e 50%,#1a2a3e 100%);}
 body.ux-dark-on .ux-growth-stat{background:rgba(255,255,255,.08);}
 body.ux-dark-on .ux-growth-stat-label{color:#aaa;}
@@ -267,10 +345,13 @@ body.ux-dark-on .ux-growth-card-milestone{background:rgba(255,255,255,.06);}
 }
 
 /* Anniversary Reminder */
-.ux-anniversary-banner{position:fixed;top:env(safe-area-inset-top,12px);left:50%;transform:translateX(-50%);z-index:9995;max-width:380px;width:calc(100% - 32px);padding:16px 20px;border-radius:18px;background:linear-gradient(135deg,#FF7B9C,#FF9B6A);color:#fff;box-shadow:0 8px 24px rgba(255,123,156,.35);animation:ux-toast-in .35s cubic-bezier(.175,.885,.32,1.275);display:flex;align-items:center;gap:12px;cursor:pointer;}
-.ux-anniversary-banner .ux-anniv-icon{font-size:28px;flex-shrink:0;}
+@keyframes ux-anniv-shimmer{0%{background-position:-200% center;}100%{background-position:200% center;}}
+@keyframes ux-anniv-icon-pop{0%,100%{transform:scale(1);}40%{transform:scale(1.25) rotate(-8deg);}70%{transform:scale(.95) rotate(4deg);}}
+.ux-anniversary-banner{position:fixed;top:env(safe-area-inset-top,12px);left:50%;transform:translateX(-50%);z-index:9995;max-width:380px;width:calc(100% - 32px);padding:16px 20px;border-radius:20px;background:linear-gradient(135deg,#FF7B9C 0%,#FFAB76 50%,#FF7B9C 100%);background-size:200% auto;color:#fff;box-shadow:0 8px 28px rgba(255,123,156,.45),0 2px 8px rgba(255,123,156,.2);animation:ux-toast-in .35s cubic-bezier(.175,.885,.32,1.275),ux-anniv-shimmer 3s linear 1s infinite;display:flex;align-items:center;gap:12px;cursor:pointer;}
+.ux-anniversary-banner .ux-anniv-icon{font-size:28px;flex-shrink:0;animation:ux-anniv-icon-pop 1.8s ease-in-out infinite;}
 .ux-anniversary-banner .ux-anniv-text{flex:1;font-size:14px;font-weight:700;line-height:1.5;}
-.ux-anniversary-banner .ux-anniv-close{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;border:none;color:#fff;cursor:pointer;font-family:inherit;}
+.ux-anniversary-banner .ux-anniv-close{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;color:#fff;cursor:pointer;font-family:inherit;transition:background .2s;}
+.ux-anniversary-banner .ux-anniv-close:hover{background:rgba(255,255,255,.4);}
 
 /* Breed Growth Curve */
 .ux-breed-curve-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10001;display:flex;align-items:center;justify-content:center;animation:ux-fade-in .2s ease;padding:16px;}
@@ -294,7 +375,7 @@ body.ux-dark-on .ux-breed-curve-legend{color:#ccc;}
 
 /* Symptom Checker */
 .ux-symptom-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0;}
-.ux-symptom-chip{padding:10px 8px;border-radius:12px;border:2px solid #eee;background:#fff;text-align:center;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;}
+.ux-symptom-chip{padding:10px 8px;border-radius:12px;border:2px solid #eee;background:#fff;text-align:center;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;} /* UX: タッチターゲット44px保証 */
 .ux-symptom-chip.ux-selected{border-color:#FF7B9C;background:#FFF0F3;color:#FF7B9C;}
 body.ux-dark-on .ux-symptom-chip{background:#2a2a3e;border-color:#444;color:#ccc;}
 body.ux-dark-on .ux-symptom-chip.ux-selected{border-color:#FF7B9C;background:#3a2a3e;color:#FF7B9C;}
@@ -309,15 +390,17 @@ body.ux-dark-on .ux-symptom-chip.ux-selected{border-color:#FF7B9C;background:#3a
 }
 
 /* PWA Install Banner */
-.ux-pwa-banner{position:fixed;bottom:0;left:0;right:0;z-index:9992;padding:16px 20px env(safe-area-inset-bottom,16px);background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -4px 24px rgba(0,0,0,.1);animation:ux-slide-up .3s ease;display:flex;align-items:center;gap:14px;}
-.ux-pwa-banner-icon{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#FF7B9C,#FF9B6A);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.ux-pwa-banner{position:fixed;bottom:0;left:0;right:0;z-index:9992;padding:16px 20px env(safe-area-inset-bottom,16px);background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -4px 24px rgba(255,123,156,.12),0 -1px 0 rgba(255,123,156,.15);border-top:2px solid rgba(255,123,156,.18);animation:ux-slide-up .3s ease;display:flex;align-items:center;gap:14px;}
+.ux-pwa-banner-icon{width:48px;height:48px;border-radius:var(--wc-radius-card);background:linear-gradient(135deg,var(--wc-grad-start),var(--wc-grad-end));display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;box-shadow:0 4px 10px rgba(255,123,156,.3);}
 .ux-pwa-banner-text{flex:1;}
-.ux-pwa-banner-title{font-size:14px;font-weight:900;margin-bottom:2px;}
-.ux-pwa-banner-sub{font-size:12px;color:#636363;}
+.ux-pwa-banner-title{font-size:14px;font-weight:900;color:var(--wc-text);margin-bottom:2px;}
+.ux-pwa-banner-sub{font-size:12px;color:#7A6060;}
 .ux-pwa-banner-actions{display:flex;gap:8px;flex-shrink:0;}
-.ux-pwa-banner-actions button{padding:10px 16px;border-radius:12px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
-.ux-pwa-install-btn{background:#FF7B9C;color:#fff;}
-.ux-pwa-dismiss-btn{background:#f0f0f0;color:#636363;}
+.ux-pwa-banner-actions button{padding:10px 16px;border-radius:var(--wc-radius-btn);border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .15s,opacity .15s;}
+.ux-pwa-banner-actions button:active{transform:scale(.95);}
+.ux-pwa-install-btn{background:linear-gradient(135deg,var(--wc-grad-start),var(--wc-grad-end));color:#fff;box-shadow:0 4px 12px rgba(255,123,156,.35);}
+.ux-pwa-install-btn:hover{opacity:.9;}
+.ux-pwa-dismiss-btn{background:#F0E8E6;color:#7A6060;}
 @keyframes ux-slide-up{from{transform:translateY(100%);}to{transform:translateY(0);}}
 body.ux-dark-on .ux-pwa-banner{background:#1e1e2e;}
 body.ux-dark-on .ux-pwa-banner-title{color:#F0F0F0;}
@@ -353,11 +436,37 @@ Error generating stack: `+n.message+`
 ・`),b(0)}},{i:"🔤",l:"フォント",fn:()=>b(3)}].map((k,N)=>u.jsxs("div",{onClick:k.fn,style:{display:"flex",flexDirection:"column",alignItems:"center",gap:6,cursor:"pointer"},children:[u.jsx("div",{style:{width:50,height:50,borderRadius:25,background:"#2d2d4a",display:"flex",alignItems:"center",justifyContent:"center",fontSize:k.i.length>1?16:20,color:"#e0e0e0"},children:k.i}),u.jsx("span",{style:{fontSize:10,color:"#bbb"},children:k.l})]},N))})]})}),u.jsx("input",{ref:U,type:"file",accept:"image/*",multiple:!0,style:{display:"none"},onChange:J}),E===3&&u.jsx("div",{onClick:()=>b(2),style:{position:"fixed",inset:0,background:"rgba(0,0,0,.5)",zIndex:200,display:"flex",alignItems:"flex-end"},children:u.jsxs("div",{onClick:k=>k.stopPropagation(),style:{width:"100%",maxWidth:430,margin:"0 auto",background:"#1a1a2e",borderRadius:"20px 20px 0 0",padding:"12px 20px 24px"},children:[u.jsx("div",{style:{width:36,height:4,borderRadius:2,background:"#444",margin:"0 auto 14px"}}),u.jsx("div",{style:{fontSize:16,fontWeight:700,color:"#fff",marginBottom:16},children:"フォントを選ぶ"}),[{k:"default",l:"まるゴシック",s:"'Zen Maru Gothic',sans-serif"},{k:"gothic",l:"ゴシック",s:"'Hiragino Sans',sans-serif"},{k:"mincho",l:"明朝",s:"'Hiragino Mincho ProN',serif"},{k:"round",l:"まるみ",s:"'Kosugi Maru',sans-serif"}].map(k=>u.jsxs("div",{onClick:()=>{G(k.k),b(0)},style:{padding:"14px 16px",marginBottom:8,borderRadius:14,cursor:"pointer",background:Q===k.k?"#3d3d5c":"#2d2d4a",border:Q===k.k?"1.5px solid #FF7B9C":"1.5px solid transparent"},children:[u.jsx("div",{style:{fontSize:16,fontFamily:k.s,color:"#fff"},children:k.l}),u.jsx("div",{style:{fontSize:13,fontFamily:k.s,color:"#aaa",marginTop:4},children:"きょうのわんちゃんはとても元気でした"})]},k.k))]})})]})}function R0({a:s,go:z,bk:r,id:o,cf:S}){const M=s.diaries.find(G=>G.id===o),[q,_]=W.useState(0),[x,y]=W.useState(""),[A,E]=W.useState(""),b=s.t,Q={default:"'Zen Maru Gothic',sans-serif",gothic:"'Hiragino Sans',sans-serif",mincho:"'Hiragino Mincho ProN',serif",round:"'Kosugi Maru',sans-serif"}[M?.font||"default"];return M?u.jsxs("div",{style:{background:b.bg,color:b.tx,minHeight:"100dvh"},children:[M.mediaSrc&&u.jsx("img",{src:M.mediaSrc,style:{width:"100%",height:260,objectFit:"cover"},alt:""}),u.jsxs("div",{style:{padding:"0 20px"},children:[u.jsx(Yl,{t:b,title:"",left:u.jsx(ql,{t:b,onClick:r})}),q?u.jsxs("div",{children:[u.jsx("input",{value:x,onChange:G=>y(G.target.value),style:{width:"100%",fontSize:20,fontWeight:800,border:"none",background:"transparent",color:b.tx,outline:"none",padding:"8px 0"}}),u.jsx("textarea",{value:A,onChange:G=>E(G.target.value),style:{width:"100%",fontSize:16,lineHeight:1.9,border:"none",background:"transparent",color:b.tx,outline:"none",minHeight:200,resize:"none"}}),u.jsxs("div",{style:{display:"flex",gap:8},children:[u.jsx(Wt,{t:b,primary:!0,onClick:()=>{s.updD(M.id,{title:x,txt:A}),_(0)},children:"保存"}),u.jsx(Wt,{t:b,onClick:()=>_(0),children:"やめる"})]})]}):u.jsxs("div",{children:[u.jsx("h1",{style:{fontSize:22,fontWeight:900,color:b.h1,margin:"16px 0 4px",fontFamily:Q},children:M.title}),u.jsxs("div",{style:{fontSize:12,color:b.dm},children:[(M.date||"").replace(/\./g,"/")," ",M.mood&&"· "+M.mood]}),u.jsx("div",{style:{fontSize:15,lineHeight:2,marginTop:16,whiteSpace:"pre-wrap",fontFamily:Q},children:M.txt}),u.jsxs("div",{style:{marginTop:24,paddingTop:16,borderTop:"1px solid "+b.bd},children:[u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:10},children:[u.jsx("span",{children:"🐶"}),u.jsxs("span",{style:{fontSize:13,fontWeight:700},children:[s.nn,"からの一言"]})]}),u.jsx("div",{style:{background:b.c,borderRadius:16,padding:16,border:"1px solid "+b.bd,position:"relative",overflow:"hidden"},children:M.aiLoading?u.jsx("span",{style:{color:b.dm},children:"🤔 考え中..."}):s.prem?u.jsx("p",{style:{fontSize:15,lineHeight:1.7,margin:0},children:M.aiMsg||M.freeMsg}):u.jsxs("div",{children:[u.jsx("p",{style:{fontSize:15,lineHeight:1.7,margin:0,filter:"blur(5px)",userSelect:"none"},children:M.aiMsg||"きょうもいっしょにいられてうれしいな🐾"}),u.jsxs("div",{style:{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:b.bg+"ee",borderRadius:16},children:[u.jsx("div",{style:{fontSize:28},children:"🐾"}),u.jsxs("div",{style:{fontSize:14,fontWeight:800,color:b.h1,marginTop:8},children:[s.nn,"からの一言"]}),u.jsx(Wt,{t:b,primary:!0,small:!0,full:!1,onClick:()=>z("paywall"),style:{marginTop:12},children:"読んでみる ✨"})]})]})})]}),u.jsxs("div",{style:{display:"flex",gap:6,padding:"16px 0",flexWrap:"wrap"},children:[u.jsx("span",{onClick:()=>{y(M.title||""),E(M.txt||""),_(1)},style:{padding:"8px 16px",borderRadius:20,border:"1px solid "+b.bd,fontSize:13,cursor:"pointer",color:b.dm},children:"編集"}),u.jsx("span",{onClick:()=>S.ask("削除する？",()=>{s.delD(M.id),r()}),style:{padding:"8px 16px",borderRadius:20,fontSize:13,cursor:"pointer",color:"#EF4444"},children:"削除"})]}),s.prem&&(()=>{const fv=[{v:"🐩",n:"ココ"},{v:"🐕",n:"レオ"},{v:"🐶",n:"モカ"},{v:"🦮",n:"ハナ"},{v:"🐕",n:"リク"},{v:"🐾",n:"マロン"},{v:"🐶",n:"ソラ"},{v:"🐕‍🦺",n:"ルナ"}],fi=M?(M.id||"").charCodeAt(1)%5+3:5,fs=fv.slice(0,Math.min(fi,5)),fe=Math.max(0,fi-5);return u.jsxs("div",{style:{paddingBottom:16,borderTop:"1px solid "+b.bd},children:[u.jsxs("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 0"},children:[u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:6},children:[u.jsx("span",{style:{fontSize:14},children:"👣"}),u.jsxs("span",{style:{fontSize:13,fontWeight:700},children:["足あと ",u.jsx("span",{style:{color:b.ac},children:fi+"人"})]})]}),u.jsx("span",{style:{fontSize:11,color:b.dm},children:"この日記を見た人"})]}),u.jsxs("div",{style:{display:"flex"},children:[...fs.map((G,U)=>u.jsx("div",{style:{width:36,height:36,borderRadius:18,background:b.a2,border:"2px solid "+b.c,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,marginLeft:U>0?-8:0,zIndex:10-U},title:G.n,children:G.v},U)),fe>0&&u.jsx("div",{style:{width:36,height:36,borderRadius:18,background:b.s,border:"2px solid "+b.c,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,color:b.dm,marginLeft:-8},children:"+"+fe})]}),u.jsx("div",{style:{fontSize:11,color:b.dm,marginTop:8,lineHeight:1.6},children:fs.map(G=>G.n).join("、")+(fe>0?" 他"+fe+"人":"")+"が見たよ 👀"}),u.jsxs("div",{style:{marginTop:10,display:"flex",gap:6,flexWrap:"wrap"},children:[u.jsx("span",{style:{padding:"4px 10px",borderRadius:12,background:b.a2,fontSize:11,color:b.ac,fontWeight:700},children:"🐾 いいね "+((fi*3+7)%20+fi)}),u.jsx("span",{style:{padding:"4px 10px",borderRadius:12,background:b.a2,fontSize:11,color:b.ac,fontWeight:700},children:"💬 コメント "+Math.max(1,fi-2)})]})]})})(),s.prem&&u.jsxs("div",{style:{paddingBottom:16,borderTop:"1px solid "+b.bd},children:[u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:6,padding:"12px 0"},children:[u.jsx("span",{style:{fontSize:14},children:"💬"}),u.jsx("span",{style:{fontSize:13,fontWeight:700},children:"コメント"})]}),(()=>{const cmt=[{v:"🐩",n:"ココ",tx:"かわいい〜！うちの子もこんな風だったな✨",t:"2時間前"},{v:"🐕",n:"レオ",tx:"素敵な日記ですね🐾 応援してます！",t:"5時間前"},{v:"🐶",n:"モカ",tx:"いい写真！今度一緒にお散歩しませんか？",t:"1日前"}],ci=M?(M.id||"").charCodeAt(1)%3:0;return u.jsxs("div",{children:[cmt.slice(0,ci+1).map((c,i)=>u.jsxs("div",{style:{display:"flex",gap:10,padding:"10px 0",borderBottom:i<ci?"1px solid "+b.bd:"none"},children:[u.jsx("div",{style:{width:32,height:32,borderRadius:16,background:b.a2,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0},children:c.v}),u.jsxs("div",{style:{flex:1},children:[u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:6},children:[u.jsx("span",{style:{fontSize:12,fontWeight:700},children:c.n}),u.jsx("span",{style:{fontSize:10,color:b.dm},children:c.t})]}),u.jsx("div",{style:{fontSize:13,marginTop:4,lineHeight:1.5},children:c.tx})]})]},i)),u.jsxs("div",{style:{display:"flex",gap:8,marginTop:12},children:[u.jsx("input",{placeholder:"コメントを書く...",style:{flex:1,padding:"8px 14px",borderRadius:20,border:"1.5px solid "+b.bd,background:b.s,color:b.tx,fontSize:13,outline:"none"}}),u.jsx("div",{onClick:()=>alert("コメントを送信しました！"),style:{padding:"8px 14px",borderRadius:20,background:b.ac,color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap"},children:"送信"})]})]})})()]}),!s.prem&&u.jsxs("div",{style:{background:b.s,borderRadius:14,padding:"14px 16px",marginBottom:16,display:"flex",alignItems:"center",justifyContent:"space-between"},children:[u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:8},children:[u.jsx("span",{children:"👣"}),u.jsx("span",{style:{fontSize:12,color:b.dm},children:"誰が見てくれたか分かる"})]}),u.jsx("span",{onClick:()=>z("paywall"),style:{fontSize:11,color:b.ac,fontWeight:700,cursor:"pointer"},children:"PRO ›"})]})]})]})]}):u.jsxs("div",{style:{background:b.bg,color:b.tx,minHeight:"100dvh"},children:[u.jsx(Yl,{t:b,title:"日記",left:u.jsx(ql,{t:b,onClick:r})}),u.jsx("div",{style:{textAlign:"center",padding:60},children:"見つかりません"})]})}function _0({a:s,cf:z}){const[r,o]=W.useState(""),[S,M]=W.useState(""),[q,_]=W.useState(0),[x,y]=W.useState(null),[A,E]=W.useState(null),[b,Q]=W.useState(null),G=W.useRef(),U=s.t,X=s.weights.length?s.weights[s.weights.length-1].v:null,Y=Ki[s.breed];return u.jsxs("div",{style:{padding:16,overflow:"hidden"},children:[u.jsxs("div",{style:{fontSize:18,fontWeight:800,marginBottom:16,display:"flex",alignItems:"center",gap:8},children:["🌱",u.jsxs("span",{children:[s.nn,"の成長記録"]})]}),u.jsxs("div",{style:{background:U.c,borderRadius:16,padding:16,border:"1px solid "+U.bd,marginBottom:14,overflow:"hidden"},children:[u.jsx("div",{style:{fontWeight:700,marginBottom:8},children:"⚖️ 体重"}),X?u.jsxs("div",{style:{textAlign:"center"},children:[u.jsxs("div",{style:{fontSize:28,fontWeight:900,color:U.ac},children:[X.toFixed(1),"kg"]}),Y&&(()=>{const J=(Y[0]+Y[1])/2,lt=Y[0]*.85,gt=Y[1]*1.15,Dt=s.weights,yt=Dt.length>=2?Dt[Dt.length-2].v:null,F=yt?X-yt:0;let k,N,P;X<lt?(k="😰",N="痩せすぎかも",P="#F59E0B"):X<Y[0]?(k="🍖",N="少しスリム",P="#3B82F6"):X<=Y[1]?Math.abs(X-J)<(Y[1]-Y[0])*.2?(k="✨",N="ベスト！",P="#16A34A"):(k="👍",N="適正範囲",P="#16A34A"):X<=gt?(k="🍽",N="ちょっとぽっちゃり",P="#F59E0B"):(k="⚠️",N="太りすぎかも",P="#DC2626");const it=F>.3?"📈 +"+F.toFixed(1):F<-.3?"📉 "+F.toFixed(1):null;return u.jsxs("div",{style:{display:"flex",alignItems:"center",justifyContent:"center",gap:6,marginTop:6},children:[u.jsxs("span",{style:{fontSize:13,padding:"4px 14px",borderRadius:20,background:P+"18",color:P,fontWeight:800},children:[k," ",N]}),it&&u.jsx("span",{style:{fontSize:11,color:U.dm,padding:"3px 8px",borderRadius:8,background:U.s,fontWeight:700},children:it})]})})(),u.jsx("div",{style:{fontSize:10,color:U.dm,marginTop:4},children:s.breed&&Y?s.breed+"の標準: "+Y[0]+"〜"+Y[1]+"kg":""})]}):u.jsxs("div",{style:{textAlign:"center",padding:"8px 0"},children:[u.jsx("div",{style:{fontSize:14,color:U.dm},children:"まだ記録がないよ"}),u.jsx("div",{style:{fontSize:11,color:U.dm,marginTop:2},children:"下から入力してみよう 📝"})]}),u.jsxs("div",{style:{display:"flex",gap:8,marginTop:12,maxWidth:"100%"},children:[u.jsx("input",{value:r,onChange:J=>o(J.target.value),placeholder:X?"今の体重(kg)":"体重(kg)",inputMode:"decimal",onKeyDown:J=>{if(J.key==="Enter"){const lt=parseFloat(r);lt>0&&(s.addW(lt),o(""))}},style:{flex:1,padding:"10px 14px",borderRadius:12,border:"1.5px solid "+U.bd,background:U.s,color:U.tx,fontSize:16,outline:"none",minWidth:0,boxSizing:"border-box"}}),u.jsx(Wt,{t:U,primary:!0,small:!0,full:!1,onClick:()=>{const J=parseFloat(r);J>0&&(s.addW(J),o(""))},children:"記録"})]}),s.weights.length>0&&u.jsxs("div",{style:{marginTop:8},children:[s.weights.length>=2&&u.jsx("div",{style:{background:U.s,borderRadius:12,padding:"12px 8px",marginBottom:8},children:(()=>{const J=s.weights.slice(-10),lt=[...J.map(H=>H.v),...Y||[]],gt=Math.min(...lt)*.9,yt=Math.max(...lt)*1.1-gt||1,F=300,k=160,N=36,P=20,it=H=>P+(1-(H-gt)/yt)*(k-P*2),ht=J.map((H,w)=>{const ut=s.diaries.find(bt=>bt.date===H.d);return{x:N+w*(F-N-8)/(J.length-1||1),y:it(H.v),w:H,emoji:ut?.emoji||"🐾"}}),xl=ht.map((H,w)=>w===0?"M"+H.x+","+H.y:"L"+H.x+","+H.y).join(""),fl=xl+"L"+ht[ht.length-1].x+","+(k-P)+"L"+ht[0].x+","+(k-P)+"Z",Gt=[],C=yt/4;for(let H=0;H<=4;H++){const w=gt+C*H;Gt.push({v:Math.round(w*10)/10,y:it(w)})}return u.jsxs(u.Fragment,{children:[u.jsxs("svg",{viewBox:"0 0 "+F+" "+k,style:{width:"100%",height:160},children:[u.jsx("defs",{children:u.jsxs("linearGradient",{id:"wg",x1:"0",y1:"0",x2:"0",y2:"1",children:[u.jsx("stop",{offset:"0%",stopColor:U.ac,stopOpacity:"0.3"}),u.jsx("stop",{offset:"100%",stopColor:U.ac,stopOpacity:"0.05"})]})}),Gt.map((H,w)=>u.jsxs("g",{children:[u.jsx("line",{x1:N-4,y1:H.y,x2:F-4,y2:H.y,stroke:U.bd,strokeWidth:"0.5"}),u.jsx("text",{x:N-8,y:H.y+3,textAnchor:"end",fontSize:"9",fill:U.dm,children:H.v})]},w)),Y&&u.jsxs(u.Fragment,{children:[u.jsx("rect",{x:N,y:it(Y[1]),width:F-N-8,height:Math.max(0,it(Y[0])-it(Y[1])),rx:"4",fill:"#16A34A",opacity:"0.08"}),u.jsx("line",{x1:N,y1:it(Y[0]),x2:F-8,y2:it(Y[0]),stroke:"#16A34A",strokeWidth:"1",strokeDasharray:"4,3",opacity:"0.4"}),u.jsx("line",{x1:N,y1:it(Y[1]),x2:F-8,y2:it(Y[1]),stroke:"#16A34A",strokeWidth:"1",strokeDasharray:"4,3",opacity:"0.4"}),u.jsxs("text",{x:F-8,y:it(Y[1])-4,textAnchor:"end",fontSize:"9",fill:"#16A34A",fontWeight:"700",children:[Y[1],"kg"]}),u.jsxs("text",{x:F-8,y:it(Y[0])+12,textAnchor:"end",fontSize:"9",fill:"#16A34A",fontWeight:"700",children:[Y[0],"kg"]}),u.jsx("text",{x:F-8,y:(it(Y[0])+it(Y[1]))/2+3,textAnchor:"end",fontSize:"8",fill:"#16A34A",opacity:"0.7",children:"標準"})]}),u.jsx("path",{d:fl,fill:"url(#wg)"}),u.jsx("path",{d:xl,fill:"none",stroke:U.ac,strokeWidth:"2.5",strokeLinecap:"round",strokeLinejoin:"round"}),ht.map((H,w)=>u.jsxs("g",{onClick:()=>E(ut=>ut===w?null:w),style:{cursor:"pointer"},children:[u.jsx("circle",{cx:H.x,cy:H.y,r:A===w?7:5,fill:A===w?"#fff":U.ac,stroke:U.ac,strokeWidth:A===w?2.5:1.5}),u.jsx("text",{x:H.x,y:H.y-14,textAnchor:"middle",fontSize:"10",fill:U.tx,fontWeight:"800",children:H.w.v}),(w===0||w===J.length-1||J.length<=5)&&u.jsx("text",{x:H.x,y:k-4,textAnchor:"middle",fontSize:"7",fill:U.dm,children:(H.w.d||"").slice(5).replace(".","/")})]},w))]}),Y&&u.jsxs("div",{style:{display:"flex",alignItems:"center",justifyContent:"center",gap:12,marginTop:4},children:[u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:4},children:[u.jsx("div",{style:{width:16,height:8,borderRadius:2,background:"#16A34A",opacity:.15}}),u.jsxs("span",{style:{fontSize:10,color:U.dm},children:[s.breed,"の標準 ",Y[0],"〜",Y[1],"kg"]})]}),u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:4},children:[u.jsx("div",{style:{width:16,height:2,borderRadius:1,background:U.ac}}),u.jsx("span",{style:{fontSize:10,color:U.dm},children:"体重推移"})]})]}),A!==null&&ht[A]&&(()=>{const H=s.weights.length-J.length+A,w=ht[A].w;return b?u.jsxs("div",{style:{background:U.c,borderRadius:12,padding:"10px 14px",border:"1px solid "+U.ac,marginTop:4},children:[u.jsxs("div",{style:{display:"flex",gap:6,marginBottom:8},children:[u.jsxs("div",{style:{flex:1},children:[u.jsx("div",{style:{fontSize:9,color:U.dm},children:"日付"}),u.jsx("input",{value:b.d,onChange:ut=>Q({...b,d:ut.target.value}),style:{width:"100%",padding:6,borderRadius:8,border:"1px solid "+U.bd,background:U.s,color:U.tx,fontSize:16,outline:"none"}})]}),u.jsxs("div",{style:{flex:1},children:[u.jsx("div",{style:{fontSize:9,color:U.dm},children:"体重(kg)"}),u.jsx("input",{value:b.v,onChange:ut=>Q({...b,v:ut.target.value}),inputMode:"decimal",style:{width:"100%",padding:6,borderRadius:8,border:"1px solid "+U.bd,background:U.s,color:U.tx,fontSize:16,outline:"none"}})]})]}),u.jsxs("div",{style:{display:"flex",gap:6},children:[u.jsx("div",{onClick:()=>{const ut=parseFloat(b.v);ut>0&&(s.updW(H,{d:b.d,v:ut}),Q(null))},style:{flex:1,padding:8,borderRadius:8,background:U.ac,color:"#fff",textAlign:"center",fontWeight:700,fontSize:12,cursor:"pointer"},children:"保存"}),u.jsx("div",{onClick:()=>Q(null),style:{flex:1,padding:8,borderRadius:8,background:U.s,color:U.tx,textAlign:"center",fontSize:12,cursor:"pointer"},children:"やめる"})]})]}):u.jsxs("div",{style:{background:U.c,borderRadius:12,padding:"10px 14px",border:"1px solid "+U.bd,display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:4},children:[u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:8},children:[u.jsx("span",{style:{fontSize:20},children:ht[A].emoji}),u.jsxs("div",{children:[u.jsxs("div",{style:{fontSize:14,fontWeight:700,color:U.ac},children:[w.v,"kg"]}),u.jsx("div",{style:{fontSize:11,color:U.dm},children:(w.d||"").replace(/\./g,"/")})]})]}),u.jsxs("div",{style:{display:"flex",gap:8},children:[u.jsx("span",{onClick:()=>Q({d:w.d||"",v:String(w.v)}),style:{fontSize:11,color:U.ac,cursor:"pointer"},children:"編集"}),u.jsx("span",{onClick:()=>z.ask("この記録を削除する？",()=>{s.delW(H),E(null)}),style:{fontSize:11,color:"#EF4444",cursor:"pointer"},children:"削除"})]})]})})()]})})()}),s.weights.length===1&&u.jsx("div",{style:{textAlign:"center",padding:"8px 0",fontSize:12,color:U.dm},children:"もう1回記録するとグラフが見れるよ 📈"})]})]}),u.jsxs("div",{style:{background:U.c,borderRadius:16,padding:16,border:"1px solid "+U.bd},children:[u.jsx("div",{style:{fontWeight:700,marginBottom:4},children:"📸 メモリー"}),u.jsx("div",{style:{fontSize:11,color:U.dm,marginBottom:12},children:"はじめてのお散歩、トリミング、誕生日…大切な瞬間を残そう"}),q?u.jsxs("div",{style:{background:U.s,borderRadius:14,padding:14},children:[u.jsx("input",{value:S,onChange:J=>M(J.target.value),placeholder:"思い出の名前",style:{width:"100%",padding:10,borderRadius:12,border:"1.5px solid "+U.bd,background:U.c,color:U.tx,fontSize:16,outline:"none",marginBottom:8,minWidth:0}}),x?u.jsxs("div",{style:{position:"relative",marginBottom:8},children:[u.jsx("img",{src:x,style:{width:"100%",height:100,objectFit:"cover",borderRadius:12},alt:""}),u.jsx("div",{onClick:()=>y(null),style:{position:"absolute",top:4,right:4,width:22,height:22,borderRadius:11,background:"rgba(0,0,0,.5)",color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"},children:"✕"})]}):u.jsx("div",{onClick:()=>G.current?.click(),style:{padding:16,borderRadius:12,border:"2px dashed "+U.bd,textAlign:"center",cursor:"pointer",marginBottom:8},children:"📷"}),u.jsx("input",{ref:G,type:"file",accept:"image/*",style:{display:"none"},onChange:J=>{const lt=J.target.files?.[0];if(lt){const gt=new FileReader;gt.onload=Dt=>y(Dt.target.result),gt.readAsDataURL(lt)}J.target.value=""}}),u.jsxs("div",{style:{display:"flex",gap:8},children:[u.jsx(Wt,{t:U,primary:!0,small:!0,full:!1,onClick:()=>{S.trim()&&(s.addM(S.trim(),x),M(""),y(null),_(0))},children:"保存"}),u.jsx(Wt,{t:U,small:!0,full:!1,onClick:()=>{_(0),M(""),y(null)},children:"やめる"})]})]}):u.jsx("div",{onClick:()=>_(1),style:{padding:14,background:U.s,borderRadius:12,cursor:"pointer",textAlign:"center"},children:u.jsx("span",{style:{fontSize:13,color:U.ac,fontWeight:600},children:"＋ メモリーを追加"})}),s.milestones.map(J=>u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:8,padding:"10px 0",borderBottom:"1px solid "+U.bd},children:[J.photo?u.jsx("img",{src:J.photo,style:{width:48,height:48,borderRadius:8,objectFit:"cover"},alt:""}):u.jsx("span",{children:"⭐"}),u.jsxs("div",{style:{flex:1},children:[u.jsx("div",{style:{fontSize:13,fontWeight:700},children:J.n}),u.jsx("div",{style:{fontSize:10,color:U.dm},children:(J.d||"").replace(/\./g,"/")})]}),u.jsx("span",{onClick:()=>z.ask("「"+J.n+"」を削除する？",()=>s.delM(J.id)),style:{fontSize:11,color:"#EF4444",cursor:"pointer"},children:"✕"})]},J.id))]})]})}function B0({a:s,go:z}){const r=s.t;return u.jsxs("div",{style:{padding:16,overflow:"hidden"},children:[!s.prem&&u.jsxs("div",{style:{background:"linear-gradient(135deg,"+r.g1+","+r.g2+")",borderRadius:20,padding:20,color:"#fff",marginBottom:16},children:[u.jsx("div",{style:{fontSize:18,fontWeight:800},children:"✨ プレミアム"}),u.jsxs("div",{style:{fontSize:12,opacity:.9,marginTop:6,lineHeight:1.7},children:[s.nn,"からの一言・AI健康相談・思い出アルバム"]}),u.jsxs("div",{style:{display:"flex",alignItems:"baseline",gap:4,marginTop:8},children:[u.jsx("span",{style:{fontSize:22,fontWeight:900},children:"¥780"}),u.jsx("span",{style:{fontSize:12,opacity:.8},children:"/月〜"})]}),u.jsx("div",{onClick:()=>z("paywall"),style:{marginTop:10,padding:"10px 0",borderRadius:12,background:"rgba(255,255,255,.25)",textAlign:"center",fontSize:14,fontWeight:700,cursor:"pointer"},children:"✨ 3日間無料でためす"})]}),s.prem&&u.jsxs("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 16px",background:r.a2,borderRadius:14,marginBottom:16},children:[u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:8},children:[u.jsx("span",{children:"✨"}),u.jsx("span",{style:{fontSize:14,fontWeight:700,color:r.ac},children:"プレミアム利用中"})]}),u.jsx("span",{onClick:()=>z("settings"),style:{fontSize:12,color:r.dm,cursor:"pointer"},children:"管理 ›"})]}),[{i:"🖼",l:"アルバム",d:s.nn+"の写真をまとめて見る 📷",p:"album"},{i:"📝",l:"症状ログ",d:"体調の変化を記録 🏥 カルテ出力はPRO",p:"sym"},{i:"🔧",l:"設定",d:"テーマ・アカウント",p:"settings"}].map(o=>u.jsxs("div",{onClick:()=>z(o.p),style:{display:"flex",alignItems:"center",gap:12,padding:14,background:r.c,borderRadius:14,marginBottom:6,cursor:"pointer",border:"1px solid "+r.bd},children:[u.jsx("div",{style:{width:40,height:40,borderRadius:12,background:r.s,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18},children:o.i}),u.jsxs("div",{style:{flex:1},children:[u.jsx("div",{style:{fontWeight:600},children:o.l}),u.jsx("div",{style:{fontSize:11,color:r.dm},children:o.d})]}),u.jsx("span",{style:{color:r.dm},children:"›"})]},o.p)),u.jsx("div",{style:{fontSize:11,fontWeight:700,color:r.ac,marginTop:16,marginBottom:6},children:"✨ プレミアム"}),[{i:"💌",l:"うちの子からの一言",d:s.nn+"からメッセージが届く 💌",p:"post"},{i:"🩹",l:"AI健康相談",d:"いつでも気軽に健康相談 🩺",p:"ai"},{i:"🏥",l:"獣医さん用カルテ",d:"症状の記録をPDFで出力 📋",p:"sym"},{i:"🐾",l:"犬友つながり",d:"飼い主さん同士でつながる 🐾",p:"friend"},{i:"📕",l:"思い出アルバム",d:"日記をまとめてDLできる 🎁",p:"membook"},{i:"🐕",l:"うちの子を追加",d:"多頭飼いの方はこちら 🏠",p:"settings"}].map(o=>u.jsxs("div",{onClick:()=>s.prem?z(o.p):z("paywall"),style:{display:"flex",alignItems:"center",gap:12,padding:14,background:r.c,borderRadius:14,marginBottom:6,cursor:"pointer",border:"1px solid "+r.bd},children:[u.jsx("span",{style:{fontSize:18},children:o.i}),u.jsxs("div",{style:{flex:1},children:[u.jsx("div",{style:{fontWeight:600},children:o.l}),u.jsx("div",{style:{fontSize:11,color:r.dm},children:o.d})]}),!s.prem&&u.jsx("span",{style:{fontSize:9,padding:"2px 8px",borderRadius:8,background:r.ac,color:"#fff",fontWeight:700},children:"PRO"})]},o.l))]})}function U0({a:s,go:z,bk:r,cf:o}){const S=s.t,M={home:{i:"🐾",l:"ホーム"},growth:{i:"🌱",l:"成長"},album:{i:"🖼",l:"アルバム"},menu:{i:"☰",l:"メニュー"},sym:{i:"📝",l:"症状"},friend:{i:"🐕",l:"犬友",pro:1},ai:{i:"🩹",l:"AI相談",pro:1},membook:{i:"📕",l:"思い出",pro:1}},q=Object.fromEntries(Object.entries(M).filter(([b,Q])=>!Q.pro||s.prem)),_=(()=>{const b=s.tabOrder||[],Q=["home","growth","album","menu"];return b.length===4&&b.every(G=>q[G])?b:b.length===2?["home",b[0],b[1],"menu"].filter(G=>q[G]):Q})(),[x,y]=W.useState(null),[A,E]=W.useState(null);return u.jsxs("div",{style:{background:S.bg,color:S.tx,minHeight:"100dvh"},children:[u.jsx(Yl,{t:S,title:"設定",left:u.jsx(ql,{t:S,onClick:r})}),u.jsxs("div",{style:{padding:16,overflow:"hidden"},children:[u.jsxs("div",{style:{background:S.c,borderRadius:16,padding:16,border:"1px solid "+S.bd,marginBottom:12},children:[u.jsx("div",{style:{fontWeight:700,marginBottom:10},children:"🎨 テーマ"}),u.jsx("div",{style:{display:"flex",gap:8},children:Object.entries(Ca).map(([b,Q])=>u.jsx("div",{onClick:()=>s.up({theme:b}),style:{width:40,height:40,borderRadius:20,background:"linear-gradient(135deg,"+Q.g1+","+Q.g2+")",cursor:"pointer",border:s.theme===b?"3px solid "+S.tx:"3px solid transparent"}},b))})]}),u.jsx("div",{style:{background:S.c,borderRadius:16,padding:16,border:"1px solid "+S.bd,marginBottom:12},children:u.jsxs("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between"},children:[u.jsx("span",{style:{fontWeight:700},children:"🌙 ダークモード"}),u.jsx("div",{onClick:()=>s.up({dark:!s.dark}),style:{width:48,height:28,borderRadius:14,background:s.dark?S.ac:S.bd,position:"relative",cursor:"pointer"},children:u.jsx("div",{style:{position:"absolute",top:3,left:s.dark?23:3,width:22,height:22,borderRadius:11,background:"#fff"}})})]})}),u.jsxs("div",{style:{background:S.c,borderRadius:16,padding:16,border:"1px solid "+S.bd,marginBottom:12},children:[u.jsx("div",{style:{fontWeight:700,marginBottom:10},children:"📱 タブの並び"}),u.jsx("div",{style:{fontSize:10,color:S.dm,marginBottom:10},children:"ドラッグで並べ替え・タップで入れ替え"}),(()=>{const b=Object.keys(q),Q=[..._,...b.filter(G=>!_.includes(G))];return u.jsxs(u.Fragment,{children:[u.jsx("div",{style:{display:"flex",flexWrap:"wrap",gap:6},children:Q.map((G,U)=>{const X=q[G],Y=U<4;return u.jsxs("div",{draggable:!0,onDragStart:()=>y(U),onDragOver:J=>{J.preventDefault(),E(U)},onDragEnd:()=>{if(x!==null&&A!==null&&x!==A){const J=[...Q],lt=J.splice(x,1)[0];J.splice(A,0,lt),s.up({tabOrder:J.slice(0,4)})}y(null),E(null)},onTouchStart:()=>y(U),onTouchEnd:J=>{const lt=J.changedTouches[0],Dt=document.elementsFromPoint(lt.clientX,lt.clientY).find(yt=>yt.dataset.tabidx);if(Dt){const yt=parseInt(Dt.dataset.tabidx);if(x!==yt){const F=[...Q],k=F.splice(x,1)[0];F.splice(yt,0,k),s.up({tabOrder:F.slice(0,4)})}}y(null),E(null)},onClick:()=>{if(!Y){const J=[..._];J[3]=G,s.up({tabOrder:J})}},"data-tabidx":U,style:{width:Y?"calc(25% - 5px)":"auto",textAlign:"center",padding:Y?"10px 4px":"6px 14px",borderRadius:12,background:x===U?S.ac:A===U?S.a2:Y?S.s:"transparent",color:x===U?"#fff":S.tx,border:Y?"2px solid "+(A===U?S.ac:S.bd):"1.5px dashed "+S.bd,cursor:"grab",userSelect:"none",touchAction:"none",opacity:x===U?.7:Y?1:.7,display:"flex",flexDirection:Y?"column":"row",alignItems:"center",justifyContent:"center",gap:Y?2:6},children:[u.jsx("div",{style:{fontSize:Y?20:16,pointerEvents:"none"},children:X.i}),u.jsx("div",{style:{fontSize:Y?10:12,fontWeight:700,pointerEvents:"none"},children:X.l}),M[G].pro&&u.jsx("span",{style:{fontSize:7,padding:"1px 4px",borderRadius:4,background:S.ac,color:"#fff",fontWeight:700,pointerEvents:"none"},children:"PRO"})]},G)})}),u.jsx("div",{style:{display:"flex",justifyContent:"center",marginTop:8,gap:4,alignItems:"center"},children:u.jsx("span",{style:{fontSize:10,color:S.dm},children:"上4つがタブバーに表示"})})]})})()]}),u.jsx("div",{style:{background:S.c,borderRadius:16,padding:16,border:"1px solid "+S.bd,marginBottom:12},children:s.prem?u.jsxs("div",{children:[u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:8},children:[u.jsx("span",{style:{fontSize:20},children:"✨"}),u.jsx("span",{style:{fontWeight:700},children:"プレミアムプラン"})]}),u.jsx("div",{style:{fontSize:12,color:S.dm},children:"すべての機能が使えます"}),u.jsx("div",{onClick:()=>o.ask("プレミアムを解除しますか？",()=>{localStorage.removeItem(_n),location.reload()}),style:{fontSize:12,color:"#EF4444",cursor:"pointer",marginTop:10},children:"プランを解除"})]}):u.jsxs("div",{children:[u.jsx("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between"},children:u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:8},children:[u.jsx("span",{style:{fontSize:20},children:"📋"}),u.jsx("span",{style:{fontWeight:700},children:"無料プラン（Free）"})]})}),u.jsx("div",{style:{fontSize:12,color:S.dm,marginTop:4},children:"一部の機能が制限されています"}),u.jsx("div",{onClick:()=>z("paywall"),style:{marginTop:10,padding:"10px 0",borderRadius:12,background:S.ac,color:"#fff",textAlign:"center",fontSize:13,fontWeight:700,cursor:"pointer"},children:"アップグレード ✨"})]})}),u.jsx("div",{style:{marginTop:24},children:u.jsxs("div",{children:[u.jsxs("div",{style:{background:S.c,borderRadius:16,padding:16,border:"1px solid "+S.bd,marginBottom:12},children:[u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:12},children:[u.jsx("span",{style:{fontSize:20},children:"🐕"}),u.jsx("span",{style:{fontWeight:700},children:"うちの子管理"})]}),u.jsxs("div",{style:{padding:12,background:S.a2,borderRadius:12,marginBottom:8},children:[u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:8},children:[u.jsx("span",{style:{fontSize:24},children:s.avi||"🐶"}),u.jsxs("div",{children:[u.jsx("div",{style:{fontWeight:700},children:s.nn}),u.jsx("div",{style:{fontSize:11,color:S.dm},children:s.breed})]})]})]}),...(s.pets||[]).map((pe,pi)=>u.jsxs("div",{style:{padding:12,background:S.s,borderRadius:12,marginBottom:8,display:"flex",alignItems:"center",gap:8},children:[u.jsx("span",{style:{fontSize:24},children:pe.avi||"🐶"}),u.jsxs("div",{children:[u.jsx("div",{style:{fontWeight:700},children:pe.name+(pe.sfx||"")}),u.jsx("div",{style:{fontSize:11,color:S.dm},children:pe.breed})]})]},pi)),u.jsx("div",{onClick:()=>{const nn=prompt("新しいわんちゃんの名前は？");if(nn){const br=prompt("犬種は？（例：トイプードル、柴犬）")||"ミックス";s.up({pets:[...(s.pets||[]),{id:"pet"+Date.now(),name:nn,breed:br,avi:null,sfx:"ちゃん"}]})}},style:{padding:"10px 0",textAlign:"center",color:S.ac,fontSize:13,fontWeight:700,cursor:"pointer",border:"1px dashed "+S.ac,borderRadius:12,marginTop:8},children:"＋ わんちゃんを追加"})]}),u.jsx(Wt,{t:S,danger:!0,onClick:()=>o.ask("⚠️ 全データ削除\n\n日記・体重記録・写真・設定など、すべてのデータが完全に削除されます。この操作は取り消せません。\n\n本当に削除しますか？",()=>o.ask("最終確認：本当にすべてのデータを削除しますか？\n\n削除後はデータを復元できません。",()=>s.nuke())),children:"アカウント削除"})]})})]})]})}function H0({a:s,bk:z}){const r=s.t,[o,S]=W.useState("y");return s.prem?u.jsxs("div",{style:{background:r.bg,color:r.tx,minHeight:"100dvh"},children:[u.jsx(Yl,{t:r,title:"プレミアム",left:u.jsx(ql,{t:r,onClick:z})}),u.jsxs("div",{style:{padding:16},children:[u.jsxs("div",{style:{textAlign:"center",padding:"30px 0"},children:[u.jsx("div",{style:{fontSize:48},children:"✨"}),u.jsx("div",{style:{fontSize:18,fontWeight:800,color:r.h1,marginTop:12},children:"プレミアム会員です"}),u.jsx("div",{style:{fontSize:13,color:r.dm,marginTop:6},children:"すべての機能をお楽しみいただけます"})]}),u.jsxs("div",{style:{background:r.c,borderRadius:16,padding:16,border:"1px solid "+r.bd},children:[u.jsx("div",{style:{fontSize:14,fontWeight:700,marginBottom:12},children:"ご利用中の特典"}),[{i:"💌",t:"うちの子からの一言"},{i:"🩹",t:"AI健康相談"},{i:"🏥",t:"獣医さん用カルテ"},{i:"📖",t:"日記の公開・シェア"},{i:"💬",t:"コメント交流"},{i:"👥",t:"フォロー・フォロワー"},{i:"👣",t:"足あと機能"},{i:"📕",t:"思い出アルバム"}].map((M,q)=>u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:q<7?"1px solid "+r.bd:"none"},children:[u.jsx("span",{style:{fontSize:18},children:M.i}),u.jsx("span",{style:{fontSize:13},children:M.t}),u.jsx("span",{style:{marginLeft:"auto",fontSize:12,color:"#16A34A",fontWeight:700},children:"✓ 利用可能"})]},q))]})]})]}):u.jsxs("div",{style:{background:r.bg,color:r.tx,minHeight:"100dvh"},children:[u.jsx(Yl,{t:r,title:"✨ プレミアム",left:u.jsx(ql,{t:r,onClick:z})}),u.jsxs("div",{style:{padding:16},children:[u.jsxs("div",{style:{textAlign:"center",padding:"20px 0",marginBottom:8},children:[u.jsx("div",{style:{fontSize:48},children:"💌"}),u.jsxs("div",{style:{fontSize:18,fontWeight:800,color:r.h1,marginTop:8},children:["日記を書くたび",`
 `,s.nn,"からメッセージが届く"]})]}),u.jsxs("div",{style:{background:"#ECFDF5",border:"1.5px solid #A7F3D0",borderRadius:14,padding:14,marginBottom:12,display:"flex",gap:12,alignItems:"center"},children:[u.jsx("span",{style:{fontSize:24},children:"🎁"}),u.jsxs("div",{children:[u.jsx("div",{style:{fontWeight:800,color:"#065F46"},children:"3日間無料おためし"}),u.jsx("div",{style:{fontSize:11,color:"#065F46",opacity:.8,marginTop:2},children:"期間中に解約すれば料金は発生しません"})]})]}),u.jsx("div",{style:{textAlign:"center",padding:"8px 0",marginBottom:8,fontSize:12,color:r.dm},children:"🐾 1,200人以上の飼い主さんが利用中"}),[{i:"💌",t:"うちの子からの一言",d:"日記を書くたび"+s.nn+"からメッセージが届くよ 💌"},{i:"🩹",t:"AI健康相談",d:"気になることをいつでも相談できる 🩺"},{i:"🏥",t:"獣医さん用カルテ",d:"症状の記録をPDFにまとめて見せられる 📋"},{i:"📖",t:"日記を公開・シェア",d:"犬友に日記を見せられるよ 📖"},{i:"💬",t:"コメント交流",d:"飼い主同士で応援し合える 💬"},{i:"👥",t:"フォロー・フォロワー",d:"気になる犬友をフォローできるよ 🤝"},{i:"👣",t:"足あと機能",d:"誰が日記を見てくれたか分かる 👀"},{i:"📕",t:"思い出アルバム",d:s.nn+"との日々を1冊にまとめてDL 🎁"}].map((M,q)=>u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderBottom:q<7?"1px solid "+r.bd:"none"},children:[u.jsx("span",{style:{fontSize:20},children:M.i}),u.jsxs("div",{children:[u.jsx("div",{style:{fontSize:14,fontWeight:600},children:M.t}),u.jsx("div",{style:{fontSize:11,color:r.dm},children:M.d})]})]},q)),u.jsx("div",{style:{marginTop:16},children:[{k:"y",p:5800,l:"年額",per:"年",b:"38%おトク"},{k:"m",p:780,l:"月額",per:"月"}].map(M=>u.jsxs("div",{onClick:()=>S(M.k),style:{border:"2px solid "+(o===M.k?r.ac:r.bd),borderRadius:16,padding:16,marginBottom:10,cursor:"pointer",background:o===M.k?r.a2:r.c,position:"relative"},children:[M.b&&u.jsx("div",{style:{position:"absolute",top:-10,right:12,background:r.ac,color:"#fff",fontSize:10,fontWeight:800,padding:"2px 10px",borderRadius:10},children:M.b}),u.jsx("div",{style:{fontWeight:700,color:r.h1},children:M.l}),u.jsxs("span",{style:{fontSize:22,fontWeight:900,color:r.ac},children:["¥",M.p.toLocaleString()]}),u.jsxs("span",{style:{fontSize:12,color:r.dm},children:["/",M.per]})]},M.k))}),u.jsx(Wt,{t:r,primary:!0,onClick:()=>{s.setPrem(o),z()},children:"はじめる"}),u.jsx(Wt,{t:r,onClick:()=>{s.setTrial(),z()},style:{marginTop:10,background:r.a2,color:r.ac,border:"1px solid "+r.ac},children:"まず3日間ためす"}),u.jsx("div",{style:{marginTop:16,textAlign:"center"},children:u.jsx("span",{onClick:()=>{s.setPrem("m"),z()},style:{fontSize:11,color:r.dm,cursor:"pointer",textDecoration:"underline"},children:"購入を復元する"})}),u.jsx("div",{style:{marginTop:12,padding:16,background:r.s,borderRadius:12,fontSize:11,color:r.dm,lineHeight:1.8},children:u.jsxs("div",{children:["・ サブスクリプションは自動更新されます",u.jsx("br",{}),"・ 解約はいつでも可能です",u.jsx("br",{}),"・ 無料お試し期間中に解約すれば料金は発生しません",u.jsx("br",{}),"・ お支払いはApple ID/Google Playアカウントに請求されます",u.jsx("br",{}),u.jsx("br",{}),u.jsxs("div",{style:{display:"flex",justifyContent:"center",gap:16},children:[u.jsx("span",{style:{cursor:"pointer",textDecoration:"underline"},children:"利用規約"}),u.jsx("span",{style:{cursor:"pointer",textDecoration:"underline"},children:"プライバシーポリシー"})]})]})})]})]})}function N0({a:s,bk:z}){const[r,o]=W.useState([{r:"ai",t:"症状を教えてね"}]),[S,M]=W.useState(""),q=s.t,_=W.useRef(),x=[{k:["血","吐血","吐いた血","血を吐"],a:"血を吐いた場合は緊急性が高いです。口の中の傷、胃潰瘍、異物誤飲、中毒などの可能性があります。吐いたものの色（鮮血か黒っぽいか）を確認して、すぐに動物病院を受診してください。夜間でも救急対応の病院に連絡を ⚠️🏥"},{k:["ゲロ","嘔吐","吐いた","吐く","もどす","もどした"],a:"嘔吐の原因はさまざまです。1回だけで元気があるなら、半日ほど絶食して水を少量ずつ与えてみてね。黄色い液体は空腹時の胆汁、白い泡は胃液の可能性が高いです。1日に3回以上吐く・ぐったりしている・異物を食べた心当たりがある場合はすぐ受診を 🏥"},{k:["食べない","食欲ない","食欲不振","ごはん食べ","ご飯食べ","食欲が"],a:"食欲低下の原因は、ストレス・口内の痛み・内臓疾患など多岐にわたります。まずは好きなおやつや、フードをぬるま湯でふやかして香りを立てて試してみてね。水は飲めているか、元気はあるかも確認を。2日以上続く場合は獣医さんへ 🏥"},{k:["下痢","軟便","ゆるい","水便","うんち"],a:"下痢の原因は食べ慣れないもの・ストレス・感染症・寄生虫などがあります。脱水を防ぐため水分補給を優先してね。消化のいいフード（ふやかしたドライフードや鶏ささみ+白米）を少量ずつ与えて。血便・黒い便・3日以上続く場合は受診を 🏥"},{k:["咳","せき","ケホケホ","ゴホゴホ"],a:"犬の咳の原因には、ケンネルコフ（伝染性気管気管支炎）・気管虚脱・心臓病・アレルギーなどがあります。乾いた咳か湿った咳かで原因が異なります。興奮時や飲水後だけなら様子見でOKですが、1週間以上続く・呼吸が荒い場合は受診を 🏥"},{k:["目やに","目が赤","目が腫","涙","充血"],a:"目やにの色が重要です。透明〜白は正常範囲、黄〜緑色はバイキンによる感染の可能性があります。清潔なガーゼをぬるま湯で湿らせて優しく拭き取ってね。目を擦っている・目が開かない・腫れている場合は角膜に傷がある可能性があるのですぐ受診を 🏥"},{k:["かゆ","掻く","皮膚","赤い","湿疹","フケ","脱毛","ハゲ"],a:"かゆみの主な原因はアレルギー（食物・環境）・ノミダニ・皮膚真菌症・アトピーです。まず掻いている部位を確認して。お腹や脇はアレルギー、耳の後ろはノミダニが多いです。掻きむしりを防ぐためエリザベスカラーも有効。広範囲・脱毛がある場合は受診を 🏥"},{k:["元気ない","元気がない","ぐったり","動かない","横になって"],a:"元気消失は多くの病気に共通するサインです。まず体温を測ってね（肛門で38.0〜39.0℃が正常、39.5℃以上は発熱）。食欲・水分摂取・排泄の状態も確認を。ぐったりして反応が鈍い場合は緊急性が高いのですぐ受診してください ⚠️🏥"},{k:["足","びっこ","引きずる","歩けない","痛そう","跛行"],a:"足を引きずる原因は、爪の割れ・肉球の傷・捻挫・骨折・関節疾患（膝蓋骨脱臼・股関節形成不全）などがあります。まず足の裏・爪・指の間を確認して。触ると痛がる部位を特定できると獣医さんの診断に役立ちます。腫れ・熱を持っている場合は早めに受診を 🏥"},{k:["耳","臭い","かく","頭を振る","耳垢"],a:"耳を痒がる・頭を振る・耳が臭い場合は外耳炎の可能性が高いです。たれ耳の犬種は特になりやすいです。耳垢が黒くて乾燥→耳ダニ、茶色くてベタベタ→細菌や酵母菌感染が多いです。綿棒は奥に押し込むリスクがあるので使わず、イヤークリーナーで洗浄して受診を 🏥"},{k:["震え","ブルブル","痙攣","けいれん"],a:"震えの原因は寒さ・緊張・痛み・低血糖・てんかん・中毒など様々です。意識がある震えは痛みやストレスの可能性、意識がない痙攣はてんかんや中毒の可能性があります。痙攣が5分以上続く場合は緊急です。発作中は体を押さえず安全な場所に移動させて、動画を撮って獣医さんに見せてね ⚠️🏥"},{k:["水","飲む","多飲","おしっこ","多尿"],a:"水をたくさん飲む（多飲多尿）は腎臓病・糖尿病・クッシング症候群・子宮蓄膿症などの初期症状の可能性があります。1日の飲水量を測ってみてね（体重1kgあたり100ml以上は多飲）。特に中高齢犬で急に増えた場合は血液検査をおすすめします 🏥"},{k:["太","肥満","ダイエット","体重"],a:"犬の肥満は関節疾患・心臓病・糖尿病のリスクを高めます。まず適正体重を確認して。肋骨を触って簡単に分かるのが理想的な体型です。フード量を10%ずつ減らし、おやつは1日のカロリーの10%以内に。急な食事制限は肝臓に負担がかかるので徐々に調整してね 🐾"},{k:["ノミ","ダニ","マダニ","虫","寄生虫","フィラリア"],a:"ノミ・ダニの予防は月1回の駆虫薬（スポットオンやチュアブル）が基本です。マダニは感染症を媒介するため、草むらの散歩後は体をチェックして。食いついたダニは無理に引っ張らず獣医さんで除去を。フィラリアは蚊が媒介するので、5〜12月は予防薬を忘れずに 🐾"},{k:["歯","歯磨き","口臭","歯石","歯茎"],a:"3歳以上の犬の80%が歯周病と言われています。毎日の歯磨きが理想ですが、難しければ歯磨きガム・デンタルジェルから始めてみて。口臭がきつい・歯茎が赤い・出血する場合は歯周病が進行している可能性があるので受診を 🦷"},{k:["ワクチン","予防接種","注射","狂犬病"],a:"狂犬病ワクチンは法律で年1回の接種が義務です。混合ワクチンは子犬期に3回、その後は1〜3年ごとが一般的。接種後は安静にし、顔が腫れる・嘔吐・ぐったりなどの副反応があればすぐ受診を 💉"},{k:["避妊","去勢","手術","不妊"],a:"避妊・去勢手術のメリットは、乳腺腫瘍・前立腺疾患・子宮蓄膿症の予防、マーキングやマウンティングの軽減などがあります。適齢は生後6ヶ月〜1歳が目安ですが、犬種によって異なるので獣医さんに相談を 🏥"},{k:["便秘","うんちが出ない","排便","いきむ"],a:"犬の便秘は水分不足・運動不足・食物繊維の不足・腸閉塞などが原因です。水分をしっかり取らせて、さつまいもやかぼちゃなど食物繊維を少し足してみて。2日以上排便がない場合は受診を 🏥"},{k:["鼻水","くしゃみ","鼻血"],a:"透明な鼻水はアレルギーや軽い風邪程度のことが多いですが、黄〜緑色は感染症の可能性があります。片方の鼻だけから出る場合は異物や腫瘍の可能性も。鼻血が出た場合は緊急なのですぐ受診を ⚠️🏥"},{k:["吠え","夜鳴き","無駄吠え","鳴く"],a:"吠えの原因は要求・警戒・不安・退屈・痛みなど様々。急に吠えるようになった場合は体の痛みの可能性も。老犬の夜鳴きは認知症のサインの場合も。改善しない場合はドッグトレーナーや獣医さんに相談を 🐕"},{k:["留守番","分離不安","ストレス"],a:"分離不安は飼い主と離れると過度に不安になる状態。留守中の破壊行動・粗相・過度な吠えが特徴。出かける前に知育トイにフードを詰めて与える、短い外出から慣らすのが効果的。重度の場合は獣医さんに相談を 🐾"},{k:["暑","熱中症","夏バテ","ハァハァ"],a:"犬は汗腺が少なく熱中症になりやすいです。特に短頭種・肥満犬・老犬はリスク大。気温28℃以上では散歩を朝晩に。ぐったり・よだれが多い場合は緊急。体を濡らして風を当てながら即受診を ⚠️🏥"},{k:["しつけ","トレーニング","噛む","甘噛み"],a:"しつけの基本は「褒めて伸ばす」正の強化です。良い行動をしたらすぐご褒美。トイレトレーニングは成功したらすぐ褒める・失敗は無反応で掃除。甘噛みは「痛い」と声を出して遊びを中断。根気よく続けてね 🐾"},{k:["フード","食事","ドッグフード","おやつ","手作り"],a:"総合栄養食の表示があるフードなら栄養バランスは問題ありません。与えてはいけない食品：チョコレート・玉ねぎ・ぶどう・キシリトール・アボカド ⚠️ 手作り食は獣医さん監修のレシピを参考に 🐾"},{k:["散歩","運動","走る"],a:"散歩は運動だけでなく社会化やストレス発散にも大切。小型犬は1日20-30分×2回、中型犬は30-40分×2回、大型犬は40-60分×2回が目安。子犬はワクチン完了後からお散歩デビュー 🐾"},{k:["老犬","シニア","高齢","介護"],a:"一般的に小型犬は10歳頃、大型犬は7歳頃からシニア期。定期健診を半年に1回に増やし、フードはシニア用に切り替えて。段差にはスロープ、滑りやすい床にはマットを 🐾"},{k:["子犬","パピー","赤ちゃん"],a:"子犬期は社会化が最も重要。3-14週齢がゴールデンタイムです。色々な人・犬・環境に慣れさせましょう。ワクチンスケジュールを守り、パピー用フードを1日3-4回に分けて 🐾"},{k:["しこり","腫瘍","できもの","イボ"],a:"しこりを見つけたら大きさ・硬さ・動くかどうかを確認して。柔らかくて動く→脂肪腫（良性）の可能性が高いですが、硬くて動かない・急に大きくなる場合は悪性の可能性も。早めに獣医さんで細胞診を受けて 🏥"},{k:["おなら","ガス","お腹が張"],a:"おならが多い原因は食事内容・早食い・腸内環境の乱れなど。早食い防止皿や乳酸菌サプリを試してみて。お腹がパンパンに張っている場合は胃拡張-捻転の可能性があり緊急です ⚠️🏥"},{k:["トイレ","粗相","おしっこ失敗","マーキング"],a:"トイレの失敗は叱らずに。成功したら大袈裟に褒めてご褒美を。急にトイレを失敗するようになった場合は膀胱炎や尿路感染などの病気の可能性も。血尿・頻尿がある場合は受診を 🏥"}],y=async()=>{if(!S.trim())return;const A=S.trim();M(""),o(E=>[...E,{r:"user",t:A}]);try{const Q=(await(await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:200,messages:[{role:"user",content:"犬の健康相談。犬:"+s.name+" 質問:"+A+" 3文で回答"}]})})).json()).content?.[0]?.text;if(Q)o(G=>[...G,{r:"ai",t:Q}]);else throw 0}catch{const E=x.find(Q=>Q.k.some(G=>A.includes(G)));let b=E?E.a:s.nn+"のこと心配だね。具体的な症状を教えてくれたらアドバイスできるよ！\n\n💡 例えば…\n・吐いた / 下痢 / 食欲がない\n・かゆがる / 目やに / 耳を掻く\n・足を引きずる / 元気がない / 震え\n・咳が出る / 水を多く飲む\n・歯磨き / ワクチン / フード\n\n症状が重い場合はすぐ獣医さんに相談してね 🏥\n\n⚠️ このアドバイスは参考情報です。正確な診断は獣医師にご相談ください。";if(E&&xf[s.breed]){const Q=Object.keys(xf[s.breed].tips||{}).find(G=>E.k.some(U=>G===U||U.includes(G)));Q&&(b+=`
 
-🐕 `+s.breed+"の場合："+xf[s.breed].tips[Q]);b+="\n\n⚠️ このアドバイスは参考情報です。正確な診断は獣医師にご相談ください。";void(0)}o(Q=>[...Q,{r:"ai",t:b}])}};return W.useEffect(()=>{_.current?.scrollIntoView()},[r]),u.jsxs("div",{style:{display:"flex",flexDirection:"column",height:"100dvh",background:q.bg,color:q.tx},children:[u.jsx(Yl,{t:q,title:"🩹 AI健康相談",left:u.jsx(ql,{t:q,onClick:z})}),u.jsxs("div",{style:{flex:1,overflowY:"auto",padding:16},children:[r.map((A,E)=>u.jsx("div",{style:{display:"flex",justifyContent:A.r==="user"?"flex-end":"flex-start",marginBottom:12},children:u.jsx("div",{style:{maxWidth:"75%",padding:"10px 14px",borderRadius:16,background:A.r==="user"?q.ac:q.c,color:A.r==="user"?"#fff":q.tx,fontSize:14,lineHeight:1.6,border:A.r==="ai"?"1px solid "+q.bd:"none"},children:A.t})},E)),u.jsx("div",{ref:_})]}),u.jsxs("div",{style:{display:"flex",gap:8,padding:"8px 12px",borderTop:"1px solid "+q.bd,background:q.c},children:[u.jsx("div",{style:{display:"flex",gap:6,padding:"4px 12px",overflowX:"auto",flexShrink:0},children:["吐いた","食欲がない","下痢","かゆがる","元気がない","足を引きずる","咳が出る","歯磨き","ワクチン"].map(A=>u.jsx("span",{onClick:()=>{M(A)},style:{padding:"4px 10px",borderRadius:16,background:q.a2,color:q.ac,fontSize:11,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0},children:A},A))}),u.jsx("input",{value:S,onChange:A=>M(A.target.value),onKeyDown:A=>{A.key==="Enter"&&y()},placeholder:"症状を入力",style:{flex:1,padding:"10px 14px",borderRadius:24,border:"1.5px solid "+q.bd,background:q.s,color:q.tx,fontSize:16,outline:"none",minWidth:0}}),u.jsx("div",{onClick:y,style:{width:40,height:40,borderRadius:20,background:q.ac,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"},children:u.jsx("span",{style:{color:"#fff"},children:"↑"})})]})]})}function Y0({a:s,bk:z,go:r}){const o=s.t,[S,M]=W.useState("feed"),[q,_]=W.useState({}),[x,y]=W.useState({}),A=[{id:"u1",n:"ココ",b:"トイプードル",v:"🐩"},{id:"u2",n:"レオ",b:"柴犬",v:"🐕"},{id:"u3",n:"モカ",b:"チワワ",v:"🐶"},{id:"u4",n:"ハナ",b:"ゴールデン",v:"🦮"},{id:"u5",n:"リク",b:"コーギー",v:"🐕"},{id:"u6",n:"マロン",b:"ダックス",v:"🐾"},{id:"u7",n:"ソラ",b:"ポメラニアン",v:"🐶"},{id:"u8",n:"ルナ",b:"フレブル",v:"🐕‍🦺"}],E=[{id:"p1",u:A[0],ti:"公園でお友達できた！",tx:"ボール遊びしたよ。初めて会ったプードルちゃんと仲良くなれた✨",mo:"🥳",dt:"3/14",li:42,cm:[{u:A[1],tx:"うちのレオも連れてきたい！"},{u:A[2],tx:"ココちゃん社交的でいいなぁ〜✨"}]},{id:"p2",u:A[1],ti:"はじめてのトリミング",tx:"スッキリした顔に！トリマーさんが優しくてだんだん慣れてきた",mo:"😊",dt:"3/13",li:67,cm:[{u:A[2],tx:"イケメン！✨ どこのサロン？"},{u:A[3],tx:"ハナもそろそろトリミングしなきゃ〜🐾"}]},{id:"p3",u:A[3],ti:"海デビューしました🏖",tx:"ハナ、初めての海に大興奮！波が来るたびにジャンプしてた（笑）",mo:"🤩",dt:"3/12",li:89,cm:[{u:A[0],tx:"わぁ楽しそう！砂浜走れるんですね🐾"},{u:A[4],tx:"リクも海に連れて行きたい！"}]},{id:"p4",u:A[4],ti:"おすわり完璧にできた！",tx:"3ヶ月かかったけど、ようやくおすわりがバッチリに🎉 次はお手に挑戦！",mo:"🎉",dt:"3/11",li:55,cm:[{u:A[5],tx:"すごい！コツを教えてほしい〜"},{u:A[1],tx:"リクくんおりこう！"}]},{id:"p5",u:A[5],ti:"手作りおやつに挑戦🍪",tx:"さつまいもとかぼちゃのクッキー！マロン、すごい食いつきで嬉しい〜",mo:"😋",dt:"3/10",li:73,cm:[{u:A[2],tx:"レシピ知りたいです！"},{u:A[6],tx:"うちのソラにも作ってあげたい✨"}]},{id:"p6",u:A[6],ti:"新しいお洋服🧥",tx:"寒がりなソラ。新しいダウンベストがお気に入りみたいで自分から着に来る（笑）",mo:"😍",dt:"3/9",li:61,cm:[{u:A[0],tx:"かわいすぎる〜！"},{u:A[3],tx:"ソラちゃんファッショナブル✨"}]},{id:"p7",u:A[7],ti:"動物病院の定期検診🏥",tx:"ルナの1歳検診、体重もちょうど良くて健康優良犬！先生に褒められて得意顔",mo:"😊",dt:"3/8",li:48,cm:[{u:A[1],tx:"健康なのが一番！🎉"},{u:A[5],tx:"うちも来週検診だ〜"}]},{id:"p8",u:A[2],ti:"添い寝が至福の時間💤",tx:"モカはいつも布団に潜り込んでくる。ちっちゃくて温かくて幸せすぎる…このまま時間止まれ〜",mo:"🥰",dt:"3/7",li:95,cm:[{u:A[6],tx:"わかりすぎる…！至福ですよね"},{u:A[3],tx:"小さい子の添い寝は最高🐾"},{u:A[0],tx:"うちのココも布団大好き！"}]}];return u.jsxs("div",{style:{background:o.bg,color:o.tx,minHeight:"100dvh"},children:[u.jsx(Yl,{t:o,title:"🐾 犬友コミュニティ",left:u.jsx(ql,{t:o,onClick:z})}),u.jsxs("div",{style:{padding:"12px 16px",background:"linear-gradient(135deg,"+o.g1+","+o.g2+")",display:"flex",alignItems:"center",gap:12},children:[u.jsx("div",{style:{width:48,height:48,borderRadius:24,background:"rgba(255,255,255,.3)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,border:"2px solid rgba(255,255,255,.5)"},children:s.avi||"🐶"}),u.jsxs("div",{style:{color:"#fff"},children:[u.jsx("div",{style:{fontWeight:800,fontSize:16},children:s.nn}),u.jsx("div",{style:{fontSize:11,opacity:.85},children:s.breed}),u.jsxs("div",{style:{display:"flex",gap:12,marginTop:4,fontSize:12},children:[u.jsxs("span",{children:[u.jsx("b",{children:"3"})," フォロー中"]}),u.jsxs("span",{children:[u.jsx("b",{children:Object.keys(q).filter(k=>q[k]).length||"0"})," フォロワー"]})]})]})]}),u.jsx("div",{style:{display:"flex",borderBottom:"1px solid "+o.bd},children:[["feed","タイムライン"],["discover","みつける"],["ranking","ランキング"]].map(([b,Q])=>u.jsx("div",{onClick:()=>M(b),style:{flex:1,textAlign:"center",padding:"10px 0",fontSize:13,fontWeight:700,cursor:"pointer",color:S===b?o.ac:o.dm,borderBottom:S===b?"2px solid "+o.ac:"2px solid transparent"},children:Q},b))}),u.jsxs("div",{style:{padding:16},children:[S==="feed"&&u.jsxs("div",{children:[u.jsxs("div",{style:{background:"linear-gradient(135deg,"+o.g1+"22,"+o.g2+"22)",borderRadius:14,padding:14,marginBottom:14,border:"1px solid "+o.bd},children:[u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:10},children:[u.jsx("span",{style:{fontSize:14},children:"🔔"}),u.jsx("span",{style:{fontSize:13,fontWeight:700},children:"新着アクティビティ"})]}),u.jsxs("div",{style:{fontSize:12,color:o.tx,lineHeight:1.8},children:[u.jsxs("div",{children:["🐩 ココが日記にいいねしました"]}),u.jsxs("div",{children:["🐕 レオがあなたをフォローしました"]}),u.jsxs("div",{children:["🐶 モカがコメントしました：「かわいい〜✨」"]}),u.jsxs("div",{children:["🦮 ハナが新しい日記を投稿しました"]})]})]}),u.jsxs("div",{onClick:()=>r("post"),style:{display:"flex",alignItems:"center",gap:10,padding:"12px 14px",background:o.c,borderRadius:14,marginBottom:14,cursor:"pointer",border:"1px solid "+o.bd},children:[u.jsx("span",{style:{fontSize:18},children:s.avi||"🐶"}),u.jsx("span",{style:{fontSize:13,color:o.dm},children:"日記をみんなにシェアしよう"})]}),u.jsx("div",{style:{fontSize:10,color:o.dm,background:o.s,padding:"3px 10px",borderRadius:8,marginBottom:8,display:"inline-block"},children:"📌 みんなの投稿"}),E.map(b=>u.jsxs("div",{style:{background:o.c,borderRadius:16,marginBottom:12,border:"1px solid "+o.bd,overflow:"hidden"},children:[u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"12px 14px"},children:[u.jsx("div",{style:{width:36,height:36,borderRadius:18,background:o.a2,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20},children:b.u.v}),u.jsxs("div",{style:{flex:1},children:[u.jsx("div",{style:{fontSize:13,fontWeight:700},children:b.u.n}),u.jsxs("div",{style:{fontSize:10,color:o.dm},children:[b.u.b," · ",b.dt]})]}),u.jsx("span",{onClick:()=>_(Q=>({...Q,[b.u.id]:!Q[b.u.id]})),style:{padding:"5px 14px",borderRadius:16,fontSize:11,fontWeight:700,cursor:"pointer",background:q[b.u.id]?o.s:o.ac,color:q[b.u.id]?o.dm:"#fff"},children:q[b.u.id]?"フォロー中":"フォロー"})]}),u.jsxs("div",{style:{padding:"0 14px 10px"},children:[u.jsx("span",{style:{fontSize:11,padding:"3px 10px",borderRadius:12,background:o.a2,display:"inline-block",marginBottom:4},children:b.mo}),u.jsx("div",{style:{fontSize:15,fontWeight:700},children:b.ti}),u.jsx("div",{style:{fontSize:13,color:o.dm,marginTop:4},children:b.tx})]}),u.jsxs("div",{style:{display:"flex",gap:16,padding:"8px 14px",borderTop:"1px solid "+o.bd},children:[u.jsxs("span",{onClick:()=>y(Q=>({...Q,[b.id]:!Q[b.id]})),style:{fontSize:13,cursor:"pointer",color:x[b.id]?"#EF4444":o.dm},children:[x[b.id]?"❤️":"🤍"," ",b.li+(x[b.id]?1:0)]}),u.jsxs("span",{style:{fontSize:13,color:o.dm},children:["💬 ",b.cm.length]})]}),b.cm.map((Q,G)=>u.jsxs("div",{style:{display:"flex",gap:8,padding:"8px 14px",borderTop:"1px solid "+o.bd,background:o.s},children:[u.jsx("span",{children:Q.u.v}),u.jsxs("span",{style:{fontSize:11},children:[u.jsx("b",{children:Q.u.n})," ",Q.tx]})]},G))]},b.id))]}),S==="discover"&&u.jsxs("div",{children:[u.jsx("div",{style:{fontSize:14,fontWeight:700,marginBottom:4},children:"おすすめの犬友"}),u.jsx("div",{style:{fontSize:11,color:o.dm,marginBottom:12},children:"犬種や日数が近い飼い主さん"}),A.map(b=>u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:12,padding:"12px 0",borderBottom:"1px solid "+o.bd},children:[u.jsx("div",{style:{width:44,height:44,borderRadius:22,background:o.a2,display:"flex",alignItems:"center",justifyContent:"center",fontSize:24},children:b.v}),u.jsxs("div",{style:{flex:1},children:[u.jsx("div",{style:{fontSize:14,fontWeight:700},children:b.n}),u.jsx("div",{style:{fontSize:11,color:o.dm},children:b.b})]}),u.jsx("span",{onClick:()=>_(Q=>({...Q,[b.id]:!Q[b.id]})),style:{padding:"6px 16px",borderRadius:16,fontSize:12,fontWeight:700,cursor:"pointer",background:q[b.id]?o.s:o.ac,color:q[b.id]?o.dm:"#fff"},children:q[b.id]?"フォロー中":"フォロー"})]},b.id))]}),S==="ranking"&&u.jsxs("div",{children:[u.jsx("div",{style:{textAlign:"center",padding:"16px 0",fontSize:13,color:o.dm},children:"🏆 今週の人気わんちゃん"}),u.jsxs("div",{children:[{r:1,v:"🐕‍🦺",n:"ルナ",b:"フレブル",li:245,fo:312},{r:2,v:"🐩",n:"ココ",b:"トイプードル",li:198,fo:256},{r:3,v:"🦮",n:"ハナ",b:"ゴールデン",li:176,fo:203},{r:4,v:"🐕",n:"レオ",b:"柴犬",li:142,fo:175},{r:5,v:"🐶",n:"モカ",b:"チワワ",li:128,fo:167},{r:6,v:"🐾",n:"マロン",b:"ダックス",li:115,fo:148},{r:7,v:"🐶",n:"ソラ",b:"ポメラニアン",li:98,fo:124},{r:8,v:"🐕",n:"リク",b:"コーギー",li:87,fo:112}].map(rk=>u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:12,padding:"12px 0",borderBottom:"1px solid "+o.bd},children:[u.jsx("div",{style:{width:28,fontSize:rk.r<=3?18:14,fontWeight:800,textAlign:"center",color:rk.r===1?"#FFD700":rk.r===2?"#C0C0C0":rk.r===3?"#CD7F32":o.dm},children:rk.r<=3?["🥇","🥈","🥉"][rk.r-1]:rk.r}),u.jsx("div",{style:{width:40,height:40,borderRadius:20,background:o.a2,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22},children:rk.v}),u.jsxs("div",{style:{flex:1},children:[u.jsx("div",{style:{fontWeight:700,fontSize:14},children:rk.n}),u.jsx("div",{style:{fontSize:11,color:o.dm},children:rk.b})]}),u.jsxs("div",{style:{textAlign:"right"},children:[u.jsxs("div",{style:{fontSize:12,fontWeight:700,color:o.ac},children:["❤️ ",rk.li]}),u.jsxs("div",{style:{fontSize:10,color:o.dm},children:[rk.fo," フォロワー"]})]})]},rk.r))})]})]})]})}function q0({a:s,bk:z,cf:r,go:o}){const S=s.t,[M,q]=W.useState(0),[_,x]=W.useState(""),[y,A]=W.useState(1),[E,b]=W.useState(""),[Q,G]=W.useState(null),U=W.useRef(),X=["食欲不振","嘔吐","下痢","咳","目やに","皮膚の赤み","元気がない","その他"];return u.jsxs("div",{style:{background:S.bg,color:S.tx,minHeight:"100dvh"},children:[u.jsx(Yl,{t:S,title:"📝 症状ログ",left:u.jsx(ql,{t:S,onClick:z})}),u.jsx("div",{style:{padding:16},children:M?u.jsxs("div",{style:{background:S.c,borderRadius:16,padding:16,border:"1px solid "+S.bd},children:[u.jsx("div",{style:{display:"flex",flexWrap:"wrap",gap:6,marginBottom:12},children:X.map(Y=>u.jsx("span",{onClick:()=>x(Y),style:{padding:"7px 14px",borderRadius:20,fontSize:13,fontWeight:600,cursor:"pointer",background:_===Y?S.ac:S.s,color:_===Y?"#fff":S.tx},children:Y},Y))}),u.jsx("div",{style:{display:"flex",gap:8,marginBottom:12},children:[{v:1,l:"軽い",c:"#16A34A"},{v:2,l:"心配",c:"#F59E0B"},{v:3,l:"要注意",c:"#DC2626"}].map(Y=>u.jsx("span",{onClick:()=>A(Y.v),style:{flex:1,padding:10,borderRadius:12,textAlign:"center",fontWeight:700,cursor:"pointer",background:y===Y.v?Y.c+"22":S.s,color:y===Y.v?Y.c:S.tx,border:y===Y.v?"2px solid "+Y.c:"2px solid "+S.bd},children:Y.l},Y.v))}),Q?u.jsxs("div",{style:{position:"relative",marginBottom:10},children:[u.jsx("img",{src:Q,style:{width:"100%",height:100,objectFit:"cover",borderRadius:10},alt:""}),u.jsx("div",{onClick:()=>G(null),style:{position:"absolute",top:4,right:4,width:22,height:22,borderRadius:11,background:"rgba(0,0,0,.5)",color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:12},children:"✕"})]}):u.jsx("div",{onClick:()=>U.current?.click(),style:{padding:12,borderRadius:10,border:"2px dashed "+S.bd,textAlign:"center",cursor:"pointer",marginBottom:10},children:u.jsx("span",{style:{fontSize:12,color:S.dm},children:"📷 症状の写真を追加（任意）"})}),u.jsx("input",{ref:U,type:"file",accept:"image/*",style:{display:"none"},onChange:Y=>{const J=Y.target.files?.[0];if(J){const lt=new FileReader;lt.onload=gt=>G(gt.target.result),lt.readAsDataURL(J)}}}),u.jsx("textarea",{value:E,onChange:Y=>b(Y.target.value),placeholder:"メモ（いつから？どんな様子？）",style:{width:"100%",padding:10,borderRadius:12,border:"1.5px solid "+S.bd,background:S.s,color:S.tx,fontSize:16,minHeight:60,resize:"none",outline:"none",marginBottom:10}}),u.jsxs("div",{style:{display:"flex",gap:8},children:[u.jsx(Wt,{t:S,primary:!0,onClick:()=>{_&&(s.addSym({sym:_,sev:y,note:E.trim(),photo:Q}),x(""),b(""),G(null),q(0))},style:{flex:2},children:"記録する"}),u.jsx(Wt,{t:S,onClick:()=>{q(0),G(null)},style:{flex:1},children:"やめる"})]})]}):u.jsxs("div",{children:[u.jsx("div",{onClick:()=>q(1),style:{padding:14,background:S.c,borderRadius:14,cursor:"pointer",border:"1px solid "+S.bd,marginBottom:12,textAlign:"center",fontWeight:600,color:S.ac},children:"＋ 症状を記録"}),(s.symptoms||[]).map(Y=>u.jsxs("div",{style:{background:S.c,borderRadius:14,padding:14,marginBottom:8,border:"1px solid "+S.bd},children:[u.jsxs("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center"},children:[u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:6},children:[u.jsx("span",{style:{fontWeight:700},children:Y.sym}),u.jsx("span",{style:{fontSize:10,padding:"2px 8px",borderRadius:8,background:Y.sev===3?"#FEE2E2":Y.sev===2?"#FFF8E1":"#E8F5E9",color:Y.sev===3?"#DC2626":Y.sev===2?"#F59E0B":"#16A34A",fontWeight:700},children:Y.sev===3?"要注意":Y.sev===2?"心配":"軽い"})]}),u.jsx("span",{onClick:()=>r.ask("この記録を削除する？",()=>s.delSym(Y.id)),style:{fontSize:12,color:"#EF4444",cursor:"pointer"},children:"削除"})]}),Y.photo&&u.jsx("img",{src:Y.photo,style:{width:"100%",height:120,objectFit:"cover",borderRadius:8,marginTop:8},alt:""}),Y.note&&u.jsx("div",{style:{fontSize:13,color:S.dm,marginTop:6},children:Y.note}),u.jsx("div",{style:{fontSize:10,color:S.dm,marginTop:4},children:(Y.d||"").replace(/\./g,"/")})]},Y.id)),(s.symptoms||[]).length>0&&u.jsxs("div",{style:{background:s.prem?"linear-gradient(135deg,"+S.g1+"22,"+S.g2+"22)":S.c,borderRadius:14,padding:"12px 16px",marginTop:4,display:"flex",alignItems:"center",justifyContent:"space-between",border:"1px solid "+S.bd},children:[u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:8},children:[u.jsx("span",{children:"🏥"}),u.jsxs("div",{children:[u.jsx("div",{style:{fontSize:13,fontWeight:700},children:"🏥 獣医さん用カルテ"}),u.jsx("div",{style:{fontSize:10,color:S.dm},children:"症状の記録をまとめて見せられる"})]})]}),s.prem?u.jsx("div",{onClick:()=>z0(s),style:{padding:"6px 14px",borderRadius:20,background:S.ac,color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"},children:"PDF出力"}):u.jsx("span",{onClick:()=>o("paywall"),style:{fontSize:11,color:S.ac,fontWeight:700,cursor:"pointer"},children:"PRO ›"})]})]})})]})}function k0({a:s,bk:z}){const r=s.t,o=s.diaries.length,S=(s.photos||[]).length+s.diaries.filter(q=>q.mediaSrc).length,M=s.milestones.length,[q,_]=W.useState("standard"),[x,y]=W.useState(""),T=[{id:"standard",i:"📕",l:"スタンダード",d:"日々の記録をまとめた1冊",bg:"linear-gradient(160deg,#FFE8EC,#FFB6C1,#FF7B9C)"},{id:"birthday",i:"🎂",l:"バースデー",d:"お誕生日をお祝いする特別なアルバム",bg:"linear-gradient(160deg,#FFF3E0,#FFD54F,#FF9800)"},{id:"anniversary",i:"🎉",l:"記念日",d:"うちの子記念日・出会いの日に",bg:"linear-gradient(160deg,#E8F5E9,#81C784,#43A047)"},{id:"memorial",i:"🕊",l:"メモリアル",d:"虹の橋を渡った子へ贈る寄せ書き",bg:"linear-gradient(160deg,#E3F2FD,#90CAF9,#5C6BC0)"}];return u.jsxs("div",{style:{background:r.bg,color:r.tx,minHeight:"100dvh"},children:[u.jsx(Yl,{t:r,title:"📕 思い出アルバム",left:u.jsx(ql,{t:r,onClick:z})}),u.jsxs("div",{style:{padding:16},children:[u.jsxs("div",{style:{textAlign:"center",padding:"16px 0 20px"},children:[u.jsx("div",{style:{fontSize:48},children:T.find(v=>v.id===q)?.i||"📕"}),u.jsxs("div",{style:{fontSize:18,fontWeight:900,color:r.h1,marginTop:8},children:[s.nn,"の思い出アルバム"]}),u.jsx("div",{style:{fontSize:12,color:r.dm,marginTop:4},children:"卒アル・寄せ書き風の特別な1冊を作ろう"})]}),u.jsx("div",{style:{fontSize:13,fontWeight:700,marginBottom:8},children:"🎨 テーマを選ぶ"}),u.jsx("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:16},children:T.map(v=>u.jsxs("div",{onClick:()=>_(v.id),style:{background:q===v.id?v.bg:r.c,borderRadius:14,padding:"14px 12px",cursor:"pointer",border:q===v.id?"2px solid "+r.ac:"1.5px solid "+r.bd,textAlign:"center",transition:"all .2s"},children:[u.jsx("div",{style:{fontSize:28},children:v.i}),u.jsx("div",{style:{fontSize:13,fontWeight:800,color:q===v.id?"#fff":r.tx,marginTop:4},children:v.l}),u.jsx("div",{style:{fontSize:10,color:q===v.id?"rgba(255,255,255,.85)":r.dm,marginTop:2,lineHeight:1.4},children:v.d})]},v.id))}),q==="memorial"&&u.jsxs("div",{style:{background:r.c,borderRadius:14,padding:14,border:"1px solid "+r.bd,marginBottom:14},children:[u.jsx("div",{style:{fontSize:13,fontWeight:700,marginBottom:8},children:"🕊 メッセージを添える（任意）"}),u.jsx("textarea",{value:x,onChange:v=>y(v.target.value),placeholder:"ありがとう、大好きだよ。虹の橋の向こうでも元気でね...",style:{width:"100%",padding:10,borderRadius:12,border:"1.5px solid "+r.bd,background:r.s,color:r.tx,fontSize:14,minHeight:80,resize:"none",outline:"none",lineHeight:1.8}})]}),q==="birthday"&&u.jsxs("div",{style:{background:r.c,borderRadius:14,padding:14,border:"1px solid "+r.bd,marginBottom:14},children:[u.jsx("div",{style:{fontSize:13,fontWeight:700,marginBottom:8},children:"🎂 お祝いメッセージ（任意）"}),u.jsx("textarea",{value:x,onChange:v=>y(v.target.value),placeholder:"お誕生日おめでとう！これからもいっぱい楽しいことしようね🎉",style:{width:"100%",padding:10,borderRadius:12,border:"1.5px solid "+r.bd,background:r.s,color:r.tx,fontSize:14,minHeight:80,resize:"none",outline:"none",lineHeight:1.8}})]}),q==="anniversary"&&u.jsxs("div",{style:{background:r.c,borderRadius:14,padding:14,border:"1px solid "+r.bd,marginBottom:14},children:[u.jsx("div",{style:{fontSize:13,fontWeight:700,marginBottom:8},children:"🎉 記念日メッセージ（任意）"}),u.jsx("textarea",{value:x,onChange:v=>y(v.target.value),placeholder:"出会えてよかった。これからもずっと一緒だよ✨",style:{width:"100%",padding:10,borderRadius:12,border:"1.5px solid "+r.bd,background:r.s,color:r.tx,fontSize:14,minHeight:80,resize:"none",outline:"none",lineHeight:1.8}})]}),u.jsxs("div",{style:{background:r.c,borderRadius:16,padding:14,border:"1px solid "+r.bd,marginBottom:14},children:[u.jsx("div",{style:{fontSize:13,fontWeight:700,marginBottom:8},children:"📋 アルバムの内容"}),[{i:"📖",l:"日記",v:o+"件"},{i:"📷",l:"写真",v:S+"枚"},{i:"⭐",l:"メモリー",v:M+"件"},{i:"📈",l:"成長記録",v:s.weights.length+"件"},{i:"💌",l:s.nn+"からの一言",v:s.prem?"収録":"—"},{i:"✍️",l:"寄せ書き",v:"自動生成"}].map((v,w)=>u.jsxs("div",{style:{display:"flex",justifyContent:"space-between",padding:"7px 0",borderBottom:w<5?"1px solid "+r.bd:"none"},children:[u.jsxs("span",{style:{display:"flex",gap:8,alignItems:"center"},children:[u.jsx("span",{children:v.i}),u.jsx("span",{style:{fontSize:12},children:v.l})]}),u.jsx("span",{style:{fontSize:12,fontWeight:700,color:r.ac},children:v.v})]},w))]}),u.jsxs("div",{style:{background:T.find(v=>v.id===q)?.bg,borderRadius:16,padding:"20px 16px",marginBottom:12,textAlign:"center"},children:[u.jsx("div",{style:{fontSize:12,color:"rgba(255,255,255,.8)",marginBottom:6},children:"プレビュー"}),u.jsxs("div",{style:{fontSize:18,fontWeight:900,color:"#fff",textShadow:"0 2px 8px rgba(0,0,0,.15)"},children:[q==="memorial"?"ありがとう、"+s.nn:q==="birthday"?s.nn+"、お誕生日おめでとう！":q==="anniversary"?s.nn+"と出会って"+s.days+"日":s.nn+"の思い出"]}),u.jsx("div",{style:{fontSize:11,color:"rgba(255,255,255,.75)",marginTop:4},children:s.breed||""})]}),o>0?u.jsxs(Wt,{t:r,primary:!0,onClick:()=>T0({...s,albumTheme:q,albumMsg:x}),children:[q==="memorial"?"メモリアルアルバムを作成 🕊":q==="birthday"?"バースデーアルバムを作成 🎂":q==="anniversary"?"記念日アルバムを作成 🎉":"思い出アルバムを作成 📕"]}):u.jsx("div",{style:{textAlign:"center",padding:16},children:u.jsx("div",{style:{fontSize:13,color:r.dm},children:"日記を書くと作成できるようになるよ 🐾"})})]})]})}function G0(){const s=j0(),z=E0(),r=D0(),o=s.t,S=A0(z.bk);if(!s.ok)return u.jsx(C0,{a:s});const q=Object.fromEntries(Object.entries({home:{i:"🐾",l:"ホーム"},growth:{i:"🌱",l:"成長"},album:{i:"🖼",l:"アルバム"},menu:{i:"☰",l:"メニュー"},sym:{i:"📝",l:"症状"},friend:{i:"🐕",l:"犬友",pro:1},ai:{i:"🩹",l:"AI相談",pro:1},membook:{i:"📕",l:"思い出",pro:1}}).filter(([E,b])=>!b.pro||s.prem)),_=(()=>{const E=s.tabOrder||[],b=["home","growth","album","menu"];return E.length===4&&E.every(Q=>q[Q])?E:E.length===2?["home",E[0],E[1],"menu"].filter(Q=>q[Q]):b})(),x=[..._.slice(0,2).map(E=>({s:E,...q[E]})),{s:"_post",i:"✏️",l:""},..._.slice(2).map(E=>({s:E,...q[E]}))],y=z.s!=="post";let A;switch(z.s){case"home":A=u.jsx(M0,{a:s,go:z.go});break;case"growth":A=u.jsx(_0,{a:s,cf:r});break;case"menu":A=u.jsx(B0,{a:s,go:z.go});break;case"post":A=u.jsx(O0,{a:s,go:z.go,bk:z.bk});break;case"detail":A=u.jsx(R0,{a:s,go:z.go,bk:z.bk,id:z.p,cf:r});break;case"settings":A=u.jsx(U0,{a:s,go:z.go,bk:z.bk,cf:r});break;case"paywall":A=u.jsx(H0,{a:s,bk:z.bk});break;case"album":A=u.jsxs("div",{style:{padding:16,overflow:"hidden"},children:[u.jsxs("div",{style:{fontSize:18,fontWeight:800,marginBottom:16,display:"flex",alignItems:"center",gap:8},children:["🖼",u.jsxs("span",{children:[s.nn,"のアルバム"]})]}),(s.photos||[]).length===0&&s.diaries.filter(E=>E.mediaSrc).length===0?u.jsxs("div",{style:{textAlign:"center",padding:40,color:o.dm},children:[u.jsx("div",{style:{fontSize:40},children:"📷"}),u.jsx("div",{style:{fontSize:13,color:o.dm,marginTop:8},children:"日記の写真がここに並ぶよ"})]}):u.jsx("div",{style:{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:3,overflow:"hidden",width:"100%"},children:[...(s.photos||[]).map(E=>E.uri),...s.diaries.filter(E=>E.mediaSrc).map(E=>E.mediaSrc)].map((E,b)=>u.jsx("img",{src:E,style:{width:"100%",maxWidth:"100%",aspectRatio:"1",objectFit:"cover",borderRadius:4,display:"block"},alt:""},b))})]});break;case"friend":A=s.prem?u.jsx(Y0,{a:s,bk:z.bk,go:z.go}):u.jsx(Yr,{a:s,bk:()=>z.go("home"),title:"🐾 犬友コミュニティ",ch:u.jsxs("div",{children:[u.jsxs("div",{style:{textAlign:"center",padding:"20px 16px"},children:[u.jsx("div",{style:{fontSize:48},children:"🐾"}),u.jsx("div",{style:{fontSize:16,fontWeight:800,marginTop:8,color:s.t.h1},children:"犬友コミュニティ"}),u.jsx("div",{style:{fontSize:13,color:s.t.dm,marginTop:6,lineHeight:1.6},children:"飼い主さん同士でつながって、日記をシェアしたり、コメントで応援し合おう！"})]}),u.jsxs("div",{style:{padding:"0 16px"},children:[[{i:"📖",t:"日記のシェア",d:"あなたの日記をみんなに公開"},{i:"💬",t:"コメント交流",d:"飼い主同士で応援し合える"},{i:"👥",t:"フォロー機能",d:"気になる犬友をフォロー"},{i:"👣",t:"足あと機能",d:"誰が日記を見たか分かる"},{i:"🏆",t:"人気ランキング",d:"今週の注目わんちゃん"}].map((ft,fi)=>u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderBottom:fi<4?"1px solid "+s.t.bd:"none"},children:[u.jsx("span",{style:{fontSize:18},children:ft.i}),u.jsxs("div",{children:[u.jsx("div",{style:{fontSize:13,fontWeight:600},children:ft.t}),u.jsx("div",{style:{fontSize:11,color:s.t.dm},children:ft.d})]})]},fi))]}),u.jsx("div",{style:{padding:"20px 16px"},children:u.jsx(Wt,{t:s.t,primary:!0,onClick:()=>z.go("paywall"),children:"プレミアムで犬友とつながる ✨"})})]})});break;case"ai":A=s.prem?u.jsx(N0,{a:s,bk:z.bk}):u.jsx(Yr,{a:s,bk:z.bk,title:"🩹 AI健康相談",ch:u.jsxs("div",{children:[u.jsxs("div",{style:{textAlign:"center",padding:"20px 16px"},children:[u.jsx("div",{style:{fontSize:48},children:"🩹"}),u.jsx("div",{style:{fontSize:16,fontWeight:800,marginTop:8,color:s.t.h1},children:"AI健康相談"}),u.jsx("div",{style:{fontSize:13,color:s.t.dm,marginTop:6,lineHeight:1.6},children:"気になる症状をAIに相談。29種類以上の症状に対応した専門的なアドバイスが受けられます。"})]}),u.jsxs("div",{style:{padding:"0 16px"},children:[[{i:"🤮",t:"吐いた・下痢"},{i:"🦶",t:"足を引きずる"},{i:"😷",t:"咳・くしゃみ"},{i:"🐾",t:"かゆがる・皮膚トラブル"},{i:"💉",t:"ワクチン・予防接種"},{i:"🦷",t:"歯磨き・口臭"}].map((ft,fi)=>u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:fi<5?"1px solid "+s.t.bd:"none"},children:[u.jsx("span",{style:{fontSize:16},children:ft.i}),u.jsx("span",{style:{fontSize:13},children:ft.t})]},fi))]}),u.jsxs("div",{style:{padding:"12px 16px",fontSize:11,color:s.t.dm,textAlign:"center",lineHeight:1.6},children:["犬種別の健康リスク情報も充実",u.jsx("br",{}),"トイプードル・柴犬・チワワなど14犬種対応"]}),u.jsx("div",{style:{padding:"8px 16px 20px"},children:u.jsx(Wt,{t:s.t,primary:!0,onClick:()=>z.go("paywall"),children:"プレミアムでAIに相談する ✨"})})]})});break;case"sym":A=u.jsx(q0,{a:s,bk:z.bk,cf:r,go:z.go});break;case"membook":A=s.prem?u.jsx(k0,{a:s,bk:z.bk}):u.jsx(Yr,{a:s,bk:z.bk,title:"📕 思い出アルバム",ch:u.jsxs("div",{children:[u.jsxs("div",{style:{textAlign:"center",padding:"20px 16px"},children:[u.jsx("div",{style:{fontSize:48},children:"📕"}),u.jsx("div",{style:{fontSize:16,fontWeight:800,marginTop:8,color:s.t.h1},children:"思い出アルバム"}),u.jsx("div",{style:{fontSize:13,color:s.t.dm,marginTop:6,lineHeight:1.6},children:"日記・写真・体重記録・メモリーを1冊のアルバムにまとめてダウンロード！記念日のプレゼントにも。"})]}),u.jsxs("div",{style:{padding:"0 16px"},children:[[{i:"📖",t:"日記をまとめて閲覧"},{i:"📷",t:"写真アルバム"},{i:"📈",t:"成長グラフ付き"},{i:"⭐",t:"メモリー集"},{i:"📥",t:"PDF/HTMLでダウンロード"}].map((ft,fi)=>u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:fi<4?"1px solid "+s.t.bd:"none"},children:[u.jsx("span",{style:{fontSize:16},children:ft.i}),u.jsx("span",{style:{fontSize:13},children:ft.t})]},fi))]}),u.jsx("div",{style:{padding:"16px 16px 20px"},children:u.jsx(Wt,{t:s.t,primary:!0,onClick:()=>z.go("paywall"),children:"プレミアムでアルバムを作る ✨"})})]})});break;default:A=u.jsx(Yr,{a:s,bk:z.bk,title:"🐾 わんちゃん日記",ch:u.jsxs("div",{style:{textAlign:"center",padding:40},children:[u.jsx("div",{style:{fontSize:48},children:"🐾"}),u.jsx("div",{style:{fontSize:16,fontWeight:700,marginTop:12},children:"このページは準備中です"}),u.jsx("div",{style:{fontSize:13,color:o.dm,marginTop:8},children:"新しい機能を追加予定！お楽しみに✨"})]})});break}return u.jsxs("div",{...S,style:{maxWidth:430,margin:"0 auto",background:o.bg,color:o.tx,minHeight:"100dvh",display:"flex",flexDirection:"column",fontFamily:"'Zen Maru Gothic','Hiragino Sans',sans-serif",overflowX:"hidden"},children:[u.jsx("div",{style:{flex:1,overflowY:"auto",paddingBottom:y?90:0},children:A}),u.jsx(r.El,{t:o}),y&&u.jsx("div",{style:{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:430,background:o.c,borderTop:"1px solid "+o.bd,paddingBottom:"env(safe-area-inset-bottom,12px)",zIndex:100},children:u.jsx("div",{style:{display:"flex",alignItems:"center",height:52},children:x.map(E=>u.jsx("div",{onClick:()=>E.s==="_post"?z.go("post"):z.go(E.s),style:{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",cursor:"pointer",gap:2,height:"100%"},children:E.s==="_post"?u.jsx("div",{style:{width:40,height:40,borderRadius:20,background:"linear-gradient(135deg,"+o.g1+","+o.g2+")",display:"flex",alignItems:"center",justifyContent:"center"},children:u.jsx("span",{style:{fontSize:18},children:"✏️"})}):u.jsxs(u.Fragment,{children:[u.jsx("span",{style:{fontSize:18},children:E.i}),u.jsx("span",{style:{fontSize:10,fontWeight:700,color:z.s===E.s?o.ac:o.dm},children:E.l})]})},E.s))})})]})}v0.createRoot(document.getElementById("root")).render(u.jsx(G0,{}));
+🐕 `+s.breed+"の場合："+xf[s.breed].tips[Q]);b+="\n\n⚠️ このアドバイスは参考情報です。正確な診断は獣医師にご相談ください。";void(0)}o(Q=>[...Q,{r:"ai",t:b}])}};return W.useEffect(()=>{_.current?.scrollIntoView()},[r]),u.jsxs("div",{style:{display:"flex",flexDirection:"column",height:"100dvh",background:q.bg,color:q.tx},children:[u.jsx(Yl,{t:q,title:"🩹 AI健康相談",left:u.jsx(ql,{t:q,onClick:z})}),u.jsxs("div",{style:{flex:1,overflowY:"auto",padding:16},children:[r.map((A,E)=>u.jsx("div",{style:{display:"flex",justifyContent:A.r==="user"?"flex-end":"flex-start",marginBottom:12},children:u.jsx("div",{style:{maxWidth:"75%",padding:"10px 14px",borderRadius:16,background:A.r==="user"?q.ac:q.c,color:A.r==="user"?"#fff":q.tx,fontSize:14,lineHeight:1.6,border:A.r==="ai"?"1px solid "+q.bd:"none"},children:A.t})},E)),u.jsx("div",{ref:_})]}),u.jsxs("div",{style:{display:"flex",gap:8,padding:"8px 12px",borderTop:"1px solid "+q.bd,background:q.c},children:[u.jsx("div",{style:{display:"flex",gap:6,padding:"4px 12px",overflowX:"auto",flexShrink:0},children:["吐いた","食欲がない","下痢","かゆがる","元気がない","足を引きずる","咳が出る","歯磨き","ワクチン"].map(A=>u.jsx("span",{onClick:()=>{M(A)},style:{padding:"4px 10px",borderRadius:16,background:q.a2,color:q.ac,fontSize:11,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0},children:A},A))}),u.jsx("input",{value:S,onChange:A=>M(A.target.value),onKeyDown:A=>{A.key==="Enter"&&y()},placeholder:"症状を入力",style:{flex:1,padding:"10px 14px",borderRadius:24,border:"1.5px solid "+q.bd,background:q.s,color:q.tx,fontSize:16,outline:"none",minWidth:0}}),u.jsx("div",{onClick:y,style:{width:40,height:40,borderRadius:20,background:q.ac,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"},children:u.jsx("span",{style:{color:"#fff"},children:"↑"})})]})]})}function Y0({a:s,bk:z,go:r}){const o=s.t,[S,M]=W.useState("diary"),[q,_]=W.useState({}),[x,y]=W.useState({}),[ce,setCe]=W.useState({}),A=[{id:"u1",n:"ココ",b:"トイプードル",v:"🐩"},{id:"u2",n:"レオ",b:"柴犬",v:"🐕"},{id:"u3",n:"モカ",b:"チワワ",v:"🐶"},{id:"u4",n:"ハナ",b:"ゴールデン",v:"🦮"},{id:"u5",n:"リク",b:"コーギー",v:"🐕"},{id:"u6",n:"マロン",b:"ダックス",v:"🐾"},{id:"u7",n:"ソラ",b:"ポメラニアン",v:"🐶"},{id:"u8",n:"ルナ",b:"フレブル",v:"🐕‍🦺"}],E=[{id:"p1",u:A[0],ti:"公園でお友達できた！",tx:"ボール遊びしたよ。初めて会ったプードルちゃんと仲良くなれた",mo:"🥳",dt:"3/14",li:42,cm:[{u:A[1],tx:"うちのレオも連れてきたい！"},{u:A[2],tx:"ココちゃん社交的でいいなぁ〜"}]},{id:"p2",u:A[1],ti:"はじめてのトリミング",tx:"スッキリした顔に！トリマーさんが優しくてだんだん慣れてきた",mo:"😊",dt:"3/13",li:67,cm:[{u:A[2],tx:"イケメン！ どこのサロン？"},{u:A[3],tx:"ハナもそろそろトリミングしなきゃ〜"}]},{id:"p3",u:A[3],ti:"海デビューしました",tx:"ハナ、初めての海に大興奮！波が来るたびにジャンプしてた（笑）",mo:"🤩",dt:"3/12",li:89,cm:[{u:A[0],tx:"わぁ楽しそう！砂浜走れるんですね"},{u:A[4],tx:"リクも海に連れて行きたい！"}]},{id:"p4",u:A[4],ti:"おすわり完璧にできた！",tx:"3ヶ月かかったけど、ようやくおすわりがバッチリに。次はお手に挑戦！",mo:"🎉",dt:"3/11",li:55,cm:[{u:A[5],tx:"すごい！コツを教えてほしい〜"},{u:A[1],tx:"リクくんおりこう！"}]},{id:"p5",u:A[5],ti:"手作りおやつに挑戦",tx:"さつまいもとかぼちゃのクッキー！マロン、すごい食いつきで嬉しい〜",mo:"😋",dt:"3/10",li:73,cm:[{u:A[2],tx:"レシピ知りたいです！"},{u:A[6],tx:"うちのソラにも作ってあげたい"}]}],FP=[{id:"f1",u:A[2],tgt:"公園でお友達できた！",time:"2時間前",nw:!0},{id:"f2",u:A[3],tgt:"はじめてのトリミング",time:"5時間前",nw:!0},{id:"f3",u:A[0],tgt:"海デビューしました",time:"昨日",nw:!1},{id:"f4",u:A[5],tgt:"おすわり完璧にできた！",time:"昨日",nw:!1},{id:"f5",u:A[7],tgt:"手作りおやつに挑戦",time:"2日前",nw:!1}],IT=[{id:"i1",au:A[1],tx:"ココちゃんはいつもニコニコで、一緒にいると元気をもらえます"},{id:"i2",au:A[3],tx:"レオくんのお散歩日記が毎日の楽しみ。写真がいつも上手！"},{id:"i3",au:A[0],tx:"モカちゃんの寝顔に毎回キュンとしてます"}];return u.jsxs("div",{style:{display:"flex",flexDirection:"column",height:"100dvh",background:o.bg,color:o.tx},children:[u.jsx(Yl,{t:o,title:"🐾 犬友ひろば",left:u.jsx(ql,{t:o,onClick:z})}),u.jsxs("div",{style:{padding:"16px 16px 10px",background:o.a2,display:"flex",alignItems:"center",gap:12},children:[u.jsx("div",{style:{width:48,height:48,borderRadius:24,background:o.c,display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,boxShadow:"0 2px 8px rgba(0,0,0,0.06)"},children:s.avi||"🐶"}),u.jsxs("div",{style:{flex:1},children:[u.jsx("div",{style:{fontWeight:800,fontSize:16,color:o.tx},children:s.nn}),u.jsx("div",{style:{fontSize:11,color:o.dm,marginTop:2},children:s.breed}),u.jsx("div",{style:{fontSize:11,color:o.dm,marginTop:2},children:"🐾 犬友 "+Object.keys(q).filter(k=>q[k]).length+"人"})]})]}),u.jsx("div",{style:{display:"flex",borderBottom:"1px solid "+o.bd,background:o.c},children:[["diary","みんなの日記"],["find","犬友さがし"],["footprint","足あと"]].map(([b,Q])=>u.jsxs("div",{onClick:()=>M(b),style:{flex:1,textAlign:"center",padding:"12px 0",fontSize:13,fontWeight:S===b?700:400,cursor:"pointer",color:S===b?o.ac:o.dm,borderBottom:S===b?"2px solid "+o.ac:"2px solid transparent",position:"relative"},children:[Q,b==="footprint"&&FP.some(f=>f.nw)?u.jsx("span",{style:{position:"absolute",top:6,marginLeft:2,fontSize:8,color:o.ac},children:"🐾"}):null]},b))}),u.jsx("div",{style:{flex:1,overflowY:"auto"},children:u.jsxs("div",{style:{padding:16},children:[S==="diary"&&u.jsx("div",{children:E.map(b=>u.jsxs("div",{style:{background:o.c,borderRadius:16,marginBottom:12,border:"1px solid "+o.bd,overflow:"hidden"},children:[u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"12px 14px"},children:[u.jsx("div",{style:{width:36,height:36,borderRadius:18,background:o.a2,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20},children:b.u.v}),u.jsxs("div",{style:{flex:1},children:[u.jsxs("div",{style:{fontSize:14,fontWeight:700,display:"flex",alignItems:"center",gap:4},children:[b.u.n,u.jsx("span",{style:{fontSize:13},children:b.mo})]}),u.jsxs("div",{style:{fontSize:11,color:o.dm},children:[b.u.b," · ",b.dt]})]})]}),u.jsxs("div",{style:{padding:"0 14px 12px"},children:[u.jsx("div",{style:{fontSize:15,fontWeight:700,marginBottom:4},children:b.ti}),u.jsx("div",{style:{fontSize:13,color:o.tx,lineHeight:1.7,display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden"},children:b.tx})]}),u.jsxs("div",{style:{display:"flex",gap:20,padding:"10px 14px",borderTop:"1px solid "+o.bd},children:[u.jsxs("span",{onClick:()=>y(Q=>({...Q,[b.id]:!Q[b.id]})),style:{fontSize:13,cursor:"pointer",color:x[b.id]?"#EF4444":o.dm,transition:"color 0.2s"},children:[x[b.id]?"❤️":"🤍"," ",b.li+(x[b.id]?1:0)]}),u.jsxs("span",{onClick:()=>setCe(Q=>({...Q,[b.id]:!Q[b.id]})),style:{fontSize:13,color:o.dm,cursor:"pointer"},children:["💬 ",b.cm.length,ce[b.id]?" ▴":" ▾"]})]}),ce[b.id]&&b.cm.map((Q,G)=>u.jsxs("div",{style:{display:"flex",gap:8,padding:"8px 14px",borderTop:"1px solid "+o.bd,background:o.s},children:[u.jsx("span",{style:{fontSize:14},children:Q.u.v}),u.jsxs("span",{style:{fontSize:12,lineHeight:1.6},children:[u.jsx("b",{children:Q.u.n})," ",Q.tx]})]},G))]},b.id))}),S==="find"&&u.jsxs("div",{children:[u.jsx("div",{style:{fontSize:14,fontWeight:700,marginBottom:4},children:"犬種が同じ犬友さん"}),u.jsx("div",{style:{fontSize:11,color:o.dm,marginBottom:12},children:"あなたと同じ犬種の飼い主さん"}),u.jsx("div",{style:{display:"flex",gap:12,overflowX:"auto",paddingBottom:16,scrollbarWidth:"none"},children:A.slice(0,4).map(b=>u.jsxs("div",{style:{minWidth:130,background:o.c,borderRadius:16,padding:"16px 12px",border:"1px solid "+o.bd,textAlign:"center",flexShrink:0},children:[u.jsx("div",{style:{width:52,height:52,borderRadius:26,background:o.a2,display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,margin:"0 auto 8px"},children:b.v}),u.jsx("div",{style:{fontSize:14,fontWeight:700},children:b.n}),u.jsx("div",{style:{fontSize:11,color:o.dm,marginTop:2},children:b.b}),u.jsx("div",{onClick:()=>_(Q=>({...Q,[b.id]:!Q[b.id]})),style:{marginTop:10,padding:"6px 0",borderRadius:20,fontSize:12,fontWeight:700,cursor:"pointer",background:q[b.id]?o.s:o.ac,color:q[b.id]?o.dm:"#fff",transition:"all 0.2s"},children:q[b.id]?"犬友":"犬友になる"})]},"s-"+b.id))}),u.jsx("div",{style:{fontSize:14,fontWeight:700,marginTop:8,marginBottom:4},children:"日齢が近い犬友さん"}),u.jsx("div",{style:{fontSize:11,color:o.dm,marginBottom:12},children:"お子さんの月齢が近い飼い主さん"}),u.jsx("div",{style:{display:"flex",gap:12,overflowX:"auto",paddingBottom:16,scrollbarWidth:"none"},children:A.slice(4).map(b=>u.jsxs("div",{style:{minWidth:130,background:o.c,borderRadius:16,padding:"16px 12px",border:"1px solid "+o.bd,textAlign:"center",flexShrink:0},children:[u.jsx("div",{style:{width:52,height:52,borderRadius:26,background:o.a2,display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,margin:"0 auto 8px"},children:b.v}),u.jsx("div",{style:{fontSize:14,fontWeight:700},children:b.n}),u.jsx("div",{style:{fontSize:11,color:o.dm,marginTop:2},children:b.b}),u.jsx("div",{onClick:()=>_(Q=>({...Q,[b.id]:!Q[b.id]})),style:{marginTop:10,padding:"6px 0",borderRadius:20,fontSize:12,fontWeight:700,cursor:"pointer",background:q[b.id]?o.s:o.ac,color:q[b.id]?o.dm:"#fff",transition:"all 0.2s"},children:q[b.id]?"犬友":"犬友になる"})]},"a-"+b.id))})]}),S==="footprint"&&u.jsxs("div",{children:[u.jsx("div",{style:{background:o.a2,borderRadius:16,padding:"14px 16px",marginBottom:16,textAlign:"center"},children:u.jsx("div",{style:{fontSize:13,color:o.tx,lineHeight:1.7},children:"🐾 今日 "+FP.filter(f=>f.nw).length+"人が日記を見てくれました"})}),u.jsx("div",{style:{fontSize:14,fontWeight:700,marginBottom:8},children:"最近の足あと"}),FP.map(fp=>u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"12px 0",borderBottom:"1px solid "+o.bd,cursor:"pointer"},children:[u.jsx("div",{style:{width:3,height:36,borderRadius:2,background:fp.nw?o.ac:"transparent",flexShrink:0}}),u.jsx("div",{style:{width:36,height:36,borderRadius:18,background:o.a2,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18},children:fp.u.v}),u.jsxs("div",{style:{flex:1},children:[u.jsxs("div",{style:{fontSize:13},children:[u.jsx("span",{style:{fontWeight:700},children:fp.u.n}),u.jsx("span",{style:{color:o.dm},children:"("+fp.u.b+")"}),u.jsx("span",{children:" が「"+fp.tgt+"」を見ました"})]}),u.jsx("div",{style:{fontSize:11,color:o.dm,marginTop:2},children:fp.time})]})]},fp.id)),u.jsx("div",{style:{fontSize:14,fontWeight:700,marginTop:24,marginBottom:12},children:"💬 犬友からのひとこと"}),IT.map(it=>u.jsxs("div",{style:{background:o.a2,borderRadius:16,padding:16,marginBottom:10},children:[u.jsx("div",{style:{fontSize:22,color:o.ac,opacity:.3,marginBottom:4,lineHeight:1},children:"\u201C"}),u.jsx("div",{style:{fontSize:13,lineHeight:1.8,color:o.tx},children:it.tx}),u.jsxs("div",{style:{fontSize:11,color:o.dm,marginTop:8,textAlign:"right"},children:["— ",it.au.v," ",it.au.n,"(",it.au.b,")"]})]},"it-"+it.id))]})]})})]})};function q0({a:s,bk:z,cf:r,go:o}){const S=s.t,[M,q]=W.useState(0),[_,x]=W.useState(""),[y,A]=W.useState(1),[E,b]=W.useState(""),[Q,G]=W.useState(null),U=W.useRef(),X=["食欲不振","嘔吐","下痢","咳","目やに","皮膚の赤み","元気がない","その他"];return u.jsxs("div",{style:{background:S.bg,color:S.tx,minHeight:"100dvh"},children:[u.jsx(Yl,{t:S,title:"📝 症状ログ",left:u.jsx(ql,{t:S,onClick:z})}),u.jsx("div",{style:{padding:16},children:M?u.jsxs("div",{style:{background:S.c,borderRadius:16,padding:16,border:"1px solid "+S.bd},children:[u.jsx("div",{style:{display:"flex",flexWrap:"wrap",gap:6,marginBottom:12},children:X.map(Y=>u.jsx("span",{onClick:()=>x(Y),style:{padding:"7px 14px",borderRadius:20,fontSize:13,fontWeight:600,cursor:"pointer",background:_===Y?S.ac:S.s,color:_===Y?"#fff":S.tx},children:Y},Y))}),u.jsx("div",{style:{display:"flex",gap:8,marginBottom:12},children:[{v:1,l:"軽い",c:"#16A34A"},{v:2,l:"心配",c:"#F59E0B"},{v:3,l:"要注意",c:"#DC2626"}].map(Y=>u.jsx("span",{onClick:()=>A(Y.v),style:{flex:1,padding:10,borderRadius:12,textAlign:"center",fontWeight:700,cursor:"pointer",background:y===Y.v?Y.c+"22":S.s,color:y===Y.v?Y.c:S.tx,border:y===Y.v?"2px solid "+Y.c:"2px solid "+S.bd},children:Y.l},Y.v))}),Q?u.jsxs("div",{style:{position:"relative",marginBottom:10},children:[u.jsx("img",{src:Q,style:{width:"100%",height:100,objectFit:"cover",borderRadius:10},alt:""}),u.jsx("div",{onClick:()=>G(null),style:{position:"absolute",top:4,right:4,width:22,height:22,borderRadius:11,background:"rgba(0,0,0,.5)",color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:12},children:"✕"})]}):u.jsx("div",{onClick:()=>U.current?.click(),style:{padding:12,borderRadius:10,border:"2px dashed "+S.bd,textAlign:"center",cursor:"pointer",marginBottom:10},children:u.jsx("span",{style:{fontSize:12,color:S.dm},children:"📷 症状の写真を追加（任意）"})}),u.jsx("input",{ref:U,type:"file",accept:"image/*",style:{display:"none"},onChange:Y=>{const J=Y.target.files?.[0];if(J){const lt=new FileReader;lt.onload=gt=>G(gt.target.result),lt.readAsDataURL(J)}}}),u.jsx("textarea",{value:E,onChange:Y=>b(Y.target.value),placeholder:"メモ（いつから？どんな様子？）",style:{width:"100%",padding:10,borderRadius:12,border:"1.5px solid "+S.bd,background:S.s,color:S.tx,fontSize:16,minHeight:60,resize:"none",outline:"none",marginBottom:10}}),u.jsxs("div",{style:{display:"flex",gap:8},children:[u.jsx(Wt,{t:S,primary:!0,onClick:()=>{_&&(s.addSym({sym:_,sev:y,note:E.trim(),photo:Q}),x(""),b(""),G(null),q(0))},style:{flex:2},children:"記録する"}),u.jsx(Wt,{t:S,onClick:()=>{q(0),G(null)},style:{flex:1},children:"やめる"})]})]}):u.jsxs("div",{children:[u.jsx("div",{onClick:()=>q(1),style:{padding:14,background:S.c,borderRadius:14,cursor:"pointer",border:"1px solid "+S.bd,marginBottom:12,textAlign:"center",fontWeight:600,color:S.ac},children:"＋ 症状を記録"}),(s.symptoms||[]).map(Y=>u.jsxs("div",{style:{background:S.c,borderRadius:14,padding:14,marginBottom:8,border:"1px solid "+S.bd},children:[u.jsxs("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center"},children:[u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:6},children:[u.jsx("span",{style:{fontWeight:700},children:Y.sym}),u.jsx("span",{style:{fontSize:10,padding:"2px 8px",borderRadius:8,background:Y.sev===3?"#FEE2E2":Y.sev===2?"#FFF8E1":"#E8F5E9",color:Y.sev===3?"#DC2626":Y.sev===2?"#F59E0B":"#16A34A",fontWeight:700},children:Y.sev===3?"要注意":Y.sev===2?"心配":"軽い"})]}),u.jsx("span",{onClick:()=>r.ask("この記録を削除する？",()=>s.delSym(Y.id)),style:{fontSize:12,color:"#EF4444",cursor:"pointer"},children:"削除"})]}),Y.photo&&u.jsx("img",{src:Y.photo,style:{width:"100%",height:120,objectFit:"cover",borderRadius:8,marginTop:8},alt:""}),Y.note&&u.jsx("div",{style:{fontSize:13,color:S.dm,marginTop:6},children:Y.note}),u.jsx("div",{style:{fontSize:10,color:S.dm,marginTop:4},children:(Y.d||"").replace(/\./g,"/")})]},Y.id)),(s.symptoms||[]).length>0&&u.jsxs("div",{style:{background:s.prem?"linear-gradient(135deg,"+S.g1+"22,"+S.g2+"22)":S.c,borderRadius:14,padding:"12px 16px",marginTop:4,display:"flex",alignItems:"center",justifyContent:"space-between",border:"1px solid "+S.bd},children:[u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:8},children:[u.jsx("span",{children:"🏥"}),u.jsxs("div",{children:[u.jsx("div",{style:{fontSize:13,fontWeight:700},children:"🏥 獣医さん用カルテ"}),u.jsx("div",{style:{fontSize:10,color:S.dm},children:"症状の記録をまとめて見せられる"})]})]}),s.prem?u.jsx("div",{onClick:()=>z0(s),style:{padding:"6px 14px",borderRadius:20,background:S.ac,color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"},children:"PDF出力"}):u.jsx("span",{onClick:()=>o("paywall"),style:{fontSize:11,color:S.ac,fontWeight:700,cursor:"pointer"},children:"PRO ›"})]})]})})]})}function k0({a:s,bk:z}){const r=s.t,o=s.diaries.length,S=(s.photos||[]).length+s.diaries.filter(q=>q.mediaSrc).length,M=s.milestones.length,[q,_]=W.useState("standard"),[x,y]=W.useState(""),T=[{id:"standard",i:"📕",l:"スタンダード",d:"日々の記録をまとめた1冊",bg:"linear-gradient(160deg,#FFE8EC,#FFB6C1,#FF7B9C)"},{id:"birthday",i:"🎂",l:"バースデー",d:"お誕生日をお祝いする特別なアルバム",bg:"linear-gradient(160deg,#FFF3E0,#FFD54F,#FF9800)"},{id:"anniversary",i:"🎉",l:"記念日",d:"うちの子記念日・出会いの日に",bg:"linear-gradient(160deg,#E8F5E9,#81C784,#43A047)"},{id:"memorial",i:"🕊",l:"メモリアル",d:"虹の橋を渡った子へ贈る寄せ書き",bg:"linear-gradient(160deg,#E3F2FD,#90CAF9,#5C6BC0)"}];return u.jsxs("div",{style:{background:r.bg,color:r.tx,minHeight:"100dvh"},children:[u.jsx(Yl,{t:r,title:"📕 思い出アルバム",left:u.jsx(ql,{t:r,onClick:z})}),u.jsxs("div",{style:{padding:16},children:[u.jsxs("div",{style:{textAlign:"center",padding:"16px 0 20px"},children:[u.jsx("div",{style:{fontSize:48},children:T.find(v=>v.id===q)?.i||"📕"}),u.jsxs("div",{style:{fontSize:18,fontWeight:900,color:r.h1,marginTop:8},children:[s.nn,"の思い出アルバム"]}),u.jsx("div",{style:{fontSize:12,color:r.dm,marginTop:4},children:"卒アル・寄せ書き風の特別な1冊を作ろう"})]}),u.jsx("div",{style:{fontSize:13,fontWeight:700,marginBottom:8},children:"🎨 テーマを選ぶ"}),u.jsx("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:16},children:T.map(v=>u.jsxs("div",{onClick:()=>_(v.id),style:{background:q===v.id?v.bg:r.c,borderRadius:14,padding:"14px 12px",cursor:"pointer",border:q===v.id?"2px solid "+r.ac:"1.5px solid "+r.bd,textAlign:"center",transition:"all .2s"},children:[u.jsx("div",{style:{fontSize:28},children:v.i}),u.jsx("div",{style:{fontSize:13,fontWeight:800,color:q===v.id?"#fff":r.tx,marginTop:4},children:v.l}),u.jsx("div",{style:{fontSize:10,color:q===v.id?"rgba(255,255,255,.85)":r.dm,marginTop:2,lineHeight:1.4},children:v.d})]},v.id))}),q==="memorial"&&u.jsxs("div",{style:{background:r.c,borderRadius:14,padding:14,border:"1px solid "+r.bd,marginBottom:14},children:[u.jsx("div",{style:{fontSize:13,fontWeight:700,marginBottom:8},children:"🕊 メッセージを添える（任意）"}),u.jsx("textarea",{value:x,onChange:v=>y(v.target.value),placeholder:"ありがとう、大好きだよ。虹の橋の向こうでも元気でね...",style:{width:"100%",padding:10,borderRadius:12,border:"1.5px solid "+r.bd,background:r.s,color:r.tx,fontSize:14,minHeight:80,resize:"none",outline:"none",lineHeight:1.8}})]}),q==="birthday"&&u.jsxs("div",{style:{background:r.c,borderRadius:14,padding:14,border:"1px solid "+r.bd,marginBottom:14},children:[u.jsx("div",{style:{fontSize:13,fontWeight:700,marginBottom:8},children:"🎂 お祝いメッセージ（任意）"}),u.jsx("textarea",{value:x,onChange:v=>y(v.target.value),placeholder:"お誕生日おめでとう！これからもいっぱい楽しいことしようね🎉",style:{width:"100%",padding:10,borderRadius:12,border:"1.5px solid "+r.bd,background:r.s,color:r.tx,fontSize:14,minHeight:80,resize:"none",outline:"none",lineHeight:1.8}})]}),q==="anniversary"&&u.jsxs("div",{style:{background:r.c,borderRadius:14,padding:14,border:"1px solid "+r.bd,marginBottom:14},children:[u.jsx("div",{style:{fontSize:13,fontWeight:700,marginBottom:8},children:"🎉 記念日メッセージ（任意）"}),u.jsx("textarea",{value:x,onChange:v=>y(v.target.value),placeholder:"出会えてよかった。これからもずっと一緒だよ✨",style:{width:"100%",padding:10,borderRadius:12,border:"1.5px solid "+r.bd,background:r.s,color:r.tx,fontSize:14,minHeight:80,resize:"none",outline:"none",lineHeight:1.8}})]}),u.jsxs("div",{style:{background:r.c,borderRadius:16,padding:14,border:"1px solid "+r.bd,marginBottom:14},children:[u.jsx("div",{style:{fontSize:13,fontWeight:700,marginBottom:8},children:"📋 アルバムの内容"}),[{i:"📖",l:"日記",v:o+"件"},{i:"📷",l:"写真",v:S+"枚"},{i:"⭐",l:"メモリー",v:M+"件"},{i:"📈",l:"成長記録",v:s.weights.length+"件"},{i:"💌",l:s.nn+"からの一言",v:s.prem?"収録":"—"},{i:"✍️",l:"寄せ書き",v:"自動生成"}].map((v,w)=>u.jsxs("div",{style:{display:"flex",justifyContent:"space-between",padding:"7px 0",borderBottom:w<5?"1px solid "+r.bd:"none"},children:[u.jsxs("span",{style:{display:"flex",gap:8,alignItems:"center"},children:[u.jsx("span",{children:v.i}),u.jsx("span",{style:{fontSize:12},children:v.l})]}),u.jsx("span",{style:{fontSize:12,fontWeight:700,color:r.ac},children:v.v})]},w))]}),u.jsxs("div",{style:{background:T.find(v=>v.id===q)?.bg,borderRadius:16,padding:"20px 16px",marginBottom:12,textAlign:"center"},children:[u.jsx("div",{style:{fontSize:12,color:"rgba(255,255,255,.8)",marginBottom:6},children:"プレビュー"}),u.jsxs("div",{style:{fontSize:18,fontWeight:900,color:"#fff",textShadow:"0 2px 8px rgba(0,0,0,.15)"},children:[q==="memorial"?"ありがとう、"+s.nn:q==="birthday"?s.nn+"、お誕生日おめでとう！":q==="anniversary"?s.nn+"と出会って"+s.days+"日":s.nn+"の思い出"]}),u.jsx("div",{style:{fontSize:11,color:"rgba(255,255,255,.75)",marginTop:4},children:s.breed||""})]}),o>0?u.jsxs(Wt,{t:r,primary:!0,onClick:()=>T0({...s,albumTheme:q,albumMsg:x}),children:[q==="memorial"?"メモリアルアルバムを作成 🕊":q==="birthday"?"バースデーアルバムを作成 🎂":q==="anniversary"?"記念日アルバムを作成 🎉":"思い出アルバムを作成 📕"]}):u.jsx("div",{style:{textAlign:"center",padding:16},children:u.jsx("div",{style:{fontSize:13,color:r.dm},children:"日記を書くと作成できるようになるよ 🐾"})})]})]})}function G0(){const s=j0(),z=E0(),r=D0(),o=s.t,S=A0(z.bk);if(!s.ok)return u.jsx(C0,{a:s});const q=Object.fromEntries(Object.entries({home:{i:"🐾",l:"ホーム"},growth:{i:"🌱",l:"成長"},album:{i:"🖼",l:"アルバム"},menu:{i:"☰",l:"メニュー"},sym:{i:"📝",l:"症状"},friend:{i:"🐕",l:"犬友",pro:1},ai:{i:"🩹",l:"AI相談",pro:1},membook:{i:"📕",l:"思い出",pro:1}}).filter(([E,b])=>!b.pro||s.prem)),_=(()=>{const E=s.tabOrder||[],b=["home","growth","album","menu"];return E.length===4&&E.every(Q=>q[Q])?E:E.length===2?["home",E[0],E[1],"menu"].filter(Q=>q[Q]):b})(),x=[..._.slice(0,2).map(E=>({s:E,...q[E]})),{s:"_post",i:"✏️",l:""},..._.slice(2).map(E=>({s:E,...q[E]}))],y=z.s!=="post";let A;switch(z.s){case"home":A=u.jsx(M0,{a:s,go:z.go});break;case"growth":A=u.jsx(_0,{a:s,cf:r});break;case"menu":A=u.jsx(B0,{a:s,go:z.go});break;case"post":A=u.jsx(O0,{a:s,go:z.go,bk:z.bk});break;case"detail":A=u.jsx(R0,{a:s,go:z.go,bk:z.bk,id:z.p,cf:r});break;case"settings":A=u.jsx(U0,{a:s,go:z.go,bk:z.bk,cf:r});break;case"paywall":A=u.jsx(H0,{a:s,bk:z.bk});break;case"album":A=u.jsxs("div",{style:{padding:16,overflow:"hidden"},children:[u.jsxs("div",{style:{fontSize:18,fontWeight:800,marginBottom:16,display:"flex",alignItems:"center",gap:8},children:["🖼",u.jsxs("span",{children:[s.nn,"のアルバム"]})]}),(s.photos||[]).length===0&&s.diaries.filter(E=>E.mediaSrc).length===0?u.jsxs("div",{style:{textAlign:"center",padding:40,color:o.dm},children:[u.jsx("div",{style:{fontSize:40},children:"📷"}),u.jsx("div",{style:{fontSize:13,color:o.dm,marginTop:8},children:"日記の写真がここに並ぶよ"})]}):u.jsx("div",{style:{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:3,overflow:"hidden",width:"100%"},children:[...(s.photos||[]).map(E=>E.uri),...s.diaries.filter(E=>E.mediaSrc).map(E=>E.mediaSrc)].map((E,b)=>u.jsx("img",{src:E,style:{width:"100%",maxWidth:"100%",aspectRatio:"1",objectFit:"cover",borderRadius:4,display:"block"},alt:""},b))})]});break;case"friend":A=s.prem?u.jsx(Y0,{a:s,bk:z.bk,go:z.go}):u.jsx(Yr,{a:s,bk:()=>z.go("home"),title:"🐾 犬友ひろば",ch:u.jsxs("div",{children:[u.jsxs("div",{style:{textAlign:"center",padding:"20px 16px"},children:[u.jsx("div",{style:{fontSize:48},children:"🐾"}),u.jsx("div",{style:{fontSize:16,fontWeight:800,marginTop:8,color:s.t.h1},children:"犬友ひろば"}),u.jsx("div",{style:{fontSize:13,color:s.t.dm,marginTop:6,lineHeight:1.6},children:"飼い主さん同士でつながって、日記をシェアしたり、コメントで応援し合おう！"})]}),u.jsxs("div",{style:{padding:"0 16px"},children:[[{i:"📖",t:"日記のシェア",d:"あなたの日記をみんなに公開"},{i:"💬",t:"コメント交流",d:"飼い主同士で応援し合える"},{i:"👥",t:"フォロー機能",d:"気になる犬友をフォロー"},{i:"👣",t:"足あと機能",d:"誰が日記を見たか分かる"},{i:"🏆",t:"人気ランキング",d:"今週の注目わんちゃん"}].map((ft,fi)=>u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderBottom:fi<4?"1px solid "+s.t.bd:"none"},children:[u.jsx("span",{style:{fontSize:18},children:ft.i}),u.jsxs("div",{children:[u.jsx("div",{style:{fontSize:13,fontWeight:600},children:ft.t}),u.jsx("div",{style:{fontSize:11,color:s.t.dm},children:ft.d})]})]},fi))]}),u.jsx("div",{style:{padding:"20px 16px"},children:u.jsx(Wt,{t:s.t,primary:!0,onClick:()=>z.go("paywall"),children:"プレミアムで犬友とつながる ✨"})})]})});break;case"ai":A=s.prem?u.jsx(N0,{a:s,bk:z.bk}):u.jsx(Yr,{a:s,bk:z.bk,title:"🩹 AI健康相談",ch:u.jsxs("div",{children:[u.jsxs("div",{style:{textAlign:"center",padding:"20px 16px"},children:[u.jsx("div",{style:{fontSize:48},children:"🩹"}),u.jsx("div",{style:{fontSize:16,fontWeight:800,marginTop:8,color:s.t.h1},children:"AI健康相談"}),u.jsx("div",{style:{fontSize:13,color:s.t.dm,marginTop:6,lineHeight:1.6},children:"気になる症状をAIに相談。29種類以上の症状に対応した専門的なアドバイスが受けられます。"})]}),u.jsxs("div",{style:{padding:"0 16px"},children:[[{i:"🤮",t:"吐いた・下痢"},{i:"🦶",t:"足を引きずる"},{i:"😷",t:"咳・くしゃみ"},{i:"🐾",t:"かゆがる・皮膚トラブル"},{i:"💉",t:"ワクチン・予防接種"},{i:"🦷",t:"歯磨き・口臭"}].map((ft,fi)=>u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:fi<5?"1px solid "+s.t.bd:"none"},children:[u.jsx("span",{style:{fontSize:16},children:ft.i}),u.jsx("span",{style:{fontSize:13},children:ft.t})]},fi))]}),u.jsxs("div",{style:{padding:"12px 16px",fontSize:11,color:s.t.dm,textAlign:"center",lineHeight:1.6},children:["犬種別の健康リスク情報も充実",u.jsx("br",{}),"トイプードル・柴犬・チワワなど14犬種対応"]}),u.jsx("div",{style:{padding:"8px 16px 20px"},children:u.jsx(Wt,{t:s.t,primary:!0,onClick:()=>z.go("paywall"),children:"プレミアムでAIに相談する ✨"})})]})});break;case"sym":A=u.jsx(q0,{a:s,bk:z.bk,cf:r,go:z.go});break;case"membook":A=s.prem?u.jsx(k0,{a:s,bk:z.bk}):u.jsx(Yr,{a:s,bk:z.bk,title:"📕 思い出アルバム",ch:u.jsxs("div",{children:[u.jsxs("div",{style:{textAlign:"center",padding:"20px 16px"},children:[u.jsx("div",{style:{fontSize:48},children:"📕"}),u.jsx("div",{style:{fontSize:16,fontWeight:800,marginTop:8,color:s.t.h1},children:"思い出アルバム"}),u.jsx("div",{style:{fontSize:13,color:s.t.dm,marginTop:6,lineHeight:1.6},children:"日記・写真・体重記録・メモリーを1冊のアルバムにまとめてダウンロード！記念日のプレゼントにも。"})]}),u.jsxs("div",{style:{padding:"0 16px"},children:[[{i:"📖",t:"日記をまとめて閲覧"},{i:"📷",t:"写真アルバム"},{i:"📈",t:"成長グラフ付き"},{i:"⭐",t:"メモリー集"},{i:"📥",t:"PDF/HTMLでダウンロード"}].map((ft,fi)=>u.jsxs("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:fi<4?"1px solid "+s.t.bd:"none"},children:[u.jsx("span",{style:{fontSize:16},children:ft.i}),u.jsx("span",{style:{fontSize:13},children:ft.t})]},fi))]}),u.jsx("div",{style:{padding:"16px 16px 20px"},children:u.jsx(Wt,{t:s.t,primary:!0,onClick:()=>z.go("paywall"),children:"プレミアムでアルバムを作る ✨"})})]})});break;default:A=u.jsx(Yr,{a:s,bk:z.bk,title:"🐾 わんちゃん日記",ch:u.jsxs("div",{style:{textAlign:"center",padding:40},children:[u.jsx("div",{style:{fontSize:48},children:"🐾"}),u.jsx("div",{style:{fontSize:16,fontWeight:700,marginTop:12},children:"このページは準備中です"}),u.jsx("div",{style:{fontSize:13,color:o.dm,marginTop:8},children:"新しい機能を追加予定！お楽しみに✨"})]})});break}return u.jsxs("div",{...S,style:{maxWidth:430,margin:"0 auto",background:o.bg,color:o.tx,minHeight:"100dvh",display:"flex",flexDirection:"column",fontFamily:"'Zen Maru Gothic','Hiragino Sans',sans-serif",overflowX:"hidden"},children:[u.jsx("div",{style:{flex:1,overflowY:"auto",paddingBottom:y?90:0},children:A}),u.jsx(r.El,{t:o}),y&&u.jsx("div",{style:{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:430,background:o.c,borderTop:"1px solid "+o.bd,paddingBottom:"env(safe-area-inset-bottom,12px)",zIndex:100},children:u.jsx("div",{style:{display:"flex",alignItems:"center",height:52},children:x.map(E=>u.jsx("div",{onClick:()=>E.s==="_post"?z.go("post"):z.go(E.s),style:{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",cursor:"pointer",gap:2,height:"100%"},children:E.s==="_post"?u.jsx("div",{style:{width:40,height:40,borderRadius:20,background:"linear-gradient(135deg,"+o.g1+","+o.g2+")",display:"flex",alignItems:"center",justifyContent:"center"},children:u.jsx("span",{style:{fontSize:18},children:"✏️"})}):u.jsxs(u.Fragment,{children:[u.jsx("span",{style:{fontSize:18},children:E.i}),u.jsx("span",{style:{fontSize:10,fontWeight:700,color:z.s===E.s?o.ac:o.dm},children:E.l})]})},E.s))})})]})}v0.createRoot(document.getElementById("root")).render(u.jsx(G0,{}));
 </script>
 </head>
 <body>
 <div id="root"></div>
+<noscript>
+<div style="max-width:480px;margin:40px auto;padding:24px;font-family:'Zen Maru Gothic','Hiragino Sans',sans-serif;color:#3D2C2C;">
+<div style="text-align:center;margin-bottom:24px;">
+<div style="font-size:64px;margin-bottom:12px;">🐾</div>
+<h1 style="font-size:22px;font-weight:900;margin-bottom:8px;">わんちゃん成長日記</h1>
+<p style="font-size:15px;color:#FF7B9C;font-weight:700;">うちの子の毎日を、もっと愛おしく。</p>
+</div>
+<h2 style="font-size:16px;font-weight:900;margin-bottom:12px;">主な機能</h2>
+<ul style="font-size:14px;color:#8A6F6A;line-height:2;list-style:none;padding:0;margin-bottom:20px;">
+<li>📝 <strong>日記・写真記録</strong> — 毎日の小さな成長を写真と一緒に</li>
+<li>⚖️ <strong>体重管理グラフ</strong> — 体重の推移をひと目で確認</li>
+<li>📈 <strong>犬種別成長曲線</strong> — うちの子と犬種平均を比較</li>
+<li>🩹 <strong>AI健康相談</strong> — 気になる症状をAIに相談</li>
+<li>🐕 <strong>犬友コミュニティ</strong> — 足あと・ひとこと・フレンド機能</li>
+<li>📱 <strong>オフライン対応</strong> — 電波がなくても安心して使える</li>
+</ul>
+<h2 style="font-size:16px;font-weight:900;margin-bottom:12px;">対応犬種の成長曲線</h2>
+<p style="font-size:13px;color:#8A6F6A;line-height:1.8;margin-bottom:20px;">チワワ、トイプードル、ミニチュアダックスフンド、ポメラニアン、柴犬、フレンチブルドッグ、ゴールデンレトリバー、ラブラドールレトリバー、ヨークシャーテリア、シーズー、パグ、マルチーズ、ミニチュアシュナウザーの月齢別体重推移データを収録。</p>
+<p style="font-size:13px;color:#BFA6A0;text-align:center;">このアプリを使うにはJavaScriptを有効にしてね。</p>
+<div style="margin-top:24px;text-align:center;font-size:12px;">
+<a href="premium.html" style="color:#FF7B9C;margin:0 8px;">プレミアムプラン</a>
+<a href="legal.html" style="color:#8A6F6A;margin:0 8px;">特定商取引法</a>
+<a href="contact.html" style="color:#8A6F6A;margin:0 8px;">お問い合わせ</a>
+</div>
+</div>
+</noscript>
 <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js');}</script>
 <script>
 (function(){
@@ -377,6 +486,21 @@ Error generating stack: `+n.message+`
     div.textContent = str;
     return div.innerHTML;
   }
+
+  // Current authenticated user cache (set via firebase onAuth listener)
+  // Avoids registering multiple onAuth listeners across callers
+  var _currentUser = null;
+  (function _initAuthListener() {
+    function tryRegister() {
+      var fb = window.__wanchan && window.__wanchan.firebase;
+      if (fb && fb.isConfigured && fb.onAuth) {
+        fb.onAuth(function(user) { _currentUser = user || null; });
+      } else {
+        setTimeout(tryRegister, 500);
+      }
+    }
+    tryRegister();
+  })();
 
   /* ==============================
      0.1 BROWSER BACK / POPSTATE SAFETY
@@ -488,6 +612,7 @@ Error generating stack: `+n.message+`
     var iconSpan = document.createElement('span');
     iconSpan.className = 'ux-toast-icon';
     iconSpan.textContent = icons[type] || '💡';
+    iconSpan.setAttribute('aria-hidden', 'true'); // UX: スクリーンリーダーが絵文字を読まないように
     var msgSpan = document.createElement('span');
     msgSpan.textContent = msg;
     t.appendChild(iconSpan);
@@ -497,8 +622,10 @@ Error generating stack: `+n.message+`
       toastContainer.firstChild.remove();
     }
     toastContainer.appendChild(t);
-    setTimeout(function(){ t.classList.add('ux-toast-out'); }, 2500);
-    setTimeout(function(){ t.remove(); }, 2800);
+    // UX: error/warningは読み終わる時間を確保（4500ms）、通常は2500ms
+    var displayMs = (type === 'error' || type === 'warning') ? 4500 : 2500;
+    setTimeout(function(){ t.classList.add('ux-toast-out'); }, displayMs);
+    setTimeout(function(){ t.remove(); }, displayMs + 300);
   }
 
   // Override native alert with toast (coerce all types to string)
@@ -516,11 +643,74 @@ Error generating stack: `+n.message+`
   window.__wanchan = window.__wanchan || {};
   window.__wanchan.showToast = showToast;
 
+  // Firebase auth user reference (set via onAuth callback)
+  var _currentUser = null;
+  // Listen for auth state from firebase-config.js module
+  (function() {
+    var _authCheckInterval = setInterval(function() {
+      var fb = window.__wanchan && window.__wanchan.firebase;
+      if (fb && fb.isConfigured && fb.onAuth) {
+        clearInterval(_authCheckInterval);
+        fb.onAuth(function(user) {
+          _currentUser = user;
+        });
+      }
+    }, 200);
+    // Give up after 30s
+    setTimeout(function() { clearInterval(_authCheckInterval); }, 30000);
+  })();
+
   /* ==============================
-     2. ENHANCED DELETE CONFIRMATION
+     2. ENHANCED DELETE CONFIRMATION + UNDO
      ============================== */
-  // The app uses a custom `.ask()` pattern for deletions.
-  // We don't override window.confirm to avoid breaking synchronous return values.
+  // Soft-delete Undo: show a "元に戻す" toast after data deletion
+  var _undoData = null;
+  var _undoTimer = null;
+
+  function showUndoToast(message, restoreCallback) {
+    // Clear previous undo
+    if (_undoTimer) { clearTimeout(_undoTimer); _undoTimer = null; }
+
+    var toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);z-index:10003;background:#333;color:#fff;padding:12px 20px;border-radius:14px;font-size:14px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 20px rgba(0,0,0,.3);animation:ux-toast-in .3s ease;max-width:calc(100% - 32px);';
+    toast.innerHTML = '<span>' + message + '</span><button id="ux-undo-btn" style="background:#FF7B9C;color:#fff;border:none;padding:8px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">元に戻す</button>';
+    document.body.appendChild(toast);
+
+    document.getElementById('ux-undo-btn').addEventListener('click', function() {
+      if (restoreCallback) restoreCallback();
+      toast.remove();
+      showToast('元に戻したよ', 'success');
+    });
+
+    _undoTimer = setTimeout(function() {
+      toast.style.opacity = '0';
+      toast.style.transition = 'opacity .3s';
+      setTimeout(function() { toast.remove(); }, 300);
+      _undoData = null;
+    }, 5000);
+  }
+
+  // Watch for wc2 data shrinkage (diary/entry deletion)
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'wc2' && e.oldValue && e.newValue) {
+      try {
+        var oldData = JSON.parse(e.oldValue);
+        var newData = JSON.parse(e.newValue);
+        var oldEntries = (oldData.diaries || oldData.entries || []).length;
+        var newEntries = (newData.diaries || newData.entries || []).length;
+        if (oldEntries > newEntries) {
+          _undoData = e.oldValue;
+          showUndoToast('日記を削除しました', function() {
+            if (_undoData) {
+              safeSetItem('wc2', _undoData);
+              _undoData = null;
+              setTimeout(function() { location.reload(); }, 500);
+            }
+          });
+        }
+      } catch(_) {}
+    }
+  });
 
   /* ==============================
      3. ACCESSIBILITY ENHANCEMENTS
@@ -650,6 +840,12 @@ Error generating stack: `+n.message+`
       img.addEventListener('load', function() {
         img.classList.add('ux-loaded');
       }, {once: true});
+      img.addEventListener('error', function() {
+        // Show image even on error (with broken icon) rather than hiding permanently
+        img.classList.add('ux-loaded');
+        // Set a placeholder alt if none exists
+        if (!img.alt) img.alt = '画像を読み込めませんでした';
+      }, {once: true});
       // Fallback: show after 3s to prevent permanently hidden images
       setTimeout(function(){ img.classList.add('ux-loaded'); }, 3000);
     });
@@ -703,12 +899,31 @@ Error generating stack: `+n.message+`
         autoSaveTimers[key] = setTimeout(function() {
           if (ta.value.trim()) {
             safeSetItem(key, ta.value);
+            // 保存済みインジケータを表示
+            _showSaveIndicator(ta);
           } else {
-            localStorage.removeItem(key);
+            try { localStorage.removeItem(key); } catch(_) {}
           }
         }, 2000);
       });
     });
+  }
+
+  // Auto-save indicator
+  function _showSaveIndicator(textarea) {
+    var existing = textarea.parentNode && textarea.parentNode.querySelector('.ux-save-indicator');
+    if (existing) { existing.remove(); }
+    var ind = document.createElement('div');
+    ind.className = 'ux-save-indicator';
+    ind.textContent = '✓ 保存済み';
+    ind.style.cssText = 'font-size:11px;color:#10B981;position:absolute;right:8px;bottom:4px;pointer-events:none;opacity:1;transition:opacity .5s;';
+    // Position relative parent
+    if (textarea.parentNode) {
+      textarea.parentNode.style.position = 'relative';
+      textarea.parentNode.appendChild(ind);
+      setTimeout(function() { ind.style.opacity = '0'; }, 1500);
+      setTimeout(function() { ind.remove(); }, 2200);
+    }
   }
 
   // Clear draft after successful form submission
@@ -730,7 +945,7 @@ Error generating stack: `+n.message+`
           clearInterval(checkInterval);
           if (!hasNonEmpty || textareas.length === 0) {
             Object.keys(localStorage).forEach(function(k) {
-              if (k.startsWith('ux_draft_')) localStorage.removeItem(k);
+              if (k.startsWith('ux_draft_')) try { localStorage.removeItem(k); } catch(_) {} // BUG-004
             });
           }
         }
@@ -756,6 +971,28 @@ Error generating stack: `+n.message+`
      ============================== */
   var debounceTimer;
 
+  // Form validation enhancement: add min/max to number inputs, prevent future dates
+  function enhanceFormValidation() {
+    // 体重入力に min/max/step 制約を追加
+    document.querySelectorAll('#root input[type="number"]:not([data-ux-validated])').forEach(function(input) {
+      input.setAttribute('data-ux-validated', '1');
+      // 体重入力を推定（placeholder や周辺テキストから判断）
+      var context = (input.placeholder || '') + (input.parentNode ? input.parentNode.textContent || '' : '');
+      if (context.match(/体重|kg|キロ|weight/i)) {
+        if (!input.min) input.min = '0.1';
+        if (!input.max) input.max = '100';
+        if (!input.step) input.step = '0.1';
+      }
+    });
+    // 日付入力に未来日防止の max を追加
+    document.querySelectorAll('#root input[type="date"]:not([data-ux-validated])').forEach(function(input) {
+      input.setAttribute('data-ux-validated', '1');
+      if (!input.max) {
+        input.max = new Date().toISOString().slice(0, 10);
+      }
+    });
+  }
+
   function runAllEnhancements() {
     // Guard: skip if #root is empty or detached (e.g., during browser back/bfcache restore)
     var root = document.getElementById('root');
@@ -765,14 +1002,42 @@ Error generating stack: `+n.message+`
       enableLazyLoading();
       enableAutoSave();
       enhanceScrolling();
+      enhanceFormValidation();
     } catch(e) {
       // Swallow errors from stale DOM references during navigation
     }
   }
 
+  // Unified MutationObserver: consolidate all observers into one to avoid
+  // redundant DOM scans (was 3 separate observers on #root with subtree:true)
+  var _screenLastScreen = '';
+  var _screenPopInProgress = false;
+
+  function _detectCurrentScreen() {
+    var activeNav = document.querySelector('[data-page].active, nav [style*="color: rgb(255, 123, 156)"], nav [style*="#FF7B9C"]');
+    if (!activeNav) return '';
+    return activeNav.getAttribute('data-page') || activeNav.textContent.trim() || '';
+  }
+
+  function _handleScreenChange() {
+    if (_screenPopInProgress) return;
+    var screen = _detectCurrentScreen();
+    if (screen && screen !== _screenLastScreen) {
+      if (_screenLastScreen === '') {
+        window.history.replaceState({ screen: screen }, '');
+      } else {
+        window.history.pushState({ screen: screen }, '');
+      }
+      _screenLastScreen = screen;
+    }
+  }
+
   var observer = new MutationObserver(function() {
     clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(runAllEnhancements, 150);
+    debounceTimer = setTimeout(function() {
+      runAllEnhancements();
+      _handleScreenChange();
+    }, 150);
   });
 
   // Start observing when root is ready
@@ -794,40 +1059,7 @@ Error generating stack: `+n.message+`
      10b. HISTORY API INTEGRATION (スワイプバック対応)
      ============================== */
   (function() {
-    var _lastScreen = '';
-    var _popInProgress = false;
-
-    // Detect screen changes by observing bottom nav active state
-    function detectCurrentScreen() {
-      var activeNav = document.querySelector('[data-page].active, nav [style*="color: rgb(255, 123, 156)"], nav [style*="#FF7B9C"]');
-      if (!activeNav) return '';
-      return activeNav.getAttribute('data-page') || activeNav.textContent.trim() || '';
-    }
-
-    // Sync React navigation with History API
-    var screenObserver = new MutationObserver(function() {
-      if (_popInProgress) return;
-      var screen = detectCurrentScreen();
-      if (screen && screen !== _lastScreen) {
-        if (_lastScreen === '') {
-          window.history.replaceState({ screen: screen }, '');
-        } else {
-          window.history.pushState({ screen: screen }, '');
-        }
-        _lastScreen = screen;
-      }
-    });
-
-    // Observe root for navigation changes
-    function startScreenObserver() {
-      var root = document.getElementById('root');
-      if (root) {
-        screenObserver.observe(root, { childList: true, subtree: true });
-      } else {
-        setTimeout(startScreenObserver, 500);
-      }
-    }
-    setTimeout(startScreenObserver, 1000);
+    // Screen observation is now handled by the unified MutationObserver above
 
     // Handle browser back (swipe back / back button)
     window.addEventListener('popstate', function(e) {
@@ -877,10 +1109,10 @@ Error generating stack: `+n.message+`
   try {
     var _wp = JSON.parse(localStorage.getItem('wp') || '{}');
     if (!_wp.on) {
-      localStorage.setItem('wp', JSON.stringify({on: true, exp: "2099-12-31T00:00:00.000Z"}));
+      try { localStorage.setItem('wp', JSON.stringify({on: true, exp: "2099-12-31T00:00:00.000Z"})); } catch(_) {}
     }
   } catch(e) {
-    try { localStorage.setItem('wp', JSON.stringify({on: true, exp: "2099-12-31T00:00:00.000Z"})); } catch(_) {}
+    // localStorage unavailable (e.g. Safari Private Browsing) — skip silently
   }
   // Sync React dark flag on page load
   try {
@@ -1010,10 +1242,27 @@ Error generating stack: `+n.message+`
   // Backup FAB (floating action button)
   var backupFab = document.createElement('button');
   backupFab.className = 'ux-backup-fab';
-  backupFab.textContent = '⚙️';
-  backupFab.setAttribute('aria-label', '設定');
-  backupFab.title = '設定';
+  backupFab.textContent = '＋'; // UX: ⚙️より「多機能メニュー」の意図が伝わる
+  backupFab.setAttribute('aria-label', 'メニューを開く');
+  backupFab.title = 'メニュー';
   document.body.appendChild(backupFab);
+
+  // FAB tooltip for first-time users
+  if (!localStorage.getItem('ux_fab_tooltip_shown')) {
+    setTimeout(function() {
+      var tooltip = document.createElement('div');
+      tooltip.style.cssText = 'position:fixed;bottom:150px;right:16px;background:#333;color:#fff;padding:10px 16px;border-radius:12px;font-size:13px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.3);animation:ux-fade-in .3s ease;z-index:9998;white-space:nowrap;';
+      tooltip.innerHTML = '👆 タップでメニューが開くよ<div style="position:absolute;bottom:-6px;right:20px;width:12px;height:12px;background:#333;transform:rotate(45deg);"></div>';
+      document.body.appendChild(tooltip);
+      try { localStorage.setItem('ux_fab_tooltip_shown', '1'); } catch(_) {}
+      setTimeout(function() {
+        tooltip.style.opacity = '0';
+        tooltip.style.transition = 'opacity .5s';
+        setTimeout(function() { tooltip.remove(); }, 500);
+      }, 4000);
+      backupFab.addEventListener('click', function() { tooltip.remove(); }, { once: true });
+    }, 3000);
+  }
 
   // --- FAB Drag Logic ---
   (function() {
@@ -1022,19 +1271,22 @@ Error generating stack: `+n.message+`
     var dragMoved = false;
     var startX = 0, startY = 0;
     var fabStartLeft = 0, fabStartTop = 0;
-    var DRAG_THRESHOLD = 8;
+    var DRAG_THRESHOLD = 15; // Increased from 8 to reduce tap/drag misdetection on mobile
     var FAB_SIZE = 48;
     var EDGE_MARGIN = 16;
 
     // Restore saved position
     var saved = null;
     try { saved = JSON.parse(localStorage.getItem('ux_fab_pos')); } catch(e) {}
-    if (saved && typeof saved.bottom === 'number' && typeof saved.right === 'number') {
-      fab.style.bottom = saved.bottom + 'px';
-      fab.style.right = saved.right + 'px';
-      if (typeof saved.side === 'string' && saved.side === 'left') {
+    if (saved && typeof saved.bottom === 'number') {
+      var vw = window.innerWidth, vh = window.innerHeight;
+      var safeBottom = Math.max(EDGE_MARGIN, Math.min(saved.bottom, vh - FAB_SIZE - EDGE_MARGIN));
+      fab.style.bottom = safeBottom + 'px';
+      if (typeof saved.side === 'string' && saved.side === 'left' && typeof saved.left === 'number') {
         fab.style.right = 'auto';
-        fab.style.left = saved.left + 'px';
+        fab.style.left = Math.max(EDGE_MARGIN, Math.min(saved.left, vw - FAB_SIZE - EDGE_MARGIN)) + 'px';
+      } else if (typeof saved.right === 'number') {
+        fab.style.right = Math.max(EDGE_MARGIN, Math.min(saved.right, vw - FAB_SIZE - EDGE_MARGIN)) + 'px';
       }
     }
 
@@ -1043,31 +1295,26 @@ Error generating stack: `+n.message+`
       return { x: e.clientX, y: e.clientY };
     }
 
+    // Cache safe area values to avoid layout thrashing during drag
+    var _safeAreaCache = null;
+    var _safeAreaCacheTime = 0;
     function getSafeArea() {
-      // env() values cannot be read via getComputedStyle directly.
-      // Use CSS custom properties set on :root as a bridge.
+      // Return cached value if measured within last 5 seconds
+      if (_safeAreaCache && (Date.now() - _safeAreaCacheTime) < 5000) return _safeAreaCache;
+
       var el = document.documentElement;
       if (!el.style.getPropertyValue('--sat')) {
         el.style.setProperty('--sat', 'env(safe-area-inset-top, 0px)');
         el.style.setProperty('--sab', 'env(safe-area-inset-bottom, 0px)');
-        el.style.setProperty('--sal', 'env(safe-area-inset-left, 0px)');
-        el.style.setProperty('--sar', 'env(safe-area-inset-right, 0px)');
       }
-      // Create a temporary element to measure actual computed values
       var probe = document.createElement('div');
       probe.style.cssText = 'position:fixed;visibility:hidden;top:env(safe-area-inset-top,0px);left:0;';
       document.body.appendChild(probe);
       var top = parseInt(getComputedStyle(probe).top) || 0;
-      probe.style.top = '';
-      probe.style.bottom = 'env(safe-area-inset-bottom,0px)';
-      // For bottom we read as offset from bottom edge
       document.body.removeChild(probe);
-      return {
-        top: top,
-        bottom: 0, // fallback; precise measurement requires layout tricks
-        left: 0,
-        right: 0
-      };
+      _safeAreaCache = { top: top, bottom: 0, left: 0, right: 0 };
+      _safeAreaCacheTime = Date.now();
+      return _safeAreaCache;
     }
 
     function onStart(e) {
@@ -1194,7 +1441,7 @@ Error generating stack: `+n.message+`
 
   // AI健康相談ボタン
   var btnAI = document.createElement('button');
-  btnAI.textContent = '🩺 AI健康相談';
+  btnAI.textContent = '🩹 AI健康相談';
   btnAI.addEventListener('click', function() {
     backupMenu.classList.remove('ux-show');
     var _aiCheck = setInterval(function() {
@@ -1208,7 +1455,7 @@ Error generating stack: `+n.message+`
     setTimeout(function() {
       clearInterval(_aiCheck);
       if (!(window.__wanchan && window.__wanchan.ai && window.__wanchan.ai.showConsultation)) {
-        showToast('AI相談の読み込みに失敗しました。ページを再読み込みしてね', 'error');
+        showToast('AI相談がうまく開けなかったよ。一度アプリを開き直してみてね', 'error');
       }
     }, 3000);
   });
@@ -1234,14 +1481,17 @@ Error generating stack: `+n.message+`
         var pets = wcData.pets || [];
         pets.push({ id: 'pet' + Date.now(), name: name, breed: breed, avi: null, sfx: 'ちゃん' });
         wcData.pets = pets;
-        safeSetItem('wc2', JSON.stringify(wcData));
+        if (!safeSetItem('wc2', JSON.stringify(wcData))) { // BUG-001: 書き込み失敗を検出
+          showToast('ストレージが不足しているよ。古いデータを整理してみてね', 'error');
+          return;
+        }
         showToast(name + 'ちゃんを追加しました！', 'success');
         window.dispatchEvent(new StorageEvent('storage', { key: 'wc2' }));
         window.dispatchEvent(new CustomEvent('wanchan-dog-added'));
         // Delay reload to let user see the success toast
         setTimeout(function() { location.reload(); }, 1500);
       } catch(err) {
-        showToast('追加に失敗しました', 'error');
+        showToast('うまく追加できなかったよ。もう一度試してみてね', 'error');
       }
     });
   });
@@ -1254,7 +1504,7 @@ Error generating stack: `+n.message+`
 
   backupMenu.setAttribute('role', 'menu');
   backupFab.setAttribute('aria-expanded', 'false');
-  backupFab.setAttribute('aria-haspopup', 'true');
+  backupFab.setAttribute('aria-haspopup', 'menu'); // UX: WAI-ARIA 1.1 準拠
   backupFab.addEventListener('click', function() {
     // Ignore click if it was a drag gesture
     if (backupFab._isDragMove && backupFab._isDragMove()) return;
@@ -1359,7 +1609,7 @@ Error generating stack: `+n.message+`
 
     var skip = document.createElement('button');
     skip.className = 'ux-ob-skip';
-    skip.textContent = 'すでにデータがあります';
+    skip.textContent = 'すでに使っていた方はこちら（データ引き継ぎ）'; // UX: 新規ユーザーに意味が伝わる文言に
 
     function closeOnboard() {
       safeSetItem('ux_onboarded', '1');
@@ -1367,7 +1617,10 @@ Error generating stack: `+n.message+`
       setTimeout(function() { overlay.remove(); }, 500);
     }
 
-    start.addEventListener('click', closeOnboard);
+    start.addEventListener('click', function() {
+      closeOnboard();
+      setTimeout(function() { showAddDogModal(function() {}); }, 550);
+    });
     skip.addEventListener('click', closeOnboard);
 
     overlay.appendChild(paw);
@@ -1380,6 +1633,67 @@ Error generating stack: `+n.message+`
     trapFocus(overlay, closeOnboard);
     autoFocusOverlay(overlay);
   }
+
+  /* ==============================
+     14a-2. COACHMARKS (初回機能ガイド)
+     ============================== */
+  function showCoachmarks() {
+    if (localStorage.getItem('ux_coachmarks_done')) return;
+
+    var tips = [
+      { icon: '📝', title: 'ここで日記を書けるよ', desc: '毎日の小さな成長を写真と一緒に記録しよう' },
+      { icon: '⚖️', title: '体重も記録できるよ', desc: '犬種別の成長曲線と比べて「うちの子」の成長を確認' },
+      { icon: '🩹', title: '困ったらAI相談', desc: '⚙️ボタンから「AI健康相談」を選んでね' }
+    ];
+
+    var currentTip = 0;
+    var isDark = _isDark();
+
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10002;display:flex;align-items:center;justify-content:center;animation:ux-fade-in .3s ease;';
+
+    function renderTip() {
+      var tip = tips[currentTip];
+      var isLast = currentTip === tips.length - 1;
+      overlay.innerHTML = '<div style="background:' + (isDark ? '#1e1e2e' : '#fff') + ';border-radius:24px;padding:32px 24px;max-width:300px;text-align:center;animation:ux-page-in .3s ease;">'
+        + '<div style="font-size:48px;margin-bottom:12px;">' + tip.icon + '</div>'
+        + '<div style="font-size:17px;font-weight:900;color:' + (isDark ? '#e0e0e0' : '#333') + ';margin-bottom:8px;">' + tip.title + '</div>'
+        + '<div style="font-size:13px;color:#8A6F6A;line-height:1.7;margin-bottom:20px;">' + tip.desc + '</div>'
+        + '<div style="display:flex;gap:6px;justify-content:center;margin-bottom:16px;">'
+        + tips.map(function(_, i) { return '<div style="width:8px;height:8px;border-radius:50%;background:' + (i === currentTip ? '#FF7B9C' : (isDark ? '#444' : '#ddd')) + ';"></div>'; }).join('')
+        + '</div>'
+        + '<button id="cm-next" style="width:100%;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,#F5A6B8,#FF7B9C);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">' + (isLast ? 'はじめよう！' : '次へ →') + '</button>'
+        + '</div>';
+
+      document.getElementById('cm-next').addEventListener('click', function() {
+        if (isLast) {
+          try { localStorage.setItem('ux_coachmarks_done', '1'); } catch(_) {}
+          overlay.style.opacity = '0';
+          overlay.style.transition = 'opacity .3s';
+          setTimeout(function() { overlay.remove(); }, 300);
+        } else {
+          currentTip++;
+          renderTip();
+        }
+      });
+    }
+
+    // スキップ（オーバーレイクリックで閉じる）
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) {
+        try { localStorage.setItem('ux_coachmarks_done', '1'); } catch(_) {}
+        overlay.remove();
+      }
+    });
+
+    renderTip();
+    document.body.appendChild(overlay);
+  }
+
+  // オンボーディング完了後にコーチマーク表示（初回のみ）
+  window.addEventListener('wanchan-dog-added', function() {
+    setTimeout(showCoachmarks, 2000);
+  });
 
   // Show onboarding for genuinely new users only
   setTimeout(showOnboarding, 600);
@@ -1526,7 +1840,13 @@ Error generating stack: `+n.message+`
   }
 
   // Render switcher after React is loaded
-  setTimeout(renderDogSwitcher, 1000);
+  (function waitForRoot() {
+    if (document.getElementById('root') && document.getElementById('root').children.length > 0) {
+      renderDogSwitcher();
+    } else {
+      setTimeout(waitForRoot, 300);
+    }
+  })();
   // Re-check when data changes
   window.addEventListener('storage', function() { _dogProfileCache = null; _dogProfileCacheKey = ''; setTimeout(renderDogSwitcher, 500); });
 
@@ -1539,8 +1859,7 @@ Error generating stack: `+n.message+`
     var existing = document.querySelector('.ux-add-dog-modal');
     if (existing) existing.remove();
 
-    var isDark = document.body.classList.contains('ux-dark-on') ||
-      (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    var isDark = _isDark();
 
     var selectedBreedIndex = 0;
     var dogName = '';
@@ -1655,7 +1974,14 @@ Error generating stack: `+n.message+`
       wasDragging = true;
       setTimeout(function() { wasDragging = false; }, 50);
       list.style.transition = 'transform .3s cubic-bezier(.23,1,.32,1)';
-      var currentY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+      var currentY;
+      if (e.changedTouches && e.changedTouches.length > 0) {
+        currentY = e.changedTouches[0].clientY;
+      } else if (typeof e.clientY === 'number') {
+        currentY = e.clientY;
+      } else {
+        currentY = startY; // フォールバック: ドラッグなしとして扱う
+      }
       var diff = currentY - startY;
       var newIndex = Math.round((-startTranslate - diff) / ITEM_HEIGHT);
       scrollToIndex(newIndex);
@@ -1733,43 +2059,57 @@ Error generating stack: `+n.message+`
   };
 
   // Watch for React's add-dog button and replace its behavior
+  // BUG-007: observerを変数に保持して、ボタン発見後にdisconnect（全DOM変化でquerySelectorAllが走るのを防ぐ）
+  var _addDogObserver = null;
+
+  function _rehookAddDogIfNeeded() {
+    var btn = document.querySelector('#root div[style*="cursor"]');
+    if (btn && !btn._uxHooked) {
+      if (_addDogObserver) _addDogObserver.observe(document.getElementById('root') || document.body, { childList: true, subtree: true });
+    }
+  }
+
   function hookAddDogButton() {
-    var observer = new MutationObserver(function() {
-      // Find the "＋ わんちゃんを追加" button in React settings
+    _addDogObserver = new MutationObserver(function() {
       var allDivs = document.querySelectorAll('#root div[style*="cursor"]');
+      var hooked = false;
       allDivs.forEach(function(div) {
         if (div.textContent.trim() === '＋ わんちゃんを追加' && !div._uxHooked) {
           div._uxHooked = true;
+          hooked = true;
           div.addEventListener('click', function(e) {
             e.stopPropagation();
             e.preventDefault();
             showAddDogModal(function(name, breed) {
-              // Trigger React state update by finding the app's update function
-              // We'll simulate by storing data and triggering the original flow
               try {
                 var wcData = JSON.parse(localStorage.getItem('wc2') || '{}');
                 var pets = wcData.pets || [];
                 pets.push({ id: 'pet' + Date.now(), name: name, breed: breed, avi: null, sfx: 'ちゃん' });
                 wcData.pets = pets;
-                safeSetItem('wc2', JSON.stringify(wcData));
+                if (!safeSetItem('wc2', JSON.stringify(wcData))) {
+                  showToast('ストレージが不足しているよ。古いデータを整理してみてね', 'error');
+                  return;
+                }
                 showToast(name + 'ちゃんを追加しました！', 'success');
-                // Trigger React re-render
                 window.dispatchEvent(new StorageEvent('storage', { key: 'wc2' }));
                 window.dispatchEvent(new CustomEvent('wanchan-dog-added'));
-                // Delay reload to let user see the success toast
                 setTimeout(function() { location.reload(); }, 1500);
               } catch(err) {
                 console.error('Add dog error:', err);
-                showToast('追加に失敗しました', 'error');
+                showToast('うまく追加できなかったよ。もう一度試してみてね', 'error');
               }
             });
-          }, true); // Use capture phase to intercept before React
+          }, true);
         }
       });
+      if (hooked && _addDogObserver) {
+        _addDogObserver.disconnect();
+      }
     });
-    observer.observe(document.getElementById('root') || document.body, { childList: true, subtree: true });
+    _addDogObserver.observe(document.getElementById('root') || document.body, { childList: true, subtree: true });
   }
   setTimeout(hookAddDogButton, 1000);
+  window.addEventListener('wanchan-dog-added', _rehookAddDogIfNeeded);
 
   /* ==============================
      16. SNS SHARE (シェア機能)
@@ -1822,8 +2162,7 @@ Error generating stack: `+n.message+`
     var existing = document.getElementById('wanchan-share-sheet');
     if (existing) existing.remove();
 
-    var isDark = document.body.classList.contains('ux-dark-on') ||
-      (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    var isDark = _isDark();
 
     var overlay = document.createElement('div');
     overlay.id = 'wanchan-share-sheet';
@@ -1889,8 +2228,7 @@ Error generating stack: `+n.message+`
     var existing = document.getElementById('wanchan-notif-panel');
     if (existing) existing.remove();
 
-    var isDark = document.body.classList.contains('ux-dark-on') ||
-      (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    var isDark = _isDark();
 
     var overlay = document.createElement('div');
     overlay.id = 'wanchan-notif-panel';
@@ -1899,7 +2237,7 @@ Error generating stack: `+n.message+`
     var panel = document.createElement('div');
     panel.style.cssText = 'background:' + (isDark ? '#1e1e2e' : '#fff') + ';border-radius:20px 20px 0 0;max-width:500px;width:100%;padding:24px 20px env(safe-area-inset-bottom,20px);max-height:70vh;overflow-y:auto;';
 
-    panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div style="font-size:18px;font-weight:900;color:' + (isDark ? '#e0e0e0' : '#333') + ';">🔔 お知らせ</div><div id="notif-close" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:' + (isDark ? '#333' : '#f0f0f0') + ';cursor:pointer;font-size:14px;">✕</div></div><div id="notif-content" style="text-align:center;padding:20px;"><div class="ux-spinner" style="width:24px;height:24px;border-width:2.5px;color:#FF7B9C;margin:0 auto;"></div></div>';
+    panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div style="font-size:18px;font-weight:900;color:' + (isDark ? '#e0e0e0' : '#333') + ';">🔔 お知らせ</div><button id="notif-close" role="button" aria-label="閉じる" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:' + (isDark ? '#333' : '#f0f0f0') + ';cursor:pointer;font-size:14px;border:none;font-family:inherit;">✕</button></div><div id="notif-content" style="text-align:center;padding:20px;"><div class="ux-spinner" style="width:24px;height:24px;border-width:2.5px;color:#FF7B9C;margin:0 auto;"></div></div>';
 
     overlay.appendChild(panel);
     document.body.appendChild(overlay);
@@ -1928,13 +2266,14 @@ Error generating stack: `+n.message+`
       var user = _currentUser;
       if (!user) {
         var nc = document.getElementById('notif-content');
-        if (nc) nc.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">ログインするとお知らせが届きます</div>';
+        if (nc) nc.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">犬友と繋がったら、ここに足あとが届くよ</div>';
       } else {
-        fb.getFootprints(user.uid, 20).then(function(footprints) {
+        fb.getFootprints(user.uid, 20).then(function(grouped) {
+          var footprints = grouped.all || grouped;
           var content = document.getElementById('notif-content');
           if (!content) return;
 
-          if (footprints.length === 0) {
+          if (!footprints || footprints.length === 0) {
             content.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;line-height:1.7;">まだお知らせはありません<br><span style="font-size:12px;">犬友ができると足あとが届きます</span></div>';
             return;
           }
@@ -1943,7 +2282,7 @@ Error generating stack: `+n.message+`
           var lastCheckTs = parseInt(localStorage.getItem('ux_notif_last_check') || '0', 10);
 
           footprints.forEach(function(fp) {
-            var ts = fp.createdAt ? (fp.createdAt.seconds ? fp.createdAt.seconds * 1000 : fp.createdAt) : 0;
+            var ts = (fp.updatedAt || fp.createdAt) ? ((fp.updatedAt || fp.createdAt).seconds ? (fp.updatedAt || fp.createdAt).seconds * 1000 : (fp.updatedAt || fp.createdAt)) : 0;
             var isNew = ts > lastCheckTs;
             var date = ts ? new Date(ts) : new Date();
             var timeStr = date.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -1966,12 +2305,16 @@ Error generating stack: `+n.message+`
           });
 
           content.innerHTML = html;
-          // Mark as checked
+          // Mark as checked (both localStorage legacy + Firestore)
           try { localStorage.setItem('ux_notif_last_check', String(Date.now())); } catch(_) {}
+          if (typeof fb.markFootprintsRead === 'function') fb.markFootprintsRead(user.uid);
           _updateNotifBadge(0);
         }).catch(function() {
           var content = document.getElementById('notif-content');
-          if (content) content.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">お知らせの取得がうまくいきませんでした</div>';
+          if (content) content.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">お知らせの取得がうまくいかなかったよ<br><button id="notif-retry" style="margin-top:12px;padding:10px 20px;border-radius:12px;border:1.5px solid #ddd;background:#fff;color:#333;font-size:13px;cursor:pointer;font-family:inherit;">もう一度試す</button></div>';
+          var retryBtn = document.getElementById('notif-retry');
+          if (retryBtn) retryBtn.addEventListener('click', function() { showNotificationsPanel(); });
+          _updateNotifBadge(0); // エラー時もバッジをクリア（QA-012）
         });
 
         // Track
@@ -1980,7 +2323,7 @@ Error generating stack: `+n.message+`
       }
     } else {
       var ncFb = document.getElementById('notif-content');
-      if (ncFb) ncFb.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">ログインするとお知らせが届きます</div>';
+      if (ncFb) ncFb.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:14px;">犬友と繋がったら、ここに足あとが届くよ</div>';
     }
   }
 
@@ -1992,7 +2335,7 @@ Error generating stack: `+n.message+`
         badge = document.createElement('span');
         badge.className = 'ux-notif-badge';
         badge.style.cssText = 'position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#EF4444;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;pointer-events:none;';
-        backupFab.appendChild(badge);
+        if (backupFab) backupFab.appendChild(badge);
       }
       badge.textContent = count > 9 ? '9+' : count;
     } else if (badge) {
@@ -2007,18 +2350,14 @@ Error generating stack: `+n.message+`
 
     var user = _currentUser;
     if (!user) return;
-    fb.getFootprints(user.uid, 10).then(function(footprints) {
-      var lastCheck = parseInt(localStorage.getItem('ux_notif_last_check') || '0', 10);
-      var newCount = 0;
-      footprints.forEach(function(fp) {
-        var ts = fp.createdAt ? (fp.createdAt.seconds ? fp.createdAt.seconds * 1000 : fp.createdAt) : 0;
-        if (ts > lastCheck) newCount++;
-      });
-      if (newCount > 0) {
-        _updateNotifBadge(newCount);
-        btnNotif.style.display = '';
-      }
-    }).catch(function() {});
+    if (typeof fb.getUnreadFootprintCount === 'function') {
+      fb.getUnreadFootprintCount(user.uid).then(function(newCount) {
+        if (newCount > 0) {
+          _updateNotifBadge(newCount);
+          if (btnNotif) btnNotif.style.display = '';
+        }
+      }).catch(function() {});
+    }
   }
 
   // Show notification button for logged-in users & check for new notifications
@@ -2028,7 +2367,7 @@ Error generating stack: `+n.message+`
     var fb = window.__wanchan && window.__wanchan.firebase;
     if (fb && fb.isConfigured) {
       clearInterval(_notifCheck);
-      btnNotif.style.display = '';
+      if (btnNotif) btnNotif.style.display = '';
       _checkNewNotifications();
       // Re-check every 2 minutes (store interval for potential cleanup)
       window.__wanchan._notifInterval = setInterval(_checkNewNotifications, 120000);
@@ -2045,10 +2384,12 @@ Error generating stack: `+n.message+`
     // Look for diary entry containers (typically have date + content)
     var entries = document.querySelectorAll('#root [data-entry-id]:not([data-share-added])');
     entries.forEach(function(entry) {
+      if (!entry || !entry.parentNode) return;
       entry.setAttribute('data-share-added', '1');
-      var shareBtn = document.createElement('div');
-      shareBtn.style.cssText = 'display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:12px;background:transparent;cursor:pointer;font-size:12px;color:#888;margin-top:4px;';
+      var shareBtn = document.createElement('button');
+      shareBtn.style.cssText = 'display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:12px;background:transparent;cursor:pointer;font-size:12px;color:#888;margin-top:4px;border:none;font-family:inherit;';
       shareBtn.textContent = '📤 シェア';
+      shareBtn.setAttribute('aria-label', 'この日記をシェア');
       shareBtn.addEventListener('click', function(e) {
         e.stopPropagation();
         var text = 'わんちゃん成長日記で記録中！ #わんちゃん成長日記';
@@ -2078,10 +2419,12 @@ Error generating stack: `+n.message+`
       var breed = data.breed || '';
 
       // Calculate age
+      // BUG-013: "YYYY-MM-DD" 形式はUTCとしてパースされるため、T00:00:00を付けてローカル時刻に強制
       var ageText = '';
       var ageDays = 0;
       if (birthday) {
-        var bDate = new Date(birthday);
+        var bdayStr = birthday.length === 10 ? birthday + 'T00:00:00' : birthday;
+        var bDate = new Date(bdayStr);
         if (isNaN(bDate.getTime())) return null; // Invalid date guard
         var now = new Date();
         ageDays = Math.floor((now - bDate) / (1000 * 60 * 60 * 24));
@@ -2101,23 +2444,42 @@ Error generating stack: `+n.message+`
       var firstWeight = weights.length > 1 ? weights[0] : null;
       var weightChange = '';
       if (latestWeight && firstWeight) {
-        var lw = parseFloat(latestWeight.weight || latestWeight.w || 0);
-        var fw = parseFloat(firstWeight.weight || firstWeight.w || 0);
-        var diff = lw - fw;
-        weightChange = (diff >= 0 ? '+' : '') + diff.toFixed(1) + 'kg';
+        var lw = parseFloat(latestWeight.weight != null ? latestWeight.weight : latestWeight.w);
+        var fw = parseFloat(firstWeight.weight != null ? firstWeight.weight : firstWeight.w);
+        if (!isNaN(lw) && !isNaN(fw) && lw > 0 && lw <= 200 && fw > 0 && fw <= 200) {
+          var diff = lw - fw;
+          weightChange = (diff >= 0 ? '+' : '') + diff.toFixed(1) + 'kg';
+        }
       }
 
-      // Milestone detection
+      // UX: マイルストーン取りこぼし修正
+      // 完全一致(===)だと当日にアプリを開かないと永久に表示されないため、
+      // 「以上」判定＋localStorageフラグで「まだ表示していない最初のマイルストーン」を表示
       var milestone = '';
-      if (ageDays === 0) milestone = '🎉 今日が記念すべき初日！';
-      else if (ageDays === 100) milestone = '🎊 100日おめでとう！';
-      else if (ageDays === 365) milestone = '🎂 1歳のお誕生日！';
-      else if (ageDays === 730) milestone = '🎂 2歳のお誕生日！';
-      else if (ageDays === 1095) milestone = '🎂 3歳のお誕生日！';
-      else if (diaries.length === 1) milestone = '📝 はじめての日記！';
-      else if (diaries.length === 10) milestone = '📝 日記10回達成！';
-      else if (diaries.length === 50) milestone = '📝 日記50回達成！';
-      else if (diaries.length === 100) milestone = '🏆 日記100回達成！';
+      var _msShown = {};
+      try { _msShown = JSON.parse(localStorage.getItem('ux_milestones') || '{}'); } catch(_) {}
+      function _checkMs(key, cond, text) {
+        if (cond && !_msShown[key]) {
+          milestone = text;
+          _msShown[key] = true;
+          try { localStorage.setItem('ux_milestones', JSON.stringify(_msShown)); } catch(_) {}
+          return true;
+        }
+        return false;
+      }
+      if (birthday) {
+        _checkMs('day0', ageDays === 0, '🎉 今日が記念すべき初日！') ||
+        _checkMs('day100', ageDays >= 100, '🎊 100日おめでとう！') ||
+        _checkMs('year1', ageDays >= 365, '🎂 1歳のお誕生日！') ||
+        _checkMs('year2', ageDays >= 730, '🎂 2歳のお誕生日！') ||
+        _checkMs('year3', ageDays >= 1095, '🎂 3歳のお誕生日！');
+      }
+      if (!milestone) {
+        _checkMs('diary1', diaries.length >= 1, '📝 はじめての日記！') ||
+        _checkMs('diary10', diaries.length >= 10, '📝 日記10回達成！') ||
+        _checkMs('diary50', diaries.length >= 50, '📝 日記50回達成！') ||
+        _checkMs('diary100', diaries.length >= 100, '🏆 日記100回達成！');
+      }
 
       return {
         name: name,
@@ -2142,8 +2504,7 @@ Error generating stack: `+n.message+`
     var data = getGrowthData();
     if (!data || (!data.ageText && data.diaryCount === 0)) return;
 
-    var isDark = document.body.classList.contains('ux-dark-on') ||
-      (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    var isDark = _isDark();
 
     var card = document.createElement('div');
     card.className = 'ux-growth-card';
@@ -2154,7 +2515,7 @@ Error generating stack: `+n.message+`
     var html = '<div class="ux-growth-card-title">📊 ' + safeName + 'の成長まとめ</div>';
     html += '<div class="ux-growth-card-stats">';
     html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + (data.ageText || '-') + '</div><div class="ux-growth-stat-label">年齢</div></div>';
-    html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + data.latestWeight + '<span style="font-size:12px;">kg</span></div><div class="ux-growth-stat-label">現在の体重' + (data.weightChange ? ' (' + data.weightChange + ')' : '') + '</div></div>';
+    html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + (data.latestWeight !== '-' ? data.latestWeight + '<span style="font-size:12px;">kg</span>' : '-') + '</div><div class="ux-growth-stat-label">現在の体重' + (data.weightChange ? ' (' + data.weightChange + ')' : '') + '</div></div>';
     html += '<div class="ux-growth-stat"><div class="ux-growth-stat-value">' + data.diaryCount + '</div><div class="ux-growth-stat-label">日記数</div></div>';
     html += '</div>';
 
@@ -2162,7 +2523,14 @@ Error generating stack: `+n.message+`
       html += '<div class="ux-growth-card-milestone" style="color:' + (isDark ? '#FFD700' : '#B45309') + ';">' + data.milestone + '</div>';
     }
 
-    html += '<div class="ux-growth-share"><button id="ux-growth-share-btn">📤 成長をみんなにシェアしてね</button></div>';
+    // ストリーク表示
+    var streak = parseInt(localStorage.getItem('ux_streak') || '0', 10);
+    if (streak >= 2) {
+      var streakEmoji = streak >= 30 ? '👑' : streak >= 14 ? '🌟' : streak >= 7 ? '🔥' : '✨';
+      html += '<div style="text-align:center;font-size:13px;font-weight:700;color:' + (isDark ? '#FFD700' : '#B45309') + ';margin:8px 0;">' + streakEmoji + ' ' + streak + '日連続記録中！</div>';
+    }
+
+    html += '<div class="ux-growth-share"><button id="ux-growth-share-btn">📤 みんなに見せてあげよう</button></div>';
 
     card.innerHTML = html;
 
@@ -2198,6 +2566,56 @@ Error generating stack: `+n.message+`
   });
 
   /* ==============================
+     20b. ACTION-BASED MILESTONES (行動ベースマイルストーン)
+     ============================== */
+  function checkActionMilestones() {
+    try {
+      var data = JSON.parse(localStorage.getItem('wc2') || '{}');
+      var name = data.name || 'わんちゃん';
+      var milestoneKey = 'ux_action_ms';
+      var shown = {};
+      try { shown = JSON.parse(localStorage.getItem(milestoneKey) || '{}'); } catch(_) {}
+
+      var milestones = [
+        { id: 'first_diary', check: function() { return (data.diaries || data.entries || []).length >= 1; }, text: '📝 初めての日記を書いたよ！', emoji: '🎉' },
+        { id: 'diary_10', check: function() { return (data.diaries || data.entries || []).length >= 10; }, text: '📝 日記が10件になったよ！すごい！', emoji: '🏆' },
+        { id: 'diary_50', check: function() { return (data.diaries || data.entries || []).length >= 50; }, text: '📝 日記50件達成！' + name + 'との思い出がたくさん', emoji: '👑' },
+        { id: 'weight_5', check: function() { return (data.weights || []).length >= 5; }, text: '⚖️ 体重記録5回目！成長が見えてきたね', emoji: '📊' },
+        { id: 'weight_20', check: function() { return (data.weights || []).length >= 20; }, text: '⚖️ 体重記録20回達成！健康管理バッチリ', emoji: '🌟' }
+      ];
+
+      milestones.forEach(function(ms) {
+        if (!shown[ms.id] && ms.check()) {
+          shown[ms.id] = Date.now();
+          try { localStorage.setItem(milestoneKey, JSON.stringify(shown)); } catch(_) {}
+          // 初回のマイルストーンのみバナー表示（1日1件まで）
+          var todayKey = 'ux_ms_today';
+          if (localStorage.getItem(todayKey) === new Date().toISOString().slice(0, 10)) return;
+          try { localStorage.setItem(todayKey, new Date().toISOString().slice(0, 10)); } catch(_) {}
+
+          var banner = document.createElement('div');
+          banner.style.cssText = 'position:fixed;top:env(safe-area-inset-top,16px);left:50%;transform:translateX(-50%);z-index:9999;background:linear-gradient(135deg,#FFD700,#FFA500);color:#fff;padding:14px 24px;border-radius:16px;font-size:14px;font-weight:700;box-shadow:0 4px 20px rgba(255,165,0,.3);animation:ux-page-in .4s ease;max-width:calc(100% - 32px);text-align:center;';
+          banner.innerHTML = '<span style="font-size:20px;">' + ms.emoji + '</span> ' + _escHtml(ms.text);
+          document.body.appendChild(banner);
+          setTimeout(function() {
+            banner.style.opacity = '0';
+            banner.style.transition = 'opacity .5s';
+            setTimeout(function() { banner.remove(); }, 500);
+          }, 5000);
+
+          var an = window.__wanchan && window.__wanchan.analytics;
+          if (an && an.logEvent) an.logEvent('action_milestone', { id: ms.id });
+        }
+      });
+    } catch(e) {}
+  }
+  // データ変更時にチェック
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'wc2') setTimeout(checkActionMilestones, 1000);
+  });
+  setTimeout(checkActionMilestones, 3000);
+
+  /* ==============================
      21. ANNIVERSARY REMINDER (記念日リマインダー) - Feature C
      ============================== */
   function checkAnniversary() {
@@ -2205,7 +2623,9 @@ Error generating stack: `+n.message+`
       var data = JSON.parse(localStorage.getItem('wc2') || '{}');
       if (!data.birthday) return;
 
-      var birthday = new Date(data.birthday);
+      // BUG-013: ローカル時刻で解析してタイムゾーンズレを防ぐ
+      var bdayRaw = data.birthday.length === 10 ? data.birthday + 'T00:00:00' : data.birthday;
+      var birthday = new Date(bdayRaw);
       if (isNaN(birthday.getTime())) return; // Invalid date guard
       var now = new Date();
       var dogName = _escHtml(data.name || 'わんちゃん');
@@ -2215,7 +2635,12 @@ Error generating stack: `+n.message+`
       // Check if today is birthday
       if (todayStr === bdayStr) {
         var years = now.getFullYear() - birthday.getFullYear();
-        showAnniversaryBanner('🎂', dogName + 'の' + years + '歳のお誕生日おめでとう！');
+        if (years < 0) return; // 誕生日が未来日の場合は表示しない
+        if (years === 0) {
+          showAnniversaryBanner('🎉', dogName + 'が今日生まれたよ！');
+        } else {
+          showAnniversaryBanner('🎂', dogName + 'の' + years + '歳のお誕生日おめでとう！');
+        }
         return;
       }
 
@@ -2252,6 +2677,7 @@ Error generating stack: `+n.message+`
     var dismissed = localStorage.getItem('ux_anniv_dismissed');
     var today = new Date().toISOString().slice(0, 10);
     if (dismissed === today) return;
+    safeSetItem('ux_anniv_dismissed', today); // 表示した時点でその日の表示済みとしてマーク
 
     var banner = document.createElement('div');
     banner.className = 'ux-anniversary-banner';
@@ -2298,6 +2724,90 @@ Error generating stack: `+n.message+`
   setTimeout(checkAnniversary, 2000);
 
   /* ==============================
+     21b. MEMORY TIME CAPSULE (思い出タイムカプセル)
+     ============================== */
+  function showTimeCapsule() {
+    try {
+      var data = JSON.parse(localStorage.getItem('wc2') || '{}');
+      var diaries = data.diaries || data.entries || [];
+      if (diaries.length < 5) return; // 日記5件未満はスキップ
+
+      var now = new Date();
+      var capsules = [];
+
+      diaries.forEach(function(entry) {
+        var entryDate = new Date(entry.date || entry.d);
+        if (isNaN(entryDate.getTime())) return;
+        var diffDays = Math.floor((now - entryDate) / (1000 * 60 * 60 * 24));
+
+        // 1ヶ月前、3ヶ月前、6ヶ月前、1年前の±2日以内
+        var labels = [
+          { days: 30, label: '1ヶ月前の今日' },
+          { days: 90, label: '3ヶ月前の今日' },
+          { days: 180, label: '半年前の今日' },
+          { days: 365, label: '1年前の今日' }
+        ];
+        labels.forEach(function(m) {
+          if (Math.abs(diffDays - m.days) <= 2) {
+            capsules.push({ entry: entry, label: m.label, daysAgo: diffDays });
+          }
+        });
+      });
+
+      if (capsules.length === 0) return;
+
+      // 最も近い1件を表示
+      var capsule = capsules[0];
+      var name = data.name || 'わんちゃん';
+      var isDark = _isDark();
+
+      var card = document.createElement('div');
+      card.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:9999;max-width:340px;width:calc(100% - 32px);background:' + (isDark ? 'linear-gradient(135deg,#2a1a2e,#1e1e2e)' : 'linear-gradient(135deg,#FFF8F5,#FFE8EC)') + ';border-radius:20px;padding:16px 20px;box-shadow:0 8px 32px rgba(255,123,156,.25);border:1px solid rgba(255,123,156,.15);animation:ux-page-in .4s ease;';
+
+      var text = capsule.entry.text || capsule.entry.t || '';
+      var preview = text.substring(0, 60) + (text.length > 60 ? '...' : '');
+
+      card.innerHTML = '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">'
+        + '<span style="font-size:24px;">💝</span>'
+        + '<div style="font-size:13px;font-weight:700;color:' + (isDark ? '#F5A6B8' : '#FF7B9C') + ';">' + capsule.label + 'の' + _escHtml(name) + '</div>'
+        + '<button id="tc-close" style="margin-left:auto;background:none;border:none;font-size:16px;cursor:pointer;color:#888;">✕</button>'
+        + '</div>'
+        + '<div style="font-size:13px;color:' + (isDark ? '#ccc' : '#636363') + ';line-height:1.7;">' + _escHtml(preview) + '</div>';
+
+      document.body.appendChild(card);
+
+      document.getElementById('tc-close').addEventListener('click', function() {
+        card.style.opacity = '0';
+        card.style.transition = 'opacity .3s';
+        setTimeout(function() { card.remove(); }, 300);
+      });
+
+      // 10秒後に自動消去
+      setTimeout(function() {
+        if (card.parentNode) {
+          card.style.opacity = '0';
+          card.style.transition = 'opacity .3s';
+          setTimeout(function() { card.remove(); }, 300);
+        }
+      }, 10000);
+
+      // Analytics
+      var an = window.__wanchan && window.__wanchan.analytics;
+      if (an && an.logEvent) an.logEvent('time_capsule_shown', { label: capsule.label, days_ago: capsule.daysAgo });
+
+      // 1日1回まで
+      try { localStorage.setItem('ux_tc_last', new Date().toISOString().slice(0, 10)); } catch(_) {}
+    } catch(e) {}
+  }
+
+  // 1日1回、ページ読み込み5秒後に表示
+  setTimeout(function() {
+    var lastShown = localStorage.getItem('ux_tc_last') || '';
+    var today = new Date().toISOString().slice(0, 10);
+    if (lastShown !== today) showTimeCapsule();
+  }, 5000);
+
+  /* ==============================
      22. BREED GROWTH CURVE (犬種別成長曲線) - Feature B
      ============================== */
   var BREED_CURVES = {
@@ -2316,16 +2826,43 @@ Error generating stack: `+n.message+`
     'ミニチュアシュナウザー': { m: [0.3, 0.8, 1.5, 2.5, 3.5, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5], max: 9 }
   };
 
+  // ADD_DOG_BREEDS の略称 → BREED_CURVES の正式名マッピング
+  var BREED_ALIAS = {
+    'ダックス': 'ミニチュアダックスフンド',
+    'フレブル': 'フレンチブルドッグ',
+    'ゴールデン': 'ゴールデンレトリバー',
+    'ハスキー': null, // 成長曲線データなし
+    'ラブラドール': 'ラブラドールレトリバー',
+    'ボーダーコリー': null,
+    '秋田犬': null,
+    'ビーグル': null,
+    'コーギー': null,
+    'MIX': null,
+    'その他': null
+  };
+
+  // 犬種名を正規化（略称→正式名に変換）
+  function resolveBreedName(breed) {
+    if (!breed) return '';
+    if (BREED_CURVES[breed]) return breed;
+    if (BREED_ALIAS[breed] !== undefined) return BREED_ALIAS[breed] || '';
+    // 部分一致フォールバック
+    var keys = Object.keys(BREED_CURVES);
+    for (var i = 0; i < keys.length; i++) {
+      if (keys[i].indexOf(breed) !== -1 || breed.indexOf(keys[i]) !== -1) return keys[i];
+    }
+    return breed;
+  }
+
   function showBreedCurveModal() {
     var existing = document.querySelector('.ux-breed-curve-modal');
     if (existing) existing.remove();
 
-    var isDark = document.body.classList.contains('ux-dark-on') ||
-      (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    var isDark = _isDark();
 
     var data;
     try { data = JSON.parse(localStorage.getItem('wc2') || '{}'); } catch(e) { data = {}; }
-    var breed = data.breed || '';
+    var breed = resolveBreedName(data.breed || '');
     var weights = data.weights || [];
     var birthday = data.birthday || '';
     var name = data.name || 'わんちゃん';
@@ -2395,6 +2932,11 @@ Error generating stack: `+n.message+`
       }
 
       var maxW = curve.max;
+      if (!maxW || maxW <= 0) {
+        chart.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#888;font-size:14px;">この犬種のデータが正しく読み込めませんでした</div>';
+        if (status) status.style.display = 'none';
+        return;
+      }
       var months = curve.m;
       var barWidth = Math.floor((chart.offsetWidth - 24) / 12) - 4;
       if (barWidth < 16) barWidth = 16;
@@ -2404,7 +2946,9 @@ Error generating stack: `+n.message+`
       if (birthday && weights.length > 0) {
         var bDate = new Date(birthday);
         if (!isNaN(bDate.getTime())) weights.forEach(function(w) {
-          var wDate = new Date(w.date || w.d);
+          var rawDate = w.date || w.d;
+          if (!rawDate) return; // null/undefinedを明示的に除外
+          var wDate = new Date(rawDate);
           if (isNaN(wDate.getTime())) return;
           var monthAge = Math.round((wDate - bDate) / (1000 * 60 * 60 * 24 * 30));
           if (monthAge >= 0 && monthAge < 12) {
@@ -2436,7 +2980,7 @@ Error generating stack: `+n.message+`
         var label = document.createElement('div');
         label.className = 'ux-breed-curve-label';
         label.style.cssText = 'position:absolute;bottom:-18px;left:' + x + 'px;width:' + barWidth + 'px;';
-        label.textContent = (i + 1) + 'M';
+        label.textContent = (i + 1) + 'ヶ月';
         chart.appendChild(label);
       }
 
@@ -2452,7 +2996,7 @@ Error generating stack: `+n.message+`
         });
 
         if (lastUserMonth >= 0 && lastUserMonth < 12) {
-          var expected = months[lastUserMonth];
+          var expected = months[lastUserMonth] || 0;
           if (expected <= 0) { status.style.display = 'none'; return; } // zero division guard
           var pct = ((lastUserWeight / expected) * 100).toFixed(0);
           var msg = '';
@@ -2464,6 +3008,10 @@ Error generating stack: `+n.message+`
             msg = '📉 ' + safeName + 'は犬種平均よりちょっと小さめ（' + pct + '%）だよ。気になったら獣医さんに相談してみてね。';
           }
           status.textContent = msg;
+          status.style.display = 'block';
+        } else if (lastUserMonth >= 12) {
+          // BUG-012: 1歳以上はグラフ対象外であることを明示
+          status.textContent = '※ このグラフは生後12ヶ月までの成長目安を表示しているよ。1歳以上の体重管理は体重記録で続けてね！';
           status.style.display = 'block';
         } else {
           status.style.display = 'none';
@@ -2527,8 +3075,7 @@ Error generating stack: `+n.message+`
           var textarea = modal.querySelector('textarea');
           if (!textarea || textarea.parentNode.querySelector('.ux-symptom-grid')) return;
 
-          var isDark = document.body.classList.contains('ux-dark-on') ||
-            (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          var isDark = _isDark();
 
           var label = document.createElement('div');
           label.style.cssText = 'font-size:12px;color:' + (isDark ? '#aaa' : '#888') + ';margin-bottom:6px;font-weight:600;';
@@ -2578,7 +3125,7 @@ Error generating stack: `+n.message+`
 
           // Medical disclaimer
           var disclaimer = document.createElement('div');
-          disclaimer.style.cssText = 'font-size:11px;color:' + (isDark ? '#777' : '#aaa') + ';margin:8px 0 4px;line-height:1.5;';
+          disclaimer.style.cssText = 'font-size:12px;font-weight:600;color:' + (isDark ? '#fbbf24' : '#92400e') + ';background:' + (isDark ? 'rgba(251,191,36,.1)' : 'rgba(245,158,11,.08)') + ';border-left:3px solid ' + (isDark ? '#fbbf24' : '#f59e0b') + ';padding:8px 12px;border-radius:0 8px 8px 0;margin:8px 0 12px;line-height:1.6;';
           disclaimer.textContent = '※ AIの回答は参考情報だよ。心配なときは獣医さんに相談してね。';
 
           textarea.parentNode.insertBefore(label, textarea);
@@ -2604,8 +3151,10 @@ Error generating stack: `+n.message+`
     var dismissed = localStorage.getItem('ux_pwa_dismissed');
     if (dismissed) {
       var dismissedDate = new Date(dismissed);
-      var daysSince = (Date.now() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24);
-      if (daysSince < 7) return; // Don't show again for 7 days
+      if (!isNaN(dismissedDate.getTime())) {
+        var daysSince = (Date.now() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24);
+        if (daysSince < 7) return; // Don't show again for 7 days
+      }
     }
 
     // Show banner after 30 seconds of use

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#FFF8F5"/>
+<meta name="description" content="わんちゃん成長日記のプレミアムプラン。AI健康相談が無制限、写真の高画質保存など。月額480円から。"/>
+<meta property="og:title" content="プレミアムプラン - わんちゃん成長日記"/>
+<meta property="og:description" content="もっと楽しくなる機能で、うちの子との毎日をもっと愛おしく。"/>
+<title>プレミアムプラン - わんちゃん成長日記</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Zen Maru Gothic','Hiragino Sans',sans-serif;background:#FFF8F5;color:#3D2C2C;line-height:1.8}
+.container{max-width:500px;margin:0 auto;padding:24px 20px 60px}
+h1{font-size:22px;font-weight:900;text-align:center;margin-bottom:8px}
+.catch{text-align:center;font-size:15px;color:#FF7B9C;font-weight:700;margin-bottom:24px}
+.plan{background:#fff;border-radius:20px;padding:24px;margin-bottom:16px;box-shadow:0 2px 12px rgba(255,123,156,.1);border:1.5px solid #f0e0d8;position:relative;transition:transform .2s,box-shadow .2s}
+.plan:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(255,123,156,.15)}
+.plan.popular{border-color:#FF7B9C;box-shadow:0 4px 20px rgba(255,123,156,.2)}
+.plan.popular:hover{transform:translateY(-3px);box-shadow:0 6px 24px rgba(255,123,156,.3)}
+.popular-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#FFD700,#FFA500);color:#fff;font-size:12px;font-weight:700;padding:4px 16px;border-radius:10px}
+.plan-name{font-size:16px;font-weight:900;margin-bottom:4px}
+.plan-price{font-size:28px;font-weight:900;color:#FF7B9C}
+.plan-price span{font-size:14px;font-weight:400;color:#8A6F6A}
+.plan-note{font-size:12px;color:#8A6F6A;margin-top:4px}
+
+/* 31%おトク強調バッジ */
+.discount-badge{display:inline-block;background:linear-gradient(135deg,#FF6B6B,#EE5A24);color:#fff;font-size:13px;font-weight:900;padding:4px 12px;border-radius:10px;margin-top:8px;animation:badgePulse 2s ease-in-out infinite}
+@keyframes badgePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+
+h2{font-size:17px;font-weight:900;margin:32px 0 16px}
+.features{list-style:none}
+.features li{font-size:14px;padding:10px 0;border-bottom:1px solid #f0e0d8;display:flex;align-items:center;gap:10px}
+.features li:last-child{border:none}
+.free-tag{font-size:11px;background:#E8F5E9;color:#2E7D32;padding:2px 8px;border-radius:8px;font-weight:700}
+.premium-tag{font-size:11px;background:#FFF3E0;color:#E65100;padding:2px 8px;border-radius:8px;font-weight:700}
+
+/* アニメーション付きCTAボタン */
+.cta{display:block;width:100%;padding:16px;background:linear-gradient(135deg,#F5A6B8,#FF7B9C);color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;margin-top:24px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.cta:active{transform:scale(.98)}
+.cta:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,123,156,.4)}
+.cta::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:ctaShine 3s ease-in-out infinite}
+@keyframes ctaShine{0%{left:-100%}50%{left:100%}100%{left:100%}}
+
+.cta-sub{display:block;text-align:center;font-size:12px;color:#8A6F6A;margin-top:8px}
+
+/* フッター統一 */
+.site-footer{margin-top:40px;padding-top:20px;border-top:1px solid #f0e0d8;text-align:center}
+.site-footer nav{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;font-size:13px}
+.site-footer a{color:#8A6F6A;text-decoration:none;transition:color .2s}
+.site-footer a:hover{color:#FF7B9C}
+.site-footer .copyright{font-size:11px;color:#b0a09a;margin-top:12px}
+
+a{color:#FF7B9C;text-decoration:none}
+
+/* ダークモード */
+@media(prefers-color-scheme:dark){
+  body{background:#1a1210;color:#e8d8d0}
+  .plan{background:#2a1e1a;border-color:#3d2e28;box-shadow:0 2px 12px rgba(0,0,0,.3)}
+  .plan.popular{border-color:#FF7B9C;box-shadow:0 4px 20px rgba(255,123,156,.15)}
+  .plan-price span{color:#a89490}
+  .plan-note{color:#a89490}
+  h2{color:#e8d8d0}
+  .features li{border-bottom-color:#3d2e28}
+  .free-tag{background:#1b3a1b;color:#66bb6a}
+  .premium-tag{background:#3a2a1a;color:#ffab40}
+  .site-footer{border-top-color:#3d2e28}
+  .site-footer a{color:#a89490}
+  .site-footer a:hover{color:#FF7B9C}
+  .site-footer .copyright{color:#6a5a54}
+  .cta-sub{color:#a89490}
+  .popular-badge{color:#1a1210}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🐾 もっと楽しくなる機能</h1>
+<p class="catch">うちの子との毎日を、もっと愛おしく。</p>
+
+<h2>プラン</h2>
+
+<div class="plan">
+<div class="plan-name">月額プラン</div>
+<div class="plan-price">480<span>円/月（税込）</span></div>
+<p class="plan-note">いつでもキャンセル可能</p>
+</div>
+
+<div class="plan popular">
+<div class="popular-badge">おすすめ</div>
+<div class="plan-name">年額プラン</div>
+<div class="plan-price">3,980<span>円/年（税込）</span></div>
+<p class="plan-note">月あたり約332円</p>
+<span class="discount-badge">今なら31%おトク!</span>
+</div>
+
+<h2>機能比較</h2>
+<ul class="features">
+<li>📝 日記・写真記録 <span class="free-tag">無料</span></li>
+<li>⚖️ 体重管理グラフ <span class="free-tag">無料</span></li>
+<li>📈 犬種別成長曲線 <span class="free-tag">無料</span></li>
+<li>🐕 犬友コミュニティ <span class="free-tag">無料</span></li>
+<li>📱 オフライン対応 <span class="free-tag">無料</span></li>
+<li>🩹 AI健康相談（月5回） <span class="free-tag">無料</span></li>
+<li>🩹 AI健康相談（無制限） <span class="premium-tag">プレミアム</span></li>
+<li>📸 写真の高画質保存 <span class="premium-tag">プレミアム</span></li>
+</ul>
+
+<a href="/wanchan-seichou-nikki/" class="cta">アプリで試してみる（無料）</a>
+<span class="cta-sub">クレジットカード登録不要 / いつでも解約OK</span>
+
+<footer class="site-footer">
+<nav>
+<a href="/wanchan-seichou-nikki/">トップページ</a>
+<a href="legal.html">特定商取引法</a>
+<a href="privacy.html">プライバシーポリシー</a>
+<a href="terms.html">利用規約</a>
+<a href="contact.html">お問い合わせ</a>
+</nav>
+<p class="copyright">&copy; 2025 わんちゃん成長日記</p>
+</footer>
+</div>
+</body>
+</html>

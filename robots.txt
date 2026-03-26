@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://nbyk115.github.io/wanchan-seichou-nikki/sitemap.xml

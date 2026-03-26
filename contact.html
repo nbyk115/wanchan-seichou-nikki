@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#FFF8F5"/>
+<title>お問い合わせ - わんちゃん成長日記</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Zen Maru Gothic','Hiragino Sans',sans-serif;background:#FFF8F5;color:#3D2C2C;line-height:1.8}
+.container{max-width:500px;margin:0 auto;padding:24px 20px 60px}
+h1{font-size:20px;font-weight:900;margin-bottom:8px;text-align:center}
+.sub{font-size:14px;color:#8A6F6A;text-align:center;margin-bottom:24px}
+label{display:block;font-size:14px;font-weight:700;margin-bottom:6px;color:#3D2C2C}
+input,textarea,select{width:100%;padding:12px 16px;border:1.5px solid #e0d0c8;border-radius:14px;font-size:14px;font-family:inherit;background:#fff;color:#3D2C2C;margin-bottom:16px;outline:none;transition:border-color .2s}
+input:focus,textarea:focus,select:focus{border-color:#FF7B9C}
+textarea{min-height:120px;resize:vertical}
+.submit{width:100%;padding:14px;background:linear-gradient(135deg,#F5A6B8,#FF7B9C);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+.submit:active{transform:scale(.98)}
+.info{background:#FFF0EB;border-radius:14px;padding:16px;margin-bottom:24px;font-size:13px;color:#8A6F6A;line-height:1.7}
+a{color:#FF7B9C;text-decoration:none}
+.back{display:inline-block;margin-top:24px;padding:12px 24px;background:#f0e0d8;color:#3D2C2C;border-radius:14px;font-weight:700;font-size:14px}
+.thanks{display:none;text-align:center;padding:40px 20px}
+.thanks .icon{font-size:64px;margin-bottom:16px}
+.footer{margin-top:40px;padding-top:20px;border-top:1px solid #f0e0d8;text-align:center}
+.footer nav{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;font-size:13px}
+.footer a{color:#8A6F6A;text-decoration:none}
+.footer a:hover{color:#FF7B9C}
+.footer .copy{font-size:11px;color:#b0a09a;margin-top:12px}
+@media(prefers-color-scheme:dark){
+  body{background:#1a1210;color:#e8d8d0}
+  label{color:#e8d8d0}
+  input,textarea,select{background:#2a1e1a;border-color:#3d2e28;color:#e8d8d0}
+  .info{background:#2a1e1a;color:#a89490}
+  .footer{border-top-color:#3d2e28}
+  .footer a{color:#a89490}
+  .footer .copy{color:#6a5a54}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🐾 お問い合わせ</h1>
+<p class="sub">わんちゃん成長日記へのご質問・ご要望をお聞かせください</p>
+
+<div class="info">
+📧 メールでもお問い合わせいただけます:<br>
+<a href="mailto:wanchan.diary@gmail.com">wanchan.diary@gmail.com</a><br>
+通常2営業日以内にご返信いたします。
+</div>
+
+<form id="contact-form" action="https://formspree.io/f/your-form-id" method="POST">
+<label for="name">お名前</label>
+<input type="text" id="name" name="name" placeholder="お名前" required/>
+
+<label for="email">メールアドレス</label>
+<input type="email" id="email" name="email" placeholder="example@email.com" required/>
+
+<label for="category">お問い合わせ種別</label>
+<select id="category" name="category">
+<option value="general">一般的なご質問</option>
+<option value="bug">不具合のご報告</option>
+<option value="feature">機能のご要望</option>
+<option value="payment">お支払いについて</option>
+<option value="account">アカウントについて</option>
+<option value="other">その他</option>
+</select>
+
+<label for="message">お問い合わせ内容</label>
+<textarea id="message" name="message" placeholder="お気軽にお書きください..." required></textarea>
+
+<button type="submit" class="submit">送信する</button>
+</form>
+
+<div class="thanks" id="thanks">
+<div class="icon">💌</div>
+<h2 style="font-size:18px;font-weight:900;margin-bottom:12px;">送信できたよ！</h2>
+<p style="font-size:14px;color:#8A6F6A;">2営業日以内にご返信いたします。<br>しばらくお待ちくださいね。</p>
+</div>
+
+<script>
+document.getElementById('contact-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  // Simple mailto fallback (no server needed)
+  var name = document.getElementById('name').value;
+  var email = document.getElementById('email').value;
+  var category = document.getElementById('category').value;
+  var message = document.getElementById('message').value;
+  var subject = encodeURIComponent('[わんちゃん成長日記] ' + category + ' - ' + name);
+  var body = encodeURIComponent('お名前: ' + name + '\nメール: ' + email + '\n種別: ' + category + '\n\n' + message);
+  window.location.href = 'mailto:wanchan.diary@gmail.com?subject=' + subject + '&body=' + body;
+  document.getElementById('contact-form').style.display = 'none';
+  document.getElementById('thanks').style.display = 'block';
+});
+</script>
+
+<footer class="footer">
+<nav>
+<a href="/wanchan-seichou-nikki/">トップページ</a>
+<a href="premium.html">プレミアムプラン</a>
+<a href="legal.html">特定商取引法</a>
+<a href="privacy.html">プライバシーポリシー</a>
+</nav>
+<p class="copy">&copy; 2025 わんちゃん成長日記</p>
+</footer>
+</div>
+</body>
+</html>
