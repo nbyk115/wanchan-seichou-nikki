@@ -27,10 +27,20 @@ function getAdmin() {
 // HANDLER
 // ============================================================
 module.exports = async function handler(req, res) {
-  // CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // CORS — 許可オリジンを明示的に制限 (CSRF対策)
+  const ALLOWED_ORIGINS = [
+    'https://wanchan-seichou-nikki.vercel.app',
+    'https://nbyk115.github.io',
+    ...(process.env.VERCEL_ENV === 'development' ? ['http://localhost:3000', 'http://localhost:5173'] : [])
+  ];
+  const origin = req.headers.origin || '';
+  if (ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Max-Age', '86400');
   if (req.method === 'OPTIONS') return res.status(204).end();
 
   if (req.method !== 'POST') {
@@ -38,6 +48,19 @@ module.exports = async function handler(req, res) {
   }
 
   try {
+    // --- Firebase IDトークン検証 (認証必須) ---
+    const authHeader = req.headers.authorization || '';
+    const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+    if (!idToken) {
+      return res.status(401).json({ error: 'Authorization required' });
+    }
+    const admin = getAdmin();
+    try {
+      await admin.auth().verifyIdToken(idToken);
+    } catch (authErr) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
     const { session_id } = req.body || {};
     if (!session_id || typeof session_id !== 'string') {
       return res.status(400).json({ error: 'session_id required' });

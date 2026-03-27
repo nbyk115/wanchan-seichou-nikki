@@ -24,7 +24,7 @@ const OFFLINE_PAGE = `<!DOCTYPE html>
 body{font-family:'Zen Maru Gothic','Hiragino Sans',sans-serif;background:#FFF8F5;display:flex;align-items:center;justify-content:center;min-height:100dvh;padding:24px;text-align:center;color:#333}
 .c{max-width:320px}.icon{font-size:64px;margin-bottom:16px}
 h1{font-size:20px;font-weight:900;margin-bottom:8px}
-p{font-size:14px;color:#888;line-height:1.7;margin-bottom:24px}
+p{font-size:14px;color:#555;line-height:1.7;margin-bottom:24px}
 button{background:#FF7B9C;color:#fff;border:none;padding:14px 32px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
 button:active{transform:scale(.97)}
 </style></head><body>

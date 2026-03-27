@@ -11,21 +11,21 @@
 body{font-family:'Zen Maru Gothic','Hiragino Sans',sans-serif;background:#FFF8F5;color:#3D2C2C;line-height:1.8}
 .container{max-width:500px;margin:0 auto;padding:24px 20px 60px}
 h1{font-size:20px;font-weight:900;margin-bottom:8px;text-align:center}
-.sub{font-size:14px;color:#8A6F6A;text-align:center;margin-bottom:24px}
+.sub{font-size:14px;color:#6A4F4A;text-align:center;margin-bottom:24px}
 label{display:block;font-size:14px;font-weight:700;margin-bottom:6px;color:#3D2C2C}
 input,textarea,select{width:100%;padding:12px 16px;border:1.5px solid #e0d0c8;border-radius:14px;font-size:14px;font-family:inherit;background:#fff;color:#3D2C2C;margin-bottom:16px;outline:none;transition:border-color .2s}
 input:focus,textarea:focus,select:focus{border-color:#FF7B9C}
 textarea{min-height:120px;resize:vertical}
 .submit{width:100%;padding:14px;background:linear-gradient(135deg,#F5A6B8,#FF7B9C);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
 .submit:active{transform:scale(.98)}
-.info{background:#FFF0EB;border-radius:14px;padding:16px;margin-bottom:24px;font-size:13px;color:#8A6F6A;line-height:1.7}
+.info{background:#FFF0EB;border-radius:14px;padding:16px;margin-bottom:24px;font-size:13px;color:#6A4F4A;line-height:1.7}
 a{color:#FF7B9C;text-decoration:none}
 .back{display:inline-block;margin-top:24px;padding:12px 24px;background:#f0e0d8;color:#3D2C2C;border-radius:14px;font-weight:700;font-size:14px}
 .thanks{display:none;text-align:center;padding:40px 20px}
 .thanks .icon{font-size:64px;margin-bottom:16px}
 .footer{margin-top:40px;padding-top:20px;border-top:1px solid #f0e0d8;text-align:center}
 .footer nav{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;font-size:13px}
-.footer a{color:#8A6F6A;text-decoration:none}
+.footer a{color:#6A4F4A;text-decoration:none}
 .footer a:hover{color:#FF7B9C}
 .footer .copy{font-size:11px;color:#b0a09a;margin-top:12px}
 @media(prefers-color-scheme:dark){
@@ -58,7 +58,7 @@ a{color:#FF7B9C;text-decoration:none}
 <input type="email" id="email" name="email" placeholder="example@email.com" required/>
 
 <label for="category">お問い合わせ種別</label>
-<select id="category" name="category">
+<select id="category" name="category" required>
 <option value="general">一般的なご質問</option>
 <option value="bug">不具合のご報告</option>
 <option value="feature">機能のご要望</option>
@@ -77,7 +77,7 @@ a{color:#FF7B9C;text-decoration:none}
 <div class="thanks" id="thanks">
 <div class="icon">💌</div>
 <h2 style="font-size:18px;font-weight:900;margin-bottom:12px;">送信できたよ！</h2>
-<p style="font-size:14px;color:#8A6F6A;">2営業日以内にご返信いたします。<br>しばらくお待ちくださいね。</p>
+<p style="font-size:14px;color:#6A4F4A;">2営業日以内にご返信いたします。<br>しばらくお待ちくださいね。</p>
 </div>
 
 <script>

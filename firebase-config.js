@@ -57,7 +57,13 @@ if (isConfigured) {
       lastLogin: serverTimestamp()
     }, { merge: true });
     window.dispatchEvent(new CustomEvent('wanchan-login', { detail: { uid: result.user.uid } }));
-  }).catch(() => {});
+  }).catch((err) => {
+    // auth/popup-closed-by-user は正常系なのでログ出力のみ
+    if (err.code !== 'auth/popup-closed-by-user') {
+      console.error('getRedirectResult error:', err.code, err.message);
+      _toast('ログイン処理中にエラーが発生しました。もう一度お試しください', 'error');
+    }
+  });
 }
 
 // ============================================================

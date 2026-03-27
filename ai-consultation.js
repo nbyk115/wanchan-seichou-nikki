@@ -393,7 +393,7 @@ function showConsultationModal() {
   html += '<textarea id="ai-input" maxlength="500" placeholder="わんちゃんの気になることを書いてね..." style="flex:1;padding:12px 16px;border-radius:16px;border:1.5px solid ' + (isDark ? '#444' : '#e0e0e0') + ';background:' + (isDark ? '#2a2a3e' : '#f8f8f8') + ';font-size:14px;font-family:inherit;resize:none;min-height:48px;max-height:120px;outline:none;color:' + (isDark ? '#e0e0e0' : '#333') + ';" rows="1"></textarea>';
   html += '<button id="ai-send" style="width:48px;height:48px;border-radius:50%;border:none;background:linear-gradient(135deg,#F5A6B8,#FF7B9C);color:#fff;font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;">➤</button>';
   html += '</div>';
-  html += '<div id="ai-char-count" style="text-align:right;font-size:11px;color:#aaa;margin-top:4px;">0 / 500</div>';
+  html += '<div id="ai-char-count" style="text-align:right;font-size:11px;color:#555;margin-top:4px;">0 / 500</div>';
 
   // 過去の相談履歴リンク
   var history = getHistory();

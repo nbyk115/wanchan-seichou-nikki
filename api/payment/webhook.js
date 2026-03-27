@@ -76,17 +76,16 @@ module.exports = async function handler(req, res) {
     }
     const rawBody = Buffer.concat(chunks).toString('utf8');
 
-    // --- 2. 署名検証 ---
+    // --- 2. 署名検証 (必須 — 未設定時は全リクエスト拒否) ---
     const webhookSecret = process.env.KOMOJU_WEBHOOK_SECRET;
-    if (webhookSecret) {
-      const signature = req.headers['x-komoju-signature'] || '';
-      if (!verifySignature(rawBody, signature, webhookSecret)) {
-        console.error('Webhook signature verification failed');
-        return res.status(401).json({ error: 'Invalid signature' });
-      }
-    } else {
-      // 開発環境では署名検証をスキップ (本番では必ず設定すること)
-      console.warn('KOMOJU_WEBHOOK_SECRET not set — skipping signature verification');
+    if (!webhookSecret) {
+      console.error('KOMOJU_WEBHOOK_SECRET not set — rejecting all webhooks for security');
+      return res.status(500).json({ error: 'Webhook not configured' });
+    }
+    const signature = req.headers['x-komoju-signature'] || '';
+    if (!verifySignature(rawBody, signature, webhookSecret)) {
+      console.error('Webhook signature verification failed');
+      return res.status(401).json({ error: 'Invalid signature' });
     }
 
     // --- 3. イベント解析 ---

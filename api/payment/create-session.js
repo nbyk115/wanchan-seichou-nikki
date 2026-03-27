@@ -48,10 +48,20 @@ function getAdmin() {
 // HANDLER
 // ============================================================
 module.exports = async function handler(req, res) {
-  // CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // CORS — 許可オリジンを明示的に制限 (CSRF対策)
+  const ALLOWED_ORIGINS = [
+    'https://wanchan-seichou-nikki.vercel.app',
+    'https://nbyk115.github.io',
+    ...(process.env.VERCEL_ENV === 'development' ? ['http://localhost:3000', 'http://localhost:5173'] : [])
+  ];
+  const origin = req.headers.origin || '';
+  if (ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Max-Age', '86400');
   if (req.method === 'OPTIONS') return res.status(204).end();
 
   if (req.method !== 'POST') {
@@ -79,7 +89,7 @@ module.exports = async function handler(req, res) {
     const { planKey } = req.body || {};
     const plan = PLANS[planKey];
     if (!plan) {
-      return res.status(400).json({ error: 'Invalid plan: ' + planKey });
+      return res.status(400).json({ error: 'Invalid plan. Allowed: monthly, yearly' });
     }
 
     // --- 3. 重複購入チェック ---

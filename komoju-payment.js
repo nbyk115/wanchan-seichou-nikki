@@ -319,13 +319,13 @@ function showPremiumModal() {
   var html = '';
   html += '<div style="font-size:48px;margin-bottom:12px;">🐾✨</div>';
   html += '<h2 style="font-size:22px;font-weight:900;color:#333;margin-bottom:6px;">プレミアムプラン</h2>';
-  html += '<p style="font-size:14px;color:#888;margin-bottom:24px;line-height:1.6;">もっと便利に、もっと楽しく<br>わんちゃんとの毎日を記録</p>';
+  html += '<p style="font-size:14px;color:#555;margin-bottom:24px;line-height:1.6;">もっと便利に、もっと楽しく<br>わんちゃんとの毎日を記録</p>';
 
   if (currentPlan) {
     var expDate = new Date(currentPlan.expiresAt);
     html += '<div style="background:#FFF8F0;border:1.5px solid #FFD700;border-radius:16px;padding:16px;margin-bottom:20px;">';
     html += '<div style="font-size:14px;font-weight:700;color:#F59E0B;">★ プレミアム会員</div>';
-    html += '<div style="font-size:12px;color:#888;margin-top:4px;">有効期限: ' + expDate.toLocaleDateString('ja-JP') + '</div>';
+    html += '<div style="font-size:12px;color:#555;margin-top:4px;">有効期限: ' + expDate.toLocaleDateString('ja-JP') + '</div>';
     html += '</div>';
   }
 
@@ -334,7 +334,7 @@ function showPremiumModal() {
   html += '<div style="display:flex;justify-content:space-between;align-items:center;">';
   html += '<div style="text-align:left;">';
   html += '<div style="font-size:15px;font-weight:700;color:#333;">' + plans.monthly.name + '</div>';
-  html += '<div style="font-size:12px;color:#888;margin-top:4px;">月々のお支払い</div>';
+  html += '<div style="font-size:12px;color:#555;margin-top:4px;">月々のお支払い</div>';
   html += '</div>';
   html += '<div style="font-size:24px;font-weight:900;color:#FF7B9C;">¥' + plans.monthly.amount.toLocaleString() + '</div>';
   html += '</div>';
@@ -346,7 +346,7 @@ function showPremiumModal() {
   html += '<div style="display:flex;justify-content:space-between;align-items:center;">';
   html += '<div style="text-align:left;">';
   html += '<div style="font-size:15px;font-weight:700;color:#333;">' + plans.yearly.name + '</div>';
-  html += '<div style="font-size:12px;color:#888;margin-top:4px;">月あたり約¥' + Math.round(plans.yearly.amount / 12).toLocaleString() + '</div>';
+  html += '<div style="font-size:12px;color:#555;margin-top:4px;">月あたり約¥' + Math.round(plans.yearly.amount / 12).toLocaleString() + '</div>';
   html += '</div>';
   html += '<div style="font-size:24px;font-weight:900;color:#16A34A;">¥' + plans.yearly.amount.toLocaleString() + '</div>';
   html += '</div>';
@@ -368,7 +368,7 @@ function showPremiumModal() {
   }
 
   // 閉じるボタン
-  html += '<button id="premium-close" style="width:100%;padding:14px;border:none;border-radius:14px;background:#f0f0f0;color:#888;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">閉じる</button>';
+  html += '<button id="premium-close" style="width:100%;padding:14px;border:none;border-radius:14px;background:#f0f0f0;color:#555;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">閉じる</button>';
 
   modal.innerHTML = html;
   overlay.appendChild(modal);
