@@ -129,7 +129,7 @@ module.exports = async function handler(req, res) {
         amount: plan.amount,
         currency: plan.currency,
         default_locale: 'ja',
-        return_url: (req.headers.origin || 'https://wanchan-diary.vercel.app')
+        return_url: (req.headers.origin || 'https://wanchan-seichou-nikki.vercel.app')
           + '/?session_id={session_id}&status={status}&plan=' + planKey,
         metadata: {
           uid: uid,

@@ -69,11 +69,16 @@ function incrementUsage() {
 }
 
 function getRemainingCount() {
-  // プレミアム判定: wp フラグが立っていて2099年でない場合はプレミアム
+  // プレミアム判定: wpフラグ または KOMOJU決済後のwanchan_premiumキャッシュ
   try {
+    // 旧方式: wp キー
     var wp = JSON.parse(localStorage.getItem('wp') || '{}');
-    // 全機能無料開放中（2099年）は無料ユーザーとして扱う
-    if (wp.on && wp.exp && !wp.exp.startsWith('2099')) {
+    if (wp.on && wp.exp && !wp.exp.startsWith('2099') && new Date(wp.exp).getTime() > Date.now()) {
+      return Infinity; // プレミアムは無制限
+    }
+    // 新方式: KOMOJU決済後のFirestoreキャッシュ (komoju-payment.jsが書き込む)
+    var premCache = JSON.parse(localStorage.getItem('wanchan_premium') || '{}');
+    if (premCache.planId && premCache.expiresAt && premCache.expiresAt > Date.now()) {
       return Infinity; // プレミアムは無制限
     }
   } catch (e) {}
