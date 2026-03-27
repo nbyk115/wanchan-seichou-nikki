@@ -455,12 +455,12 @@ Error generating stack: `+n.message+`
 <li>⚖️ <strong>体重管理グラフ</strong> — 体重の推移をひと目で確認</li>
 <li>📈 <strong>犬種別成長曲線</strong> — うちの子と犬種平均を比較</li>
 <li>🩹 <strong>AI健康相談</strong> — 気になる症状をAIに相談</li>
-<li>🐕 <strong>犬友コミュニティ</strong> — 足あと・ひとこと・フレンド機能</li>
+<li>🐕 <strong>犬友コミュニティ</strong> — 足あと・ひとこと・犬友機能</li>
 <li>📱 <strong>オフライン対応</strong> — 電波がなくても安心して使える</li>
 </ul>
 <h2 style="font-size:16px;font-weight:900;margin-bottom:12px;">対応犬種の成長曲線</h2>
 <p style="font-size:13px;color:#6A4F4A;line-height:1.8;margin-bottom:20px;">チワワ、トイプードル、ミニチュアダックスフンド、ポメラニアン、柴犬、フレンチブルドッグ、ゴールデンレトリバー、ラブラドールレトリバー、ヨークシャーテリア、シーズー、パグ、マルチーズ、ミニチュアシュナウザーの月齢別体重推移データを収録。</p>
-<p style="font-size:13px;color:#BFA6A0;text-align:center;">このアプリを使うにはJavaScriptを有効にしてね。</p>
+<p style="font-size:13px;color:#7A6A64;text-align:center;">このアプリを使うにはJavaScriptを有効にしてね。</p>
 <div style="margin-top:24px;text-align:center;font-size:12px;">
 <a href="premium.html" style="color:#FF7B9C;margin:0 8px;">プレミアムプラン</a>
 <a href="legal.html" style="color:#6A4F4A;margin:0 8px;">特定商取引法</a>
@@ -1085,7 +1085,7 @@ Error generating stack: `+n.message+`
 
     // Handle browser back (swipe back / back button)
     window.addEventListener('popstate', function(e) {
-      _popInProgress = true;
+      _screenPopInProgress = true;
       // Find and click the app's back button
       var backBtn = document.querySelector('[aria-label="戻る"], [style*="cursor"] svg');
       if (backBtn) {
@@ -1095,8 +1095,8 @@ Error generating stack: `+n.message+`
         var homeNav = document.querySelector('[data-page="home"], nav button:first-child');
         if (homeNav) homeNav.click();
       }
-      _lastScreen = (e.state && e.state.screen) || '';
-      setTimeout(function() { _popInProgress = false; }, 100);
+      _screenLastScreen = (e.state && e.state.screen) || '';
+      setTimeout(function() { _screenPopInProgress = false; }, 100);
     });
   })();
 
@@ -2208,7 +2208,7 @@ Error generating stack: `+n.message+`
     var buttons = [
       { id: 'share-x', icon: '𝕏', label: 'X', color: '#000' },
       { id: 'share-line', icon: '💬', label: 'LINE', color: '#06C755' },
-      { id: 'share-copy', icon: '🔗', label: 'コピー', color: '#888' }
+      { id: 'share-copy', icon: '🔗', label: 'コピー', color: '#555' }
     ];
     buttons.forEach(function(b) {
       html += '<div id="' + b.id + '" style="text-align:center;cursor:pointer;">';

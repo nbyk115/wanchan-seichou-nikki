@@ -35,7 +35,15 @@ function getAdmin() {
   if (_admin) return _admin;
   const admin = require('firebase-admin');
   if (!admin.apps.length) {
-    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
+      throw new Error('FIREBASE_SERVICE_ACCOUNT environment variable is not set');
+    }
+    let serviceAccount;
+    try {
+      serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    } catch (parseErr) {
+      throw new Error('FIREBASE_SERVICE_ACCOUNT is not valid JSON: ' + parseErr.message);
+    }
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount)
     });
@@ -129,7 +137,7 @@ module.exports = async function handler(req, res) {
         amount: plan.amount,
         currency: plan.currency,
         default_locale: 'ja',
-        return_url: (req.headers.origin || 'https://wanchan-seichou-nikki.vercel.app')
+        return_url: (ALLOWED_ORIGINS.includes(origin) ? origin : 'https://wanchan-seichou-nikki.vercel.app')
           + '/?session_id={session_id}&status={status}&plan=' + planKey,
         metadata: {
           uid: uid,

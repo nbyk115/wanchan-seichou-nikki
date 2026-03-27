@@ -438,7 +438,7 @@ function showConsultationModal() {
     var len = input.value.length;
     if (charCount) {
       charCount.textContent = len + ' / 500';
-      charCount.style.color = len >= 450 ? '#EF4444' : len >= 350 ? '#F59E0B' : '#aaa';
+      charCount.style.color = len >= 450 ? '#EF4444' : len >= 350 ? '#F59E0B' : '#555';
     }
   });
 
@@ -582,7 +582,7 @@ function showConsultationModal() {
         : '';
       answerArea.innerHTML = fallbackNotice +
         '<div style="padding:16px;background:' + (isDark ? '#1a2a1a' : '#F0FFF4') + ';border-radius:16px;font-size:14px;line-height:1.8;color:' + (isDark ? '#a7f3d0' : '#166534') + ';white-space:pre-wrap;">' + _escapeHtml(result.answer) + '</div>' +
-        '<div style="margin-top:8px;padding:8px 12px;font-size:11px;color:#999;text-align:center;">※ AIの回答は参考情報だよ。心配なときは獣医さんに相談してね。</div>';
+        '<div style="margin-top:8px;padding:8px 12px;font-size:11px;color:' + (isDark ? '#a89490' : '#6A4F4A') + ';text-align:center;">※ AIの回答は参考情報だよ。心配なときは獣医さんに相談してね。</div>';
     }
 
     input.focus();
