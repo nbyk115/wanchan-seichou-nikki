@@ -357,7 +357,7 @@ function showConsultationModal() {
   html += '<div style="font-size:12px;color:#636363;">わんちゃんの気になることを聞いてみよう</div>';
   html += '</div>';
   html += '</div>';
-  html += '<div id="ai-close" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:' + (isDark ? '#333' : '#f0f0f0') + ';cursor:pointer;font-size:16px;">✕</div>';
+  html += '<div id="ai-close" role="button" tabindex="0" aria-label="閉じる" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:' + (isDark ? '#333' : '#f0f0f0') + ';cursor:pointer;font-size:16px;">✕</div>';
   html += '</div>';
 
   // 残り回数
@@ -390,8 +390,8 @@ function showConsultationModal() {
 
   // 入力エリア
   html += '<div style="display:flex;gap:8px;align-items:flex-end;">';
-  html += '<textarea id="ai-input" maxlength="500" placeholder="わんちゃんの気になることを書いてね..." style="flex:1;padding:12px 16px;border-radius:16px;border:1.5px solid ' + (isDark ? '#444' : '#e0e0e0') + ';background:' + (isDark ? '#2a2a3e' : '#f8f8f8') + ';font-size:14px;font-family:inherit;resize:none;min-height:48px;max-height:120px;outline:none;color:' + (isDark ? '#e0e0e0' : '#333') + ';" rows="1"></textarea>';
-  html += '<button id="ai-send" style="width:48px;height:48px;border-radius:50%;border:none;background:linear-gradient(135deg,#F5A6B8,#FF7B9C);color:#fff;font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;">➤</button>';
+  html += '<textarea id="ai-input" aria-label="相談内容を入力" maxlength="500" placeholder="わんちゃんの気になることを書いてね..." style="flex:1;padding:12px 16px;border-radius:16px;border:1.5px solid ' + (isDark ? '#444' : '#e0e0e0') + ';background:' + (isDark ? '#2a2a3e' : '#f8f8f8') + ';font-size:14px;font-family:inherit;resize:none;min-height:48px;max-height:120px;outline:none;color:' + (isDark ? '#e0e0e0' : '#333') + ';" rows="1"></textarea>';
+  html += '<button id="ai-send" aria-label="送信する" style="width:48px;height:48px;border-radius:50%;border:none;background:linear-gradient(135deg,#F5A6B8,#FF7B9C);color:#fff;font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;">➤</button>';
   html += '</div>';
   html += '<div id="ai-char-count" style="text-align:right;font-size:11px;color:#aaa;margin-top:4px;">0 / 500</div>';
 
@@ -411,6 +411,7 @@ function showConsultationModal() {
   function closeAIModal() { overlay.remove(); document.removeEventListener('keydown', aiEscHandler); if (window.__wanchan && window.__wanchan.unlockBodyScroll) window.__wanchan.unlockBodyScroll(); }
   function aiEscHandler(e) { if (e.key === 'Escape') closeAIModal(); }
   closeBtn.addEventListener('click', closeAIModal);
+  closeBtn.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); closeAIModal(); } });
   overlay.addEventListener('click', function(e) { if (e.target === overlay) closeAIModal(); });
   document.addEventListener('keydown', aiEscHandler);
   overlay.setAttribute('role', 'dialog');

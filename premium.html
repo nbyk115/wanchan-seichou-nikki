@@ -64,6 +64,10 @@ a{color:#FF7B9C;text-decoration:none}
   .features li{border-bottom-color:#3d2e28}
   .free-tag{background:#1b3a1b;color:#66bb6a}
   .premium-tag{background:#3a2a1a;color:#ffab40}
+  .vision-box{background:linear-gradient(135deg,#2a1e1a,#1a1210) !important}
+  .vision-box *{color:#a89490 !important}
+  .voice-box{background:#2a1e1a !important}
+  .voice-box *{color:#a89490 !important}
   .site-footer{border-top-color:#3d2e28}
   .site-footer a{color:#a89490}
   .site-footer a:hover{color:#FF7B9C}
@@ -75,23 +79,24 @@ a{color:#FF7B9C;text-decoration:none}
 </head>
 <body>
 <div class="container">
+<main>
 <h1>🐾 もっと楽しくなる機能</h1>
 <p class="catch">うちの子との毎日を、もっと愛おしく。</p>
 
 <h2>プラン</h2>
 
-<div class="plan">
+<div class="plan" role="region" aria-label="月額プラン">
 <div class="plan-name">月額プラン</div>
 <div class="plan-price">480<span>円/月（税込）</span></div>
 <p class="plan-note">いつでもキャンセル可能</p>
 </div>
 
-<div class="plan popular">
-<div class="popular-badge">おすすめ</div>
+<div class="plan popular" role="region" aria-label="年額プラン（おすすめ）">
+<div class="popular-badge" aria-label="おすすめプラン">おすすめ</div>
 <div class="plan-name">年額プラン</div>
 <div class="plan-price">3,980<span>円/年（税込）</span></div>
 <p class="plan-note">月あたり約332円</p>
-<span class="discount-badge">今なら31%おトク!</span>
+<span class="discount-badge" aria-label="31%おトク">今なら31%おトク!</span>
 </div>
 
 <h2>機能比較</h2>
@@ -106,7 +111,7 @@ a{color:#FF7B9C;text-decoration:none}
 <li>📸 写真の高画質保存 <span class="premium-tag">プレミアム</span></li>
 </ul>
 
-<div style="background:linear-gradient(135deg,#FFF5F7,#FFF0EB);border-radius:16px;padding:24px 20px;margin-top:24px;text-align:center;">
+<div class="vision-box" style="background:linear-gradient(135deg,#FFF5F7,#FFF0EB);border-radius:16px;padding:24px 20px;margin-top:24px;text-align:center;">
 <div style="font-size:28px;margin-bottom:8px;">🐾</div>
 <div style="font-size:15px;font-weight:900;margin-bottom:10px;color:#8A6F6A;">わたしたちの想い</div>
 <div style="font-size:13px;color:#8A6F6A;line-height:2;">
@@ -116,7 +121,7 @@ a{color:#FF7B9C;text-decoration:none}
 </div>
 </div>
 
-<div style="background:#FFF0EB;border-radius:16px;padding:20px;margin-top:24px;">
+<div class="voice-box" style="background:#FFF0EB;border-radius:16px;padding:20px;margin-top:24px;">
 <div style="font-size:15px;font-weight:900;margin-bottom:12px;">飼い主さんの声</div>
 <div style="font-size:13px;color:#8A6F6A;line-height:1.8;margin-bottom:12px;">
 <div style="margin-bottom:12px;">🐩 「体重の推移がグラフで見えるのが安心。成長曲線と比較できるのが嬉しい」<br><span style="font-size:11px;">— トイプードル飼い主</span></div>
@@ -125,11 +130,12 @@ a{color:#FF7B9C;text-decoration:none}
 </div>
 </div>
 
-<a href="/wanchan-seichou-nikki/" class="cta">アプリで試してみる（無料）</a>
+<a href="/wanchan-seichou-nikki/" class="cta" role="button">アプリで試してみる（無料）</a>
 <span class="cta-sub">クレジットカード登録不要 / いつでも解約OK</span>
+</main>
 
 <footer class="site-footer">
-<nav>
+<nav aria-label="サイトナビゲーション">
 <a href="/wanchan-seichou-nikki/">トップページ</a>
 <a href="legal.html">特定商取引法</a>
 <a href="privacy.html">プライバシーポリシー</a>
@@ -137,6 +143,7 @@ a{color:#FF7B9C;text-decoration:none}
 <a href="contact.html">お問い合わせ</a>
 <a href="help.html">使い方ガイド</a>
 </nav>
+
 <p class="copyright">&copy; 2026 わんちゃん成長日記</p>
 </footer>
 </div>

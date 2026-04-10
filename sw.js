@@ -62,11 +62,15 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
 
-  // Skip cross-origin API requests
+  // Skip cross-origin API requests and auth-related endpoints (must not be cached)
   if (e.request.url.includes('api.anthropic.com')) return;
   if (e.request.url.includes('firebaseapp.com')) return;
   if (e.request.url.includes('googleapis.com/identitytoolkit')) return;
   if (e.request.url.includes('firestore.googleapis.com')) return;
+  if (e.request.url.includes('securetoken.googleapis.com')) return;
+  if (e.request.url.includes('komoju.com')) return;
+  if (e.request.url.includes('google-analytics.com')) return;
+  if (e.request.url.includes('analytics.google.com')) return;
 
   // For navigation requests, network-first with SPA fallback
   // All navigation resolves to index.html (SPA uses state-based routing)
@@ -93,8 +97,9 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // For font requests, cache-first (fonts rarely change)
-  if (e.request.url.includes('fonts.googleapis.com') || e.request.url.includes('fonts.gstatic.com')) {
+  // For font & Firebase SDK requests, cache-first (versioned URLs / rarely change)
+  if (e.request.url.includes('fonts.googleapis.com') || e.request.url.includes('fonts.gstatic.com')
+      || e.request.url.includes('www.gstatic.com/firebasejs/')) {
     e.respondWith(
       caches.match(e.request).then((cached) => {
         if (cached) return cached;

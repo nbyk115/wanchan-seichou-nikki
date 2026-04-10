@@ -45,5 +45,8 @@
     }
   ],
   "categories": ["lifestyle", "health"],
-  "lang": "ja"
+  "lang": "ja",
+  "dir": "ltr",
+  "display_override": ["standalone", "minimal-ui"],
+  "handle_links": "preferred"
 }

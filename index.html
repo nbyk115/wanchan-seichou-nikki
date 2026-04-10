@@ -1085,7 +1085,7 @@ Error generating stack: `+n.message+`
 
     // Handle browser back (swipe back / back button)
     window.addEventListener('popstate', function(e) {
-      _popInProgress = true;
+      _screenPopInProgress = true;
       // Find and click the app's back button
       var backBtn = document.querySelector('[aria-label="戻る"], [style*="cursor"] svg');
       if (backBtn) {
@@ -1095,8 +1095,8 @@ Error generating stack: `+n.message+`
         var homeNav = document.querySelector('[data-page="home"], nav button:first-child');
         if (homeNav) homeNav.click();
       }
-      _lastScreen = (e.state && e.state.screen) || '';
-      setTimeout(function() { _popInProgress = false; }, 100);
+      _screenLastScreen = (e.state && e.state.screen) || '';
+      setTimeout(function() { _screenPopInProgress = false; }, 100);
     });
   })();
 

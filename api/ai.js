@@ -266,22 +266,32 @@ async function callClaudeAPI(userMessage) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return null; // 未設定 → フォールバックへ
 
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01'
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-6-20250514',
-      max_tokens: 512,
-      system: SYSTEM_PROMPT,
-      messages: [
-        { role: 'user', content: userMessage }
-      ]
-    })
-  });
+  // AbortController for timeout (Vercel Serverless は最大10秒推奨)
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 25000); // 25秒タイムアウト
+
+  let res;
+  try {
+    res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      signal: controller.signal,
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6-20250514',
+        max_tokens: 512,
+        system: SYSTEM_PROMPT,
+        messages: [
+          { role: 'user', content: userMessage }
+        ]
+      })
+    });
+  } finally {
+    clearTimeout(timeoutId);
+  }
 
   if (!res.ok) {
     const errText = await res.text().catch(() => '');
@@ -307,10 +317,15 @@ async function callClaudeAPI(userMessage) {
 function sanitizeInput(text) {
   if (!text) return '';
   text = text.trim().substring(0, 500);
-  const suspicious = /^(system|忘れて|無視して|以下の|ルールを|指示を|あなたは今から)/i;
+  // HTMLタグ除去（ログ汚染・格納型XSS防止）
+  text = text.replace(/<[^>]*>/g, '');
+  // プロンプトインジェクション対策: 疑わしいパターンにプレフィックス付与
+  const suspicious = /^(system|忘れて|無視して|以下の|ルールを|指示を|あなたは今から|あなたは|新しいルール|override|ignore|forget|disregard)/i;
   if (suspicious.test(text)) {
     text = '【相談】' + text;
   }
+  // 制御文字の除去（null byte injection防止）
+  text = text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
   return text;
 }
 
@@ -359,6 +374,10 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(204).end();
 
+  // セキュリティヘッダー（vercel.jsonの設定に加えて明示的に）
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -389,9 +408,19 @@ module.exports = async function handler(req, res) {
     const uid = decodedToken.uid;
 
     // --- 2. リクエストボディ検証 ---
-    const { message } = req.body || {};
+    const body = req.body || {};
+    // リクエストボディに想定外のフィールドが含まれていないかチェック
+    const allowedFields = ['message'];
+    const bodyKeys = Object.keys(body);
+    if (bodyKeys.some(k => !allowedFields.includes(k))) {
+      return res.status(400).json({ error: 'Unexpected fields in request body' });
+    }
+    const { message } = body;
     if (!message || typeof message !== 'string' || !message.trim()) {
       return res.status(400).json({ error: 'Message is required' });
+    }
+    if (message.length > 2000) {
+      return res.status(400).json({ error: 'Message too long (max 2000 characters)' });
     }
     const sanitizedMessage = sanitizeInput(message);
 

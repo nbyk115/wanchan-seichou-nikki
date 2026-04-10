@@ -23,6 +23,7 @@ service cloud.firestore {
         && resource.data.to == request.auth.uid;
       allow create: if request.auth != null
         && request.resource.data.from == request.auth.uid
+        && request.resource.data.keys().hasOnly(['from', 'fromName', 'fromPhoto', 'to', 'createdAt', 'updatedAt', 'visitCount'])
         && request.resource.data.keys().hasAll(['from', 'fromName', 'to', 'createdAt', 'updatedAt', 'visitCount'])
         && request.resource.data.visitCount == 1
         && request.resource.data.from != request.resource.data.to;
@@ -33,14 +34,13 @@ service cloud.firestore {
         && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
     }
 
-    // Footprint read status: 足あと既読管理（フィールド制限付き）
-    // Note: field-validated version is in the friends section below
-
     // Introductions: ひとこと紹介文（1著者→1対象に1件、100文字以内）
     match /introductions/{introId} {
       allow read: if request.auth != null;
       allow create: if request.auth != null
         && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['targetUid', 'authorUid', 'authorName', 'authorPhoto', 'text', 'createdAt', 'updatedAt'])
+        && request.resource.data.keys().hasAll(['targetUid', 'authorUid', 'text', 'createdAt', 'updatedAt'])
         && request.resource.data.text is string
         && request.resource.data.text.size() > 0
         && request.resource.data.text.size() <= 100
@@ -61,6 +61,7 @@ service cloud.firestore {
       allow create: if request.auth != null
         && request.resource.data.from == request.auth.uid
         && request.resource.data.from != request.resource.data.to
+        && request.resource.data.keys().hasOnly(['from', 'fromName', 'to', 'status', 'createdAt'])
         && request.resource.data.keys().hasAll(['from', 'fromName', 'to', 'status', 'createdAt'])
         && request.resource.data.status == 'pending';
       allow read: if request.auth != null
@@ -110,13 +111,18 @@ service cloud.firestore {
     }
 
     // Comments: anyone logged in can create, anyone can read, author can delete
+    // update は意図的に禁止（コメント編集不可）
     match /comments/{commentId} {
       allow read: if request.auth != null;
       allow create: if request.auth != null
         && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['entryId', 'uid', 'displayName', 'photoURL', 'text', 'createdAt'])
+        && request.resource.data.keys().hasAll(['entryId', 'uid', 'text', 'createdAt'])
         && request.resource.data.text is string
         && request.resource.data.text.size() > 0
-        && request.resource.data.text.size() <= 1000;
+        && request.resource.data.text.size() <= 1000
+        && request.resource.data.entryId is string;
+      allow update: if false;
       allow delete: if request.auth != null
         && resource.data.uid == request.auth.uid;
     }

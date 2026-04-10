@@ -68,8 +68,11 @@ async function _fetchPremiumFromFirestore() {
     var db = fb._getDb && fb._getDb();
     if (!db) return null;
 
-    // dynamic import を避け、firebase-config.js が既に読み込んだ Firestore SDK を利用
-    var firestore = await import('https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js');
+    // dynamic import はブラウザでキャッシュされるが明示的にモジュールキャッシュを利用
+    if (!_fetchPremiumFromFirestore._firestoreModule) {
+      _fetchPremiumFromFirestore._firestoreModule = await import('https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js');
+    }
+    var firestore = _fetchPremiumFromFirestore._firestoreModule;
     var snap = await firestore.getDoc(firestore.doc(db, 'premium', uid));
 
     if (!snap.exists()) {
@@ -259,11 +262,15 @@ async function handlePaymentCallback() {
             if (idToken) verifyHeaders['Authorization'] = 'Bearer ' + idToken;
           }
         } catch (_authErr) {}
+        var verifyController = new AbortController();
+        var verifyTimeoutId = setTimeout(function() { verifyController.abort(); }, 15000);
         var verifyRes = await fetch('/api/payment/verify', {
           method: 'POST',
           headers: verifyHeaders,
+          signal: verifyController.signal,
           body: JSON.stringify({ session_id: sessionId })
         });
+        clearTimeout(verifyTimeoutId);
         if (!verifyRes.ok) {
           _toast('お支払いの確認がうまくいかなかったよ。サポートに相談してね', 'error');
           console.error('Payment verification failed:', verifyRes.status);
@@ -276,11 +283,14 @@ async function handlePaymentCallback() {
         }
       } catch (e) {
         console.error('Payment verification error:', e);
-        // サーバー検証が失敗した場合、ローカルのみのフォールバック（警告付き）
-        console.warn('SECURITY WARNING: Server-side verification unavailable, falling back to client-side. Configure sessionEndpoint/verify for production.');
+        // サーバー検証が失敗した場合、プレミアム付与しない（決済偽装防止）
+        _toast('お支払いの確認がうまくいかなかったよ。しばらくしてからもう一度アプリを開いてね', 'error');
+        return;
       }
     } else {
-      console.warn('SECURITY WARNING: No sessionEndpoint configured. Payment status not verified server-side.');
+      console.error('SECURITY ERROR: No sessionEndpoint configured. Cannot verify payment.');
+      _toast('お支払いの確認ができませんでした。サポートに相談してね', 'error');
+      return;
     }
 
     // verify API が Firestore に書き込み済み → クライアントはFirestoreからキャッシュ更新
