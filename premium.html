@@ -27,6 +27,7 @@ h1{font-size:22px;font-weight:900;text-align:center;margin-bottom:8px}
 /* 31%おトク強調バッジ */
 .discount-badge{display:inline-block;background:linear-gradient(135deg,#FF6B6B,#EE5A24);color:#fff;font-size:13px;font-weight:900;padding:4px 12px;border-radius:10px;margin-top:8px;animation:badgePulse 2s ease-in-out infinite}
 @keyframes badgePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@media(prefers-reduced-motion:reduce){.discount-badge{animation:none}.cta::after{animation:none}}
 
 h2{font-size:17px;font-weight:900;margin:32px 0 16px}
 .features{list-style:none}
@@ -72,6 +73,7 @@ a{color:#FF7B9C;text-decoration:none}
   .site-footer a{color:#a89490}
   .site-footer a:hover{color:#FF7B9C}
   .site-footer .copyright{color:#6a5a54}
+  .catch{color:#F5A6B8}
   .cta-sub{color:#a89490}
   .popular-badge{color:#1a1210}
 }

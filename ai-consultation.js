@@ -264,7 +264,7 @@ async function askAI(question) {
       incrementUsage();
       saveToHistory(question, answer);
       // Analytics event
-      _trackEvent('ai_consultation', { question_length: question.length, fallback: !!data.fallback });
+      _trackEvent('ai_consultation', { question_length: question.length, fallback: data.fallback ? 'true' : 'false' });
     }
 
     return { answer: answer, fallback: data.fallback || false };
@@ -310,7 +310,7 @@ function _localFallback(question) {
   // Don't consume free quota for fallback responses (endpoint not configured)
   // incrementUsage(); — disabled until real AI endpoint is connected
   saveToHistory(question, answer);
-  _trackEvent('ai_consultation', { question_length: question.length, fallback: true });
+  _trackEvent('ai_consultation', { question_length: question.length, fallback: 'true' });
 
   return { answer: answer, fallback: true };
 }
