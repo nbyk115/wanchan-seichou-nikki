@@ -43,7 +43,6 @@ function init() {
     var apps = getApps();
     if (apps.length === 0) return;
     analytics = getAnalytics(apps[0]);
-    console.log('Analytics initialized with measurementId:', ANALYTICS_CONFIG.measurementId);
   } catch (e) {
     // Analytics SDK が読み込めない場合は graceful に無視
     console.warn('Analytics init skipped:', e.message);

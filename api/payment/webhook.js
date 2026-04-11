@@ -110,7 +110,7 @@ module.exports = async function handler(req, res) {
     }
 
     const eventType = event.type;
-    console.log('Webhook received:', eventType);
+    // Webhook event type logged for monitoring
 
     // --- 4. 決済完了: プレミアム状態をFirestoreに書き込み ---
     if (eventType === 'payment.captured') {
@@ -142,7 +142,7 @@ module.exports = async function handler(req, res) {
         const existing = existingDoc.data();
         // 同一セッションIDの場合は冪等 (重複処理をスキップ)
         if (existing.sessionId === payment.session) {
-          console.log('Duplicate webhook for session:', payment.session);
+          // Duplicate webhook — skipped
           return res.status(200).json({ status: 'duplicate' });
         }
         // 残期間引き継ぎ
@@ -161,7 +161,7 @@ module.exports = async function handler(req, res) {
         updatedAt: admin.firestore.FieldValue.serverTimestamp()
       }, { merge: false });
 
-      console.log('Premium activated for uid:', uid, 'plan:', planKey);
+      // Premium activated
       return res.status(200).json({ status: 'activated' });
     }
 
@@ -179,7 +179,7 @@ module.exports = async function handler(req, res) {
           refundedAt: admin.firestore.FieldValue.serverTimestamp(),
           refundPaymentId: payment.id || ''
         });
-        console.log('Premium revoked (refund) for uid:', uid);
+        // Premium revoked
       }
 
       return res.status(200).json({ status: 'refunded' });
