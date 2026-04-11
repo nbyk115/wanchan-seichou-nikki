@@ -35,7 +35,15 @@ function getAdmin() {
   if (_admin) return _admin;
   const admin = require('firebase-admin');
   if (!admin.apps.length) {
-    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
+      throw new Error('FIREBASE_SERVICE_ACCOUNT environment variable is not set');
+    }
+    let serviceAccount;
+    try {
+      serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    } catch (parseErr) {
+      throw new Error('FIREBASE_SERVICE_ACCOUNT is not valid JSON: ' + parseErr.message);
+    }
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount)
     });
@@ -48,10 +56,21 @@ function getAdmin() {
 // HANDLER
 // ============================================================
 module.exports = async function handler(req, res) {
-  // CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // CORS — restrict to known origins (wildcard * is dangerous for authenticated endpoints)
+  const allowedOrigins = [
+    'https://nbyk115.github.io',
+    'https://wanchan-seichou-nikki.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:5173'
+  ];
+  const origin = req.headers.origin || '';
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
   if (req.method === 'OPTIONS') return res.status(204).end();
 
   if (req.method !== 'POST') {
@@ -76,7 +95,16 @@ module.exports = async function handler(req, res) {
     const uid = decodedToken.uid;
 
     // --- 2. プラン検証 (金額はサーバー側で決定) ---
-    const { planKey } = req.body || {};
+    const body = req.body || {};
+    const allowedFields = ['planKey', 'metadata'];
+    const bodyKeys = Object.keys(body);
+    if (bodyKeys.some(k => !allowedFields.includes(k))) {
+      return res.status(400).json({ error: 'Unexpected fields in request body' });
+    }
+    const { planKey } = body;
+    if (!planKey || typeof planKey !== 'string') {
+      return res.status(400).json({ error: 'planKey is required' });
+    }
     const plan = PLANS[planKey];
     if (!plan) {
       return res.status(400).json({ error: 'Invalid plan: ' + planKey });

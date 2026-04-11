@@ -324,7 +324,9 @@ function showPremiumModal() {
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10001;display:flex;align-items:center;justify-content:center;padding:20px;animation:ux-fade-in .2s ease;';
 
   var modal = document.createElement('div');
-  modal.style.cssText = 'background:#fff;border-radius:24px;max-width:380px;width:100%;padding:32px 24px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto;';
+  var _isDarkMode = document.body.classList.contains('ux-dark-on') ||
+    (document.body.classList.contains('ux-dark-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  modal.style.cssText = 'background:' + (_isDarkMode ? '#1e1e2e' : '#fff') + ';border-radius:24px;max-width:380px;width:100%;padding:32px 24px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto;color:' + (_isDarkMode ? '#e0e0e0' : '#333') + ';';
 
   var html = '';
   html += '<div style="font-size:48px;margin-bottom:12px;">🐾✨</div>';

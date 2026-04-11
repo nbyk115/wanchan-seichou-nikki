@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <meta name="theme-color" content="#FFF8F5"/>
 <meta name="description" content="わんちゃん成長日記へのお問い合わせ。ご質問・不具合報告・機能のご要望など、お気軽にご連絡ください。"/>
+<link rel="canonical" href="https://nbyk115.github.io/wanchan-seichou-nikki/contact.html"/>
 <title>お問い合わせ - わんちゃん成長日記</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -122,8 +123,12 @@ document.getElementById('contact-form').addEventListener('submit', function(e) {
   btn.style.opacity = '0.6';
 
   var category = document.getElementById('category').value;
-  var subject = encodeURIComponent('[わんちゃん成長日記] ' + category + ' - ' + name);
-  var body = encodeURIComponent('お名前: ' + name + '\nメール: ' + email + '\n種別: ' + category + '\n\n' + message);
+  // Sanitize inputs to prevent header injection in mailto
+  var safeName = name.replace(/[\r\n]/g, ' ');
+  var safeEmail = email.replace(/[\r\n]/g, ' ');
+  var safeMessage = message.replace(/[\r\n]{3,}/g, '\n\n');
+  var subject = encodeURIComponent('[わんちゃん成長日記] ' + category + ' - ' + safeName);
+  var body = encodeURIComponent('お名前: ' + safeName + '\nメール: ' + safeEmail + '\n種別: ' + category + '\n\n' + safeMessage);
   // mailto: はメールクライアントを開くだけなので、実際の送信はユーザー操作に依存
   window.location.href = 'mailto:wanchan.diary@gmail.com?subject=' + subject + '&body=' + body;
   // 送信ボタンを復元（mailto:はメーラーを開くだけで、送信は保証されない）

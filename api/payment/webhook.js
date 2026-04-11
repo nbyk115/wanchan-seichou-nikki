@@ -26,7 +26,15 @@ function getAdmin() {
   if (_admin) return _admin;
   const admin = require('firebase-admin');
   if (!admin.apps.length) {
-    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
+      throw new Error('FIREBASE_SERVICE_ACCOUNT environment variable is not set');
+    }
+    let serviceAccount;
+    try {
+      serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    } catch (parseErr) {
+      throw new Error('FIREBASE_SERVICE_ACCOUNT is not valid JSON: ' + parseErr.message);
+    }
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount)
     });
@@ -64,6 +72,10 @@ module.exports.config = {
 // HANDLER
 // ============================================================
 module.exports = async function handler(req, res) {
+  // Security headers
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
