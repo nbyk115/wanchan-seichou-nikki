@@ -1,3 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /api/ai
+Disallow: /api/payment/
+
 Sitemap: https://nbyk115.github.io/wanchan-seichou-nikki/sitemap.xml

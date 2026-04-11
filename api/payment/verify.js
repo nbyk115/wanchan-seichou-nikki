@@ -14,7 +14,15 @@ function getAdmin() {
   if (_admin) return _admin;
   const admin = require('firebase-admin');
   if (!admin.apps.length) {
-    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
+      throw new Error('FIREBASE_SERVICE_ACCOUNT environment variable is not set');
+    }
+    let serviceAccount;
+    try {
+      serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    } catch (parseErr) {
+      throw new Error('FIREBASE_SERVICE_ACCOUNT is not valid JSON: ' + parseErr.message);
+    }
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount)
     });
@@ -27,10 +35,21 @@ function getAdmin() {
 // HANDLER
 // ============================================================
 module.exports = async function handler(req, res) {
-  // CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // CORS — restrict to known origins (wildcard * is dangerous for authenticated endpoints)
+  const allowedOrigins = [
+    'https://nbyk115.github.io',
+    'https://wanchan-seichou-nikki.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:5173'
+  ];
+  const origin = req.headers.origin || '';
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
   if (req.method === 'OPTIONS') return res.status(204).end();
 
   if (req.method !== 'POST') {
@@ -38,6 +57,22 @@ module.exports = async function handler(req, res) {
   }
 
   try {
+    // --- 0. Firebase IDトークン検証 (認証済みユーザーのみ利用可能) ---
+    const authHeader = req.headers.authorization || '';
+    const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+    if (!idToken) {
+      return res.status(401).json({ error: 'Authorization required' });
+    }
+
+    const admin = getAdmin();
+    let decodedToken;
+    try {
+      decodedToken = await admin.auth().verifyIdToken(idToken);
+    } catch (authErr) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+    const callerUid = decodedToken.uid;
+
     const { session_id } = req.body || {};
     if (!session_id || typeof session_id !== 'string') {
       return res.status(400).json({ error: 'session_id required' });
@@ -78,9 +113,14 @@ module.exports = async function handler(req, res) {
       const uid = metadata.uid;
       const planKey = metadata.planKey;
 
+      // Ensure the session belongs to the authenticated caller
+      if (uid && uid !== callerUid) {
+        console.error('verify: session uid mismatch. caller:', callerUid, 'session:', uid);
+        return res.status(403).json({ error: 'Session does not belong to this user' });
+      }
+
       if (uid && planKey) {
         try {
-          const admin = getAdmin();
           const db = admin.firestore();
 
           const durationMs = planKey === 'yearly'

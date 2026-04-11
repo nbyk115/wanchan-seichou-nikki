@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <meta name="theme-color" content="#FFF8F5"/>
 <meta name="description" content="わんちゃん成長日記の使い方ガイド。日記の書き方、体重記録、AI健康相談、犬友機能の使い方をわかりやすく解説。"/>
+<link rel="canonical" href="https://nbyk115.github.io/wanchan-seichou-nikki/help.html"/>
 <title>使い方ガイド - わんちゃん成長日記</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -18,6 +19,7 @@ h2{font-size:17px;font-weight:900;margin:28px 0 12px;display:flex;align-items:ce
 .card p{font-size:13px;color:#636363}
 .faq{margin-bottom:8px}
 .faq summary{font-size:14px;font-weight:700;padding:14px 16px;background:#fff;border-radius:14px;cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;border:1px solid #f0e0d8}
+.faq summary::-webkit-details-marker{display:none}
 .faq summary::before{content:'❓';font-size:16px}
 .faq summary::after{content:'▼';margin-left:auto;font-size:10px;color:#aaa;transition:transform .2s}
 .faq[open] summary::after{transform:rotate(180deg)}
@@ -31,7 +33,10 @@ a{color:#FF7B9C;text-decoration:none}
 @media(prefers-color-scheme:dark){
   body{background:#1a1210;color:#e8d8d0}
   .card{background:#2a1e1a;border-color:#3d2e28}
+  .card-title{color:#F5A6B8}
   .card p{color:#a89490}
+  .sub{color:#a89490}
+  h2{color:#e8d8d0}
   .faq summary{background:#2a1e1a;border-color:#3d2e28;color:#e8d8d0}
   .faq .answer{color:#a89490}
   .footer{border-top-color:#3d2e28}
@@ -42,6 +47,7 @@ a{color:#FF7B9C;text-decoration:none}
 </head>
 <body>
 <div class="container">
+<main>
 <h1>🐾 使い方ガイド</h1>
 <p class="sub">わんちゃん成長日記の機能をかんたんに紹介するよ</p>
 
@@ -108,15 +114,16 @@ a{color:#FF7B9C;text-decoration:none}
 <summary>データを引き継ぐには？</summary>
 <div class="answer">Googleログインしていれば、新しい端末で同じGoogleアカウントでログインするだけで自動的にデータが同期されるよ。ログインしていない場合は、メニューからデータをエクスポート→新端末でインポートしてね。</div>
 </details>
+</main>
 
 <footer class="footer">
-<nav>
+<nav aria-label="サイトナビゲーション">
 <a href="/wanchan-seichou-nikki/">トップページ</a>
 <a href="premium.html">プレミアムプラン</a>
-<a href="contact.html">お問い合わせ</a>
 <a href="legal.html">特定商取引法</a>
 <a href="privacy.html">プライバシーポリシー</a>
 <a href="terms.html">利用規約</a>
+<a href="contact.html">お問い合わせ</a>
 </nav>
 <p class="copy">&copy; 2026 わんちゃん成長日記</p>
 </footer>

@@ -57,7 +57,12 @@ if (isConfigured) {
       lastLogin: serverTimestamp()
     }, { merge: true });
     window.dispatchEvent(new CustomEvent('wanchan-login', { detail: { uid: result.user.uid } }));
-  }).catch(() => {});
+  }).catch((err) => {
+    // redirect-cancelled / no-redirect は正常系なので無視。それ以外はログ出力
+    if (err && err.code !== 'auth/redirect-cancelled-by-user' && err.code !== 'auth/no-auth-event') {
+      console.warn('getRedirectResult error:', err.code || err.message);
+    }
+  });
 }
 
 // ============================================================
@@ -111,12 +116,13 @@ function onAuth(cb) {
 // ============================================================
 let _lastSyncHash = '';
 
-// Collect app data keys (exclude ux_ prefix which is UX-only state)
+// Collect app data keys (only wanchan_ prefixed keys — prevent leaking other apps' data)
+const APP_DATA_PREFIX = 'wanchan_';
 function _getAppData() {
   const data = {};
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
-    if (key && !key.startsWith('ux_')) {
+    if (key && key.startsWith(APP_DATA_PREFIX)) {
       data[key] = localStorage.getItem(key);
     }
   }
@@ -170,7 +176,7 @@ async function syncFromCloud(uid) {
     // Remove local app keys that no longer exist in cloud (handles deletions)
     for (let i = localStorage.length - 1; i >= 0; i--) {
       const key = localStorage.key(i);
-      if (key && !key.startsWith('ux_') && !cloudKeys.has(key)) {
+      if (key && key.startsWith(APP_DATA_PREFIX) && !cloudKeys.has(key)) {
         localStorage.removeItem(key);
       }
     }
@@ -334,6 +340,7 @@ async function postIntroduction(targetUid, text) {
     _toast('1〜100文字で書いてね', 'error');
     return false;
   }
+  var sanitizedText = _sanitizeText(text.trim());
 
   var docId = targetUid + '_' + auth.currentUser.uid;
   var ref = doc(db, 'introductions', docId);
@@ -342,7 +349,7 @@ async function postIntroduction(targetUid, text) {
     var existing = await getDoc(ref);
     if (existing.exists()) {
       await updateDoc(ref, {
-        text: text,
+        text: sanitizedText,
         updatedAt: serverTimestamp(),
         authorName: auth.currentUser.displayName,
         authorPhoto: auth.currentUser.photoURL
@@ -353,7 +360,7 @@ async function postIntroduction(targetUid, text) {
         authorUid: auth.currentUser.uid,
         authorName: auth.currentUser.displayName,
         authorPhoto: auth.currentUser.photoURL,
-        text: text,
+        text: sanitizedText,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       });
@@ -483,13 +490,15 @@ async function postComment(entryId, text) {
   if (!isConfigured || !auth.currentUser) return;
   if (!text || !text.trim()) { _toast('コメントを入力してね', 'error'); return; }
   if (text.length > 1000) { _toast('1000文字以内で書いてね', 'error'); return; }
+  if (!entryId || typeof entryId !== 'string') return;
+  var sanitizedText = _sanitizeText(text.trim());
   try {
     await addDoc(collection(db, 'comments'), {
       entryId: entryId,
       uid: auth.currentUser.uid,
       displayName: auth.currentUser.displayName,
       photoURL: auth.currentUser.photoURL,
-      text: text,
+      text: sanitizedText,
       createdAt: serverTimestamp()
     });
   } catch (e) {
@@ -527,6 +536,17 @@ function onCommentsUpdate(entryId, cb) {
     cb(snap.docs.map(function(d) { return { id: d.id, ...d.data() }; }));
   }, function(err) {
     console.error('onCommentsUpdate error:', err);
+  });
+}
+
+// ============================================================
+// INPUT SANITIZATION
+// ============================================================
+/** Strip HTML tags to prevent stored XSS when content is rendered with innerHTML elsewhere */
+function _sanitizeText(text) {
+  if (!text) return '';
+  return text.replace(/[<>&"']/g, function(c) {
+    return { '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&#39;' }[c];
   });
 }
 

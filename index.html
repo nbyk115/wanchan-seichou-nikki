@@ -665,22 +665,8 @@ Error generating stack: `+n.message+`
   window.__wanchan = window.__wanchan || {};
   window.__wanchan.showToast = showToast;
 
-  // Firebase auth user reference (set via onAuth callback)
-  var _currentUser = null;
-  // Listen for auth state from firebase-config.js module
-  (function() {
-    var _authCheckInterval = setInterval(function() {
-      var fb = window.__wanchan && window.__wanchan.firebase;
-      if (fb && fb.isConfigured && fb.onAuth) {
-        clearInterval(_authCheckInterval);
-        fb.onAuth(function(user) {
-          _currentUser = user;
-        });
-      }
-    }, 200);
-    // Give up after 30s
-    setTimeout(function() { clearInterval(_authCheckInterval); }, 30000);
-  })();
+  // Firebase auth user reference — uses _currentUser declared in section 0 (Utilities)
+  // The onAuth listener is already registered there via _initAuthListener().
 
   /* ==============================
      2. ENHANCED DELETE CONFIRMATION + UNDO
@@ -1085,7 +1071,7 @@ Error generating stack: `+n.message+`
 
     // Handle browser back (swipe back / back button)
     window.addEventListener('popstate', function(e) {
-      _popInProgress = true;
+      _screenPopInProgress = true;
       // Find and click the app's back button
       var backBtn = document.querySelector('[aria-label="戻る"], [style*="cursor"] svg');
       if (backBtn) {
@@ -1095,8 +1081,8 @@ Error generating stack: `+n.message+`
         var homeNav = document.querySelector('[data-page="home"], nav button:first-child');
         if (homeNav) homeNav.click();
       }
-      _lastScreen = (e.state && e.state.screen) || '';
-      setTimeout(function() { _popInProgress = false; }, 100);
+      _screenLastScreen = (e.state && e.state.screen) || '';
+      setTimeout(function() { _screenPopInProgress = false; }, 100);
     });
   })();
 

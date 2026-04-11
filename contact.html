@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <meta name="theme-color" content="#FFF8F5"/>
 <meta name="description" content="わんちゃん成長日記へのお問い合わせ。ご質問・不具合報告・機能のご要望など、お気軽にご連絡ください。"/>
+<link rel="canonical" href="https://nbyk115.github.io/wanchan-seichou-nikki/contact.html"/>
 <title>お問い合わせ - わんちゃん成長日記</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -33,6 +34,10 @@ a{color:#FF7B9C;text-decoration:none}
   label{color:#e8d8d0}
   input,textarea,select{background:#2a1e1a;border-color:#3d2e28;color:#e8d8d0}
   .info{background:#2a1e1a;color:#a89490}
+  .sub{color:#a89490}
+  .back{background:#3d2e28;color:#e8d8d0}
+  .thanks h2{color:#e8d8d0}
+  .thanks p{color:#a89490}
   .footer{border-top-color:#3d2e28}
   .footer a{color:#a89490}
   .footer .copy{color:#6a5a54}
@@ -41,6 +46,7 @@ a{color:#FF7B9C;text-decoration:none}
 </head>
 <body>
 <div class="container">
+<main>
 <h1>🐾 お問い合わせ</h1>
 <p class="sub">わんちゃん成長日記へのご質問・ご要望をお聞かせください</p>
 
@@ -50,9 +56,9 @@ a{color:#FF7B9C;text-decoration:none}
 通常2営業日以内にご返信いたします。
 </div>
 
-<form id="contact-form" action="#" method="POST">
+<form id="contact-form" action="#" method="POST" novalidate>
 <label for="name">お名前</label>
-<input type="text" id="name" name="name" placeholder="お名前" required/>
+<input type="text" id="name" name="name" placeholder="お名前" required maxlength="100"/>
 
 <label for="email">メールアドレス</label>
 <input type="email" id="email" name="email" placeholder="example@email.com" required/>
@@ -68,9 +74,9 @@ a{color:#FF7B9C;text-decoration:none}
 </select>
 
 <label for="message">お問い合わせ内容</label>
-<textarea id="message" name="message" placeholder="お気軽にお書きください..." required></textarea>
+<textarea id="message" name="message" placeholder="お気軽にお書きください..." required maxlength="5000"></textarea>
 
-<div id="form-errors" style="display:none;background:#FEF2F2;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#DC2626;line-height:1.7;"></div>
+<div id="form-errors" role="alert" aria-live="polite" style="display:none;background:#FEF2F2;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#DC2626;line-height:1.7;"></div>
 <button type="submit" class="submit" id="submit-btn">送信する</button>
 </form>
 
@@ -92,13 +98,18 @@ document.getElementById('contact-form').addEventListener('submit', function(e) {
 
   // バリデーション
   if (!name) errors.push('お名前を入力してね');
+  else if (name.length > 100) errors.push('お名前は100文字以内でお願いするね');
   if (!email) errors.push('メールアドレスを入力してね');
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push('メールアドレスの形式を確認してね');
   if (!message) errors.push('お問い合わせ内容を入力してね');
   else if (message.length < 10) errors.push('お問い合わせ内容をもう少し詳しく書いてね（10文字以上）');
+  else if (message.length > 5000) errors.push('お問い合わせ内容は5000文字以内でお願いするね');
 
   if (errors.length > 0) {
     errDiv.textContent = '';
+    var isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    errDiv.style.background = isDark ? '#3a1a1a' : '#FEF2F2';
+    errDiv.style.color = isDark ? '#fca5a5' : '#DC2626';
     errors.forEach(function(err, i) {
       if (i > 0) errDiv.appendChild(document.createElement('br'));
       errDiv.appendChild(document.createTextNode(err));
@@ -114,8 +125,12 @@ document.getElementById('contact-form').addEventListener('submit', function(e) {
   btn.style.opacity = '0.6';
 
   var category = document.getElementById('category').value;
-  var subject = encodeURIComponent('[わんちゃん成長日記] ' + category + ' - ' + name);
-  var body = encodeURIComponent('お名前: ' + name + '\nメール: ' + email + '\n種別: ' + category + '\n\n' + message);
+  // Sanitize inputs to prevent header injection in mailto
+  var safeName = name.replace(/[\r\n]/g, ' ');
+  var safeEmail = email.replace(/[\r\n]/g, ' ');
+  var safeMessage = message.replace(/[\r\n]{3,}/g, '\n\n');
+  var subject = encodeURIComponent('[わんちゃん成長日記] ' + category + ' - ' + safeName);
+  var body = encodeURIComponent('お名前: ' + safeName + '\nメール: ' + safeEmail + '\n種別: ' + category + '\n\n' + safeMessage);
   // mailto: はメールクライアントを開くだけなので、実際の送信はユーザー操作に依存
   window.location.href = 'mailto:wanchan.diary@gmail.com?subject=' + subject + '&body=' + body;
   // 送信ボタンを復元（mailto:はメーラーを開くだけで、送信は保証されない）
@@ -124,14 +139,16 @@ document.getElementById('contact-form').addEventListener('submit', function(e) {
   btn.style.opacity = '1';
   // 注意メッセージを表示
   errDiv.style.display = 'block';
-  errDiv.style.background = '#F0FFF4';
-  errDiv.style.color = '#166534';
+  var isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  errDiv.style.background = isDarkMode ? '#1a2e1a' : '#F0FFF4';
+  errDiv.style.color = isDarkMode ? '#86efac' : '#166534';
   errDiv.textContent = 'メールアプリが開いたよ。メールアプリで「送信」してね。メールアプリが開かない場合は wanchan.diary@gmail.com に直接メールしてね。';
 });
 </script>
+</main>
 
 <footer class="footer">
-<nav>
+<nav aria-label="サイトナビゲーション">
 <a href="/wanchan-seichou-nikki/">トップページ</a>
 <a href="premium.html">プレミアムプラン</a>
 <a href="legal.html">特定商取引法</a>
