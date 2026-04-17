@@ -23,8 +23,7 @@ const KOMOJU_CONFIG = {
       currency: 'JPY',
       interval: 'month',
       features: [
-        'AI健康相談 無制限',
-        '写真保存 無制限'
+        'AI健康相談 無制限'
       ]
     },
     yearly: {
@@ -35,7 +34,6 @@ const KOMOJU_CONFIG = {
       interval: 'year',
       features: [
         'AI健康相談 無制限',
-        '写真保存 無制限',
         '2ヶ月分おトク！'
       ]
     }
@@ -379,6 +377,10 @@ function showPremiumModal() {
     html += '<span style="color:#16A34A;font-weight:700;">✓</span> ' + f;
     html += '</div>';
   });
+  html += '</div>';
+
+  html += '<div style="text-align:center;font-size:12px;color:#888;margin-bottom:16px;line-height:1.7;">';
+  html += '自動更新なし / いつでもキャンセルOK';
   html += '</div>';
 
   if (!isKomojuConfigured) {
