@@ -27,6 +27,10 @@ h1{font-size:22px;font-weight:900;text-align:center;margin-bottom:8px}
 .plan-price{font-size:28px;font-weight:900;color:#FF7B9C}
 .plan-price span{font-size:14px;font-weight:400;color:#8A6F6A}
 .plan-note{font-size:12px;color:#8A6F6A;margin-top:4px}
+.plan-cta{display:block;margin-top:16px;padding:12px 16px;background:#FF7B9C;color:#fff;border-radius:12px;font-size:14px;font-weight:700;text-align:center;text-decoration:none;transition:transform .15s,box-shadow .15s;min-height:44px;line-height:1.4}
+.plan-cta:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(255,123,156,.3)}
+.plan-cta:active{transform:scale(.98)}
+.plan-cta-popular{background:linear-gradient(135deg,#FF6B6B,#FF7B9C)}
 
 /* 31%おトク強調バッジ */
 .discount-badge{display:inline-block;background:linear-gradient(135deg,#FF6B6B,#EE5A24);color:#fff;font-size:13px;font-weight:900;padding:4px 12px;border-radius:10px;margin-top:8px;animation:badgePulse 2s ease-in-out infinite}
@@ -80,6 +84,8 @@ a{color:#FF7B9C;text-decoration:none}
   .catch{color:#F5A6B8}
   .cta-sub{color:#a89490}
   .popular-badge{color:#1a1210}
+  .plan-cta{background:#FF7B9C;color:#fff}
+  .plan-cta-popular{background:linear-gradient(135deg,#FF6B6B,#FF7B9C)}
 }
 </style>
 </head>
@@ -94,15 +100,17 @@ a{color:#FF7B9C;text-decoration:none}
 <div class="plan" role="region" aria-label="月額プラン">
 <div class="plan-name">月額プラン</div>
 <div class="plan-price">480<span>円/月（税込）</span></div>
-<p class="plan-note">いつでもキャンセル可能</p>
+<p class="plan-note">いつでもキャンセル可能 / 自動更新なし</p>
+<a href="/wanchan-seichou-nikki/?plan=monthly" class="plan-cta" role="button" aria-label="月額プランで始める">月額プランで始める</a>
 </div>
 
 <div class="plan popular" role="region" aria-label="年額プラン（おすすめ）">
 <div class="popular-badge" aria-label="おすすめプラン">おすすめ</div>
 <div class="plan-name">年額プラン</div>
 <div class="plan-price">3,980<span>円/年（税込）</span></div>
-<p class="plan-note">月あたり約332円</p>
+<p class="plan-note">月あたり約332円 / 自動更新なし</p>
 <span class="discount-badge" aria-label="31%おトク">今なら31%おトク!</span>
+<a href="/wanchan-seichou-nikki/?plan=yearly" class="plan-cta plan-cta-popular" role="button" aria-label="年額プランで始める">年額プランで始める</a>
 </div>
 
 <h2>機能比較</h2>
@@ -136,8 +144,8 @@ a{color:#FF7B9C;text-decoration:none}
 </div>
 </div>
 
-<a href="/wanchan-seichou-nikki/" class="cta" role="button">アプリで試してみる（無料）</a>
-<span class="cta-sub">クレジットカード登録不要 / いつでも解約OK</span>
+<a href="/wanchan-seichou-nikki/" class="cta" role="button">まず無料で試してみる</a>
+<span class="cta-sub">基本機能は無料 / AI相談は月5回まで無料でお試しいただけます</span>
 </main>
 
 <footer class="site-footer">

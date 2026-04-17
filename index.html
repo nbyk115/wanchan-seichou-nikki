@@ -1113,7 +1113,8 @@ Error generating stack: `+n.message+`
     }
   }
   applyDarkMode();
-  // Enable all features (no premium paywall)
+  // Trial flag: exp=2099 marks free-tier users for AI 5-count limit logic.
+  // Real premium state lives in Firestore via komoju-payment.js (wanchan_premium key).
   try {
     var _wp = JSON.parse(localStorage.getItem('wp') || '{}');
     if (!_wp.on) {
