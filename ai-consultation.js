@@ -69,12 +69,12 @@ function incrementUsage() {
 }
 
 function getRemainingCount() {
-  // プレミアム判定: wp フラグが立っていて2099年でない場合はプレミアム
+  // 信頼の源泉: komoju-payment.js の isPremium() (Firestore premium/{uid})
+  // localStorageの `wp` は index.html のトライアル付与用(2099)で無制限ではない
   try {
-    var wp = JSON.parse(localStorage.getItem('wp') || '{}');
-    // 全機能無料開放中（2099年）は無料ユーザーとして扱う
-    if (wp.on && wp.exp && !wp.exp.startsWith('2099')) {
-      return Infinity; // プレミアムは無制限
+    var payment = window.__wanchan && window.__wanchan.payment;
+    if (payment && typeof payment.isPremium === 'function' && payment.isPremium()) {
+      return Infinity;
     }
   } catch (e) {}
   return Math.max(0, AI_CONFIG.freeLimit - getUsageCount());
@@ -162,8 +162,8 @@ function _sanitizeInput(text) {
   if (!text) return '';
   // 最大500文字に制限
   text = text.trim().substring(0, 500);
-  // システム指示の上書き試行を検知
-  var suspicious = /^(system|忘れて|無視して|以下の|ルールを|指示を|あなたは今から)/i;
+  // システム指示の上書き試行を検知（行頭限定は回避可能のため全文走査）
+  var suspicious = /(system:|忘れて|無視して|以下の指示|ルールを変更|指示を変更|あなたは今から|ignore (all |previous )?instructions|system prompt)/i;
   if (suspicious.test(text)) {
     text = '【相談】' + text;
   }

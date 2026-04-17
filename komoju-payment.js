@@ -312,6 +312,14 @@ function renderPremiumBadge() {
 }
 
 function showPremiumModal() {
+  // ファネル計測: モーダル表示イベントを自動送信
+  try {
+    var analytics = window.__wanchan && window.__wanchan.analytics;
+    if (analytics && typeof analytics.trackPremiumView === 'function') {
+      analytics.trackPremiumView();
+    }
+  } catch (_e) {}
+
   // 既存のモーダルがあれば削除
   var existing = document.getElementById('wanchan-premium-modal');
   if (existing) existing.remove();
@@ -394,11 +402,19 @@ function showPremiumModal() {
   var closeBtn = document.getElementById('premium-close');
   if (closeBtn) closeBtn.addEventListener('click', function() { overlay.remove(); });
 
+  function _trackPlanSelect(planKey) {
+    try {
+      var a = window.__wanchan && window.__wanchan.analytics;
+      if (a && typeof a.trackPremiumPlanSelect === 'function') a.trackPremiumPlanSelect(planKey);
+    } catch (_e) {}
+  }
+
   var monthlyBtn = document.getElementById('plan-monthly');
   if (monthlyBtn) {
     monthlyBtn.addEventListener('click', function() {
       if (!isKomojuConfigured) { _toast('決済機能はただいま準備中だよ', 'info'); return; }
       if (currentPlan) { _toast('もうプレミアムを使っているよ', 'info'); return; }
+      _trackPlanSelect('monthly');
       startPayment('monthly');
     });
     monthlyBtn.addEventListener('mouseenter', function() { this.style.transform = 'scale(1.02)'; });
@@ -410,6 +426,7 @@ function showPremiumModal() {
     yearlyBtn.addEventListener('click', function() {
       if (!isKomojuConfigured) { _toast('決済機能はただいま準備中だよ', 'info'); return; }
       if (currentPlan) { _toast('もうプレミアムを使っているよ', 'info'); return; }
+      _trackPlanSelect('yearly');
       startPayment('yearly');
     });
     yearlyBtn.addEventListener('mouseenter', function() { this.style.transform = 'scale(1.02)'; });
@@ -442,6 +459,38 @@ Object.assign(window.__wanchan, {
 });
 
 // ============================================================
-// AUTO: Check payment callback on load
+// AUTO: Check payment callback on load (IIFEでエラー伝播を遮断)
 // ============================================================
-handlePaymentCallback();
+(async function _bootPaymentCallback() {
+  try {
+    await handlePaymentCallback();
+  } catch (e) {
+    console.error('handlePaymentCallback failed:', e);
+  }
+})();
+
+// ============================================================
+// AUTO: premium.html の ?plan=monthly / ?plan=yearly 遷移を検知
+// → モーダルを自動表示して決済フローへ誘導（ログイン必須の場合はindex.html側でガード）
+// ============================================================
+(function _openModalFromQuery() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var plan = params.get('plan');
+    if (plan !== 'monthly' && plan !== 'yearly') return;
+
+    // URLをクリーン（リロードで何度も開かないため）
+    var clean = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, '', clean);
+
+    // DOMContentLoaded後に表示（モーダルDOM挿入のため）
+    function open() {
+      try { showPremiumModal(); } catch (_e) {}
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', open, { once: true });
+    } else {
+      setTimeout(open, 300);
+    }
+  } catch (_e) {}
+})();
