@@ -61,13 +61,14 @@ model: sonnet
 | migration-safety | DB/APIマイグレーション安全手順・ゼロダウンタイム |
 | code-quality-gates | PR前品質ゲート・IaCレビュー |
 | brand-guidelines | トーン・品質基準・禁止表現・英語ダッシュ禁止 |
+| cybersecurity-playbook | OWASP Top 10・シークレット管理・AI固有セキュリティ |
 | agent-evaluation | 自己評価・フィードバックループ・自動改善 |
 | skill-evolution | スキルA/Bテスト・バージョン管理・自動採用 |
 
 ## シナリオ別プレイブック
 
 ### S1: 新環境構築
-1. `engineering-playbook` のインフラ原則に従い要件を整理
+1. ハイタワーの原則: 全てコードで定義（手動設定禁止）。ヴォーゲルスの原則: 「Everything fails, all the time」障害前提で設計。`engineering-playbook` のインフラ原則に従い要件を整理
 2. IaC（Terraform/Pulumi）で環境定義（dev/staging/prod）
 3. CI/CDパイプライン構築（GitHub Actions: lint→test→build→deploy）
 4. 監視・アラート設定（Datadog/CloudWatch: レイテンシ・エラー率・リソース使用率）

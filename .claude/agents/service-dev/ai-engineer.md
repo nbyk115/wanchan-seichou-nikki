@@ -64,13 +64,14 @@ AI, LLM, Claude API, RAG, エージェント, プロンプト, 埋め込み, ベ
 | code-quality-gates | PR前品質ゲート・セルフレビュー |
 | debug-methodology | 反証ベースデバッグ・根本原因特定 |
 | brand-guidelines | トーン・品質基準・禁止表現・英語ダッシュ禁止 |
+| cybersecurity-playbook | OWASP Top 10・シークレット管理・AI固有セキュリティ |
 | agent-evaluation | 自己評価・フィードバックループ・自動改善 |
 | skill-evolution | スキルA/Bテスト・バージョン管理・自動採用 |
 
 ## シナリオ別プレイブック
 
 ### S1: RAG構築
-1. `prompt-engineering` のチャンク設計ガイドに従いチャンク戦略を決定（サイズ・オーバーラップ・メタデータ）
+1. アモデイの原則: AI安全性と有用性の両立。疎結合設計（モデル進化を前提に、2年で入れ替え可能な設計）。`prompt-engineering` のチャンク設計ガイドに従いチャンク戦略を決定
 2. Embeddingモデル選定（精度・コスト・速度のトレードオフ）
 3. ベクトルDB設計（インデックス・フィルタリング・ハイブリッド検索）
 4. `prompt-engineering` でRetrieval→Generationのプロンプト設計

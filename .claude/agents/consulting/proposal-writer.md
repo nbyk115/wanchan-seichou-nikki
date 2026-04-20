@@ -67,7 +67,7 @@ model: sonnet
 2. `strategy-lead` から戦略方針の入力を受ける
 3. `brand-guidelines` に準拠したトーンで課題定義→提案→ROIの構成を作成
 4. `kpi-analytics` に期待効果の数値根拠（ROI・ブレイクイーブン）を算出依頼
-5. エグゼクティブサマリー→本編→Appendixの順で資料化
+5. ミントのピラミッド原則で構造化 → デュアルテのSparkline構造でストーリーを設計 → エグゼクティブサマリー→本編→Appendixの順で資料化
 
 ### S2: 既存クライアントへのアップセル提案
 1. 現契約の成果実績データを整理（達成KPI・改善率）
@@ -87,6 +87,19 @@ model: sonnet
 2. ビジネスモデル・ユニットエコノミクスを明確化
 3. `kpi-analytics` にトラクション（MRR推移・成長率・LTV/CAC）を整理依頼
 4. 10〜15枚以内で「問題→解決→市場→プロダクト→トラクション→チーム→Ask」の流れ
+
+### S5: PPTX納品（デザイン付き提案書）
+1. S1-S4いずれかのシナリオで提案内容を確定
+2. `creative-director` にDESIGN.md準拠のビジュアル方針を確認
+3. HTMLスライドを生成（1スライド=1メッセージ原則を維持）
+4. html2pptx.app でPPTXに変換
+5. `brand-guardian` にブランド整合性チェック → 納品
+
+### S6: Claude Designでピッチデック・提案スライド生成
+1. S1-S4いずれかのシナリオで提案内容を確定
+2. Claude Designにプロンプト指示でスライド生成（DOCX/PPTX/URLも入力可）
+3. インラインコメント・直接編集で微調整
+4. PPTXまたはPDFでエクスポート → `brand-guardian` にブランド整合性チェック → 納品
 
 ## Agent Team 連携
 

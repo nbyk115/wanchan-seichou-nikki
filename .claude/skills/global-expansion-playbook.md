@@ -277,8 +277,11 @@ LTV/CAC（現地ベース）: ___倍
 | 自己評価・フィードバックループ | → `agent-evaluation.md` |
 | スキルA/Bテスト・自動改善 | → `skill-evolution.md` |
 | 多言語LP/UIのデザインシステム | → `creative-playbook.md` §9 DESIGN.md |
+| 現地LP高速プロトタイプ | → Claude Design（プロンプト→HTML/PDF export→現地検証） |
+| 多言語プロモ動画制作 | → Video Use（字幕焼込み・色補正・リール自動編集） |
 | ブランドトーンの多言語整合 | → `brand-guidelines.md` |
 | 現地サーバー・インフラ監視 | → `claude-code-ops.md` §4.5 Monitor |
+| 出力の事実検証が必要 | → `falsification-check.md` + `/check-hallucination` |
 
 ## 適用エージェント
 - `global/gtm-consultant` — 市場評価・GTM設計・参入モデル選択
@@ -300,3 +303,4 @@ LTV/CAC（現地ベース）: ___倍
 | Ver | 日付 | 変更内容 | 根拠 | 効果 |
 |---|---|---|---|---|
 | 1.0.0 | 2026-03-25 | 初版 | — | ベースライン |
+| 1.1.0 | 2026-04-18 | Claude Design + Video Use 参照追加 | 新ツール統合 | 現地LP検証・多言語動画の制作コスト削減 |

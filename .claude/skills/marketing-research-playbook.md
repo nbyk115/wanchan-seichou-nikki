@@ -7,6 +7,42 @@ Marketing & Research部門の全エージェントが参照する共通ナレッ
 
 ## 1. マーケティング戦略フレームワーク
 
+### 3C分析（市場環境の構造把握）
+```
+Customer（顧客）
+  → 誰が買うか。ニーズ・購買行動・意思決定プロセス
+  → セグメント別の規模・成長率・未充足ニーズ
+
+Competitor（競合）
+  → 直接競合 + 間接競合（代替手段）のリストアップ
+  → 各社の強み・弱み・戦略・シェア
+  → competitive-analyst と連携
+
+Company（自社）
+  → 自社のアセット・ケイパビリティ・リソース制約
+  → 競合に対する構造的優位性（佐藤: 「どの構造を持つプレイヤーが勝つか」）
+```
+
+### 4P/4C分析（マーケティングミックス）
+```
+4P（売り手視点）          4C（買い手視点）
+Product（製品）     ←→   Customer Value（顧客価値）
+  → 機能・品質・デザイン       → 顧客が得る便益は何か
+  → product-manager と連携
+
+Price（価格）       ←→   Cost（顧客コスト）
+  → 価格戦略・割引・支払条件   → 金銭+時間+労力の総コスト
+  → PSM/コンジョイント分析     → market-researcher と連携
+
+Place（流通）       ←→   Convenience（利便性）
+  → チャネル選定・販路設計     → 顧客がどこで買えるか
+  → オンライン/オフライン配分
+
+Promotion（販促）   ←→   Communication（対話）
+  → 広告・PR・SNS・CRM        → 双方向コミュニケーション設計
+  → 各マーケティングエージェントが分担
+```
+
 ### STP実践手順
 ```
 Segmentation（市場細分化）
@@ -38,6 +74,20 @@ MOFU（Middle of Funnel）— 検討・比較
 BOFU（Bottom of Funnel）— 購買・決定
   チャネル: SEM / LP / CRM / セールス連携
   KPI: SQL / CV数 / CPA / CVR
+```
+
+### 購買行動モデル（AIDMA/AISAS）
+```
+AIDMA（マス広告時代）
+  Attention（注意）→ Interest（興味）→ Desire（欲求）→ Memory（記憶）→ Action（行動）
+
+AISAS（デジタル時代）★推奨
+  Attention（注意）→ Interest（興味）→ Search（検索）→ Action（行動）→ Share（共有）
+  → SNS/SEO/UGCが重要。共有が次のAttentionを生む循環構造
+
+ULSSAS（SNS時代）
+  UGC → Like → Search(SNS) → Search(Google) → Action → Spread
+  → UGC起点。social-media-strategist が設計
 ```
 
 ### フライホイールモデル
@@ -309,6 +359,17 @@ BOFU（Bottom of Funnel）— 購買・決定
 
 ---
 
+## 制作ツール連携
+
+| 用途 | ツール | 備考 |
+|---|---|---|
+| レポート・提案スライド | Claude Design | プロンプト→PPTX/PDF。クライアント納品物の初稿を高速生成 |
+| SNS広告動画・リール | Video Use | 素材フォルダ→完成mp4。字幕・色補正・フィラー除去自動 |
+| バナー・OGP・SNS画像 | Canva | テンプレベース高速制作 |
+| LP プロトタイプ | Claude Design → HTML export | A/Bテスト用LPの初稿を数分で生成 |
+
+---
+
 ## アンチパターン（全般）
 
 | ❌ やりがち | ✅ 正しい方法 |
@@ -331,3 +392,4 @@ BOFU（Bottom of Funnel）— 購買・決定
 | Ver | 日付 | 変更内容 | 根拠 | 効果 |
 |---|---|---|---|---|
 | 1.0.0 | 2026-03-25 | 初版 | — | ベースライン |
+| 1.1.0 | 2026-04-18 | Claude Design + Video Use 制作ツール連携表追加 | 新ツール統合 | 納品物・広告素材の制作コスト削減 |

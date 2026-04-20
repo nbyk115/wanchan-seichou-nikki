@@ -27,7 +27,7 @@
 - **L3の場合**: strategy-leadへの提案書を作成
 
 ### Phase 5: 記録
-1. evolution-log に全過程を記録（`.claude/memory/` に保存）
+1. `evolution-log.jsonl` に1行追記（既存行の変更禁止）。JSON形式で `{id, date, target, type, level, title, changes, rationale, expected_effect, result}` を記録
 2. 修正したスキルのバージョン履歴を更新
 3. 次回測定タイミングを設定
 

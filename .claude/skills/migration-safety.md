@@ -151,6 +151,41 @@ CREATE INDEX CONCURRENTLY idx_users_email ON users(email);
 
 ---
 
+## 5.5 Shift Left + 段階的ロールアウト
+
+> **出典**: addyosmani/agent-skills "ci-cd-and-automation" + "shipping-and-launch"
+> **原則**: 本番事故を**左へ左へ**（早い段階で）検知する。デプロイは**段階的**に広げる。
+
+### Shift Left（検知を早い段階へ）
+| フェーズ | 従来の検知タイミング | Shift Left 後 |
+|---|---|---|
+| Lint エラー | CI | エディタ（エージェント出力時に即） |
+| 型エラー | CI | 編集直後の `tsc --noEmit` |
+| 単体テスト失敗 | CI | pre-commit hook |
+| セキュリティ脆弱性 | 本番スキャン | PR時 `/security-scan` |
+| パフォーマンス劣化 | 本番RUM | PR時 Lighthouse CI |
+| マイグレーション破綻 | 本番実行 | ステージング dry-run |
+
+→ **エラーは見つけるのが遅いほど修正コストが指数的に増大する**。Claude Code のhooksに組み込んで機械的に早期検知する。
+
+### 段階的ロールアウト（Progressive Delivery）
+
+| 段階 | 対象 | ゲート条件 | 期間 |
+|---|---|---|---|
+| 0% → 1% | Canary（社内/dogfood） | エラー率変化なし・レイテンシ劣化なし | 30分〜2時間 |
+| 1% → 10% | 限定ユーザー | Core Web Vitals 劣化なし・重大バグゼロ | 2〜24時間 |
+| 10% → 50% | 半分のユーザー | ビジネス指標（CVR/チャーン）劣化なし | 1〜3日 |
+| 50% → 100% | 全ユーザー | 全ゲート通過 | 即時 |
+
+**ロールバック基準**: 各段階で**1つでも**赤信号が出たら即座に前段階に戻す。「あとで直す」は禁止。
+
+### Feature Flag 運用
+- 新機能は **必ず** feature flag 配下で出す（`NEXT_PUBLIC_FEATURE_X=true`）
+- コードのロールバック ≠ 機能のロールバック。flag OFF だけで戻せる状態を保つ
+- flag の寿命管理: リリース後 30 日以内に flag を撤去する（技術的負債化を防ぐ）
+
+---
+
 ## 6. Agent Team 連携プロンプト
 
 ```
@@ -194,3 +229,4 @@ CREATE INDEX CONCURRENTLY idx_users_email ON users(email);
 | Ver | 日付 | 変更内容 | 根拠 | 効果 |
 |---|---|---|---|---|
 | 1.0.0 | 2026-03-25 | 初版 | — | ベースライン |
+| 1.1.0 | 2026-04-12 | §5.5 Shift Left + 段階的ロールアウト追加 | addyosmani/agent-skills "shipping-and-launch" | 本番事故の早期検知・段階的リリースの原則化 |

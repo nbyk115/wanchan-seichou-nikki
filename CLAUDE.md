@@ -48,10 +48,11 @@
 | feedback-synthesizer | `.claude/agents/product/feedback-synthesizer.md` | ユーザーフィードバック統合・インサイト抽出 |
 
 ### 🟣 Creative（クリエイティブ・コンテンツ）
-**トリガー**: デザイン, UI, UX, Figma, LP, コンテンツ, SNS, ブログ, HTML, CSS, キャンペーン, ブランド, AIO, トーン, グロース, A/Bテスト, ファネル, CVR
+**トリガー**: デザイン, UI, UX, Figma, LP, コンテンツ, SNS, ブログ, HTML, CSS, キャンペーン, ブランド, AIO, トーン, グロース, A/Bテスト, ファネル, CVR, 動画, 動画編集, リール, 字幕
 
 > **Figma MCP対応エージェントには 🎨 を付与。**
 > FigmaリンクをURLとして渡すと自動でデザイン→コード変換が起動する。
+> **Claude Design**: プロンプト駆動でプロトタイプ・スライド・ワンページャーを高速生成（Opus 4.7ベース）。PDF/PPTX/HTML/Canvaエクスポート対応。Claude Codeへワンクリックハンドオフ。
 
 | エージェント | ファイル | 起動条件 |
 |---|---|---|
@@ -116,11 +117,14 @@
 | api-design-patterns | `.claude/skills/api-design-patterns.md` | REST/GraphQL設計標準・認証・冪等性 |
 | prompt-engineering | `.claude/skills/prompt-engineering.md` | プロンプト設計・RAG最適化・Tool Use設計 |
 | app-design-patterns | `.claude/skills/app-design-patterns.md` | iOS HIG・Material Design・モバイルナビゲーション・ASO・アプリKPI |
+| cybersecurity-playbook | `.claude/skills/cybersecurity-playbook.md` | OWASP Top 10・シークレット管理・認証認可・AI固有セキュリティ |
 | marketing-research-playbook | `.claude/skills/marketing-research-playbook.md` | マーケティング戦略・チャネル選定・データ分析・リサーチ・PR |
 | global-expansion-playbook | `.claude/skills/global-expansion-playbook.md` | グローバル展開・市場評価・ローカライズ・現地オペレーション |
 | claude-subconscious | `.claude/skills/claude-subconscious.md` | セッション間メモリ・コンテキスト蓄積・ファイルベースメモリ |
 | agent-evaluation | `.claude/skills/agent-evaluation.md` | 自己評価・フィードバックループ・自動改善・品質スコアリング |
+| falsification-check | `.claude/skills/falsification-check.md` | 反証モード実行・ハルシネーション検証・3ラベル分類・出力前チェック |
 | skill-evolution | `.claude/skills/skill-evolution.md` | スキルA/Bテスト・バージョン管理・自動採用・ロールバック |
+| video-use | `.claude/skills/video-use` (external) | 動画編集自動化・字幕・色補正・アニメーション挿入 |
 
 ---
 
@@ -133,7 +137,9 @@
 | /codemap | `.claude/commands/codemap.md` | コードマップ自動生成・更新 |
 | /security-scan | `.claude/commands/security-scan.md` | セキュリティスキャン（OWASP・シークレット・CVE） |
 | /review-pr | `.claude/commands/review-pr.md` | PR自動レビュー（5軸評価） |
+| /check-hallucination | `.claude/commands/check-hallucination.md` | ハルシネーション反証（クレーム抽出→3ラベル分類→修正提案） |
 | /analyze | `.claude/commands/analyze.md` | 第一原理分解クイック版 |
+| /review-agent-essence | `.claude/commands/review-agent-essence.md` | エージェント本質レビュー（設計の矛盾・形骸化・過剰を検出） |
 | /evolve | `.claude/commands/evolve.md` | スキル進化サイクル実行（診断→原因分析→改善→記録） |
 
 ---
@@ -286,6 +292,7 @@
 consulting/proposal-writer → creative/ux-designer → creative/frontend-dev
      （訴求整理）              （UX設計）              （実装）
 📘 consulting-playbook → creative-playbook → code-quality-gates
+※ 早期プロトタイプはClaude Designで生成→HTML export→frontend-devで仕上げも可
 ```
 
 ### パターン2: クライアントへの戦略提案書を作りたい
@@ -483,6 +490,96 @@ marketing-research/pr-communications → marketing-research/social-media-strateg
 - **数値化**: 「大幅に」より「30%改善」「粗利XX万円増」
 - **禁止**: 抽象論・「様子を見る」・PLに落ちない提案
 - **言語**: 日本語優先
+- **UI/デザイン**: UIを作るときは必ず `DESIGN.md` を参照せよ。色・フォント・余白・コンポーネントの全てをDESIGN.mdに従う
+- **ターゲット**: マーケ/セールス/コンテンツ制作時は必ず `ICP.md` を参照せよ。ペルソナ・利用文脈・非ターゲットを ICP.md に従う（プロジェクトルートに配置）
+
+### ⚡ トークン効率優先の原則（Token Efficiency First）— 全エージェント共通・OS レベル規律
+> **出典**: 2026-04-12 ユーザー指示「トークンをくわないところから優先的に作業するように」
+
+**原則**: タスクを実行する際は、**最もトークン消費が少ないアプローチから試す**。高コストなツール/ワークフローは必要な時だけ。
+
+#### 作業優先順位（低コスト → 高コスト）
+| 優先度 | 手段 | トークンコスト |
+|---|---|---|
+| 1 | **Edit ツール直接変更**（正確な old_string がある場合） | 最小 |
+| 2 | **Grep / Glob で必要箇所だけ特定** → Edit | 小 |
+| 3 | **Bash sed/awk で部分置換** | 小 |
+| 4 | **Read 行範囲指定**（offset/limit） | 中 |
+| 5 | **Agent Explore / 一括検索** | 中〜大 |
+| 6 | **Read 全ファイル** | 大 |
+| 7 | **Web 検索 / WebFetch** | 大 |
+| 8 | **サブエージェント呼び出し** | 最大 |
+
+#### 判断ルール
+- **既に情報があれば再取得しない**（過去の出力・ツール結果を再利用）
+- **Grep は `files_with_matches` or `count` モード優先**（content モードは必要時のみ）
+- **Read は必ず offset/limit を指定**（大ファイルの全読み込み禁止）
+- **Bash 出力は head/tail/grep でフィルタ**してから表示
+- **推測で動いてから検証より、検証してから動く**（手戻りが最大のトークン浪費）
+- **並列化できるツール呼び出しは並列実行**（Independent なら 1 メッセージに複数 tool_use）
+
+#### 反証（なぜこれが必要か）
+- トークン上限に到達するとセッション中断 or 圧縮で文脈損失
+- 冗長なツール使用 = ユーザー待ち時間増 = UX悪化
+- フレームワーク量 ≠ 規律の徹底 の原則に整合
+
+#### 違反検知
+- 同じ grep を 3 回以上叩く → 結果を保存して再利用すべきだった
+- Read 全ファイル連発 → offset/limit で分割すべきだった
+- 先に Edit 試す前に Agent/Explore を呼んだ → ダイレクト変更で済んだはず
+
+### ✂️ 冗長性禁止の原則（Output Discipline）— 全エージェント共通
+> **出典**: drona23/claude-token-efficient / Karpathy観察 より選別。日本語コンテキストに適応。
+
+- **阿諛フレーズ禁止**: 「素晴らしい質問」「なるほど、良いポイントですね」「その通りです」等の追従的な前置きを書かない
+- **過剰な前置き禁止**: 「念のため確認しますが」「もしよろしければ」「ご参考までに」等の本題を遅らせる定型句を削る
+- **思考漏洩禁止**: 「考えてみます」「少しお待ちください」「分析してみましょう」等のメタ発言を書かない。**結論から書く**
+- **コード過剰装飾禁止**（Service Dev部門限定）: 起き得ないエッジケースの try/except、自明なコメント、冗長な型注釈を追加しない。Karpathy原則2「シンプルさ優先」と整合
+- **例外**: 反証モード Step 1-3、コンサル納品物（提案書・戦略分析）、ADR は**深さと詳細が価値**なので本原則の短縮圧力を受けない。ただし阿諛/前置き/思考漏洩は全領域で禁止
+
+### 🔪 外科的変更の原則（Surgical Change Principle）— 全エージェント共通
+> **出典**: Karpathy の LLM コーディング観察 + Forrest Chang の4原則（andrej-karpathy-skills）より抽出。コード以外の領域にも拡張適用する。
+
+- **依頼の範囲を超えない**: 頼まれていない部分を「ついでに改善」しない
+- **隣接物を勝手に直さない**: バグ修正時に周辺コードの整理を同時にやらない。見つけた問題は別タスクとして報告
+- **削除判断は保守的に**: 「不要に見える」ものを消す前に、使われていないことを証拠付きで確認
+- **形式の尊重**: 既存の命名・トーン・構造・フォーマットに合わせる。自分の美意識で上書きしない
+- **差分を最小化**: 1タスク1目的。diffが広がったら分割を検討
+- **探索と改変を分ける**: 「読む」「調べる」モードと「直す」モードを混ぜない
+
+#### 部門別適用
+| 部門 | 「外科的変更」の意味 |
+|---|---|
+| Consulting | クライアントが頼んだスライド/章だけ更新。関連章を勝手に書き直さない |
+| Service Dev | バグ修正で隣接関数をリファクタリングしない。テスト追加で既存テストを改変しない |
+| Creative | ブランドリニューアル依頼でないなら既存トーンを踏襲。勝手に新色を足さない |
+| Global | 翻訳依頼で元文の範囲外を意訳しない。注釈は別途提案 |
+| Marketing | 広告改善依頼でLP全体を書き換えない。依頼された変数だけ動かす |
+| Product | 1機能の仕様変更で他機能のロードマップを巻き込まない |
+
+#### 違反検知
+- diff/変更量が依頼の10倍以上 → 停止して報告
+- 「ついでに」「せっかくなので」という言葉が出たら即中断
+- 変更理由を1行で説明できないファイル編集は巻き戻す
+
+#### 補足: フレームワーク = 明確に書かれた規律
+> 34エージェント・22スキルの重装備 ≠ 良いフレームワーク。
+> **書かれた規律を全員が実行できて初めてフレームワークになる。** 量より徹底。
+
+### 🔗 反証モード連動の原則（Mandatory Integration）— 全変更に必須
+> **コード変更・CSS変更・設計変更のすべてに反証モードを連動させる。** 形骸化した反証チェックは「やったつもり」と同じ。
+
+#### 連動ルール（変更前に必ず実行）
+1. **変数/定数の削除**: 削除前に全参照箇所を grep で列挙。参照が 1 つでも残っていたら削除しない（YORUGO_CODES 事故の教訓）
+2. **CSS 変更**: 「この CSS 変更で他のどの要素が影響を受けるか」を変更前に列挙。attribute selector は inline style の値変更で壊れる前提で設計
+3. **UI 要素の追加/削除**: syntax check だけでなく、paren balance + 未定義変数チェックを実行
+4. **複数変更の混在禁止**: 1 commit = 1 目的。YORUGO 削除 + CSS 変更 + UI 追加を 1 commit に混ぜない
+5. **対症療法の検知**: 同じカテゴリの修正が 2 回続いたら「構造の問題では？」と自問。3 回続いたら設計を見直す
+
+#### 違反検知
+- 参照チェックなしの定数/変数削除 → **即フリーズリスク**（ReferenceError で React マウント失敗）
+- CSS deny-all パターンの新規追加 → 禁止。個別 disable のみ許可
+- 反証チェック結果が出力に付与されていない変更 → ドラフト扱い
 
 ---
 
@@ -493,7 +590,7 @@ marketing-research/pr-communications → marketing-research/social-media-strateg
 
 ### 適用範囲
 - **全34エージェント**: Consulting / Service Dev / Product / Creative / Global / Marketing & Research の全エージェント
-- **全21スキルファイル**: consulting-playbook から skill-evolution まで全スキル
+- **全22スキルファイル**: consulting-playbook から skill-evolution まで全スキル
 - **例外なし**: 「簡単なタスクだから省略」は禁止。規模に応じてチェック深度を調整するが、3段階は必ず実行
 
 ### トリプルチェック・プロセス
@@ -611,7 +708,7 @@ Step 3: 実用反証（Practical Falsification）
 | Consulting | 情報収集・データ整理・フォーマット | 戦略判断・PL試算・Go/No-Go判定 |
 | Service Dev | コード実装・テスト・バグ修正 | アーキテクチャ設計・セキュリティレビュー |
 | Product | バックログ整理・VOC分類 | PMF判定・ロードマップ優先順位 |
-| Creative | コンテンツ生成・デザイン実装 | ブランド戦略・クリエイティブ方針 |
+| Creative | コンテンツ生成・デザイン実装・Claude Design生成 | ブランド戦略・クリエイティブ方針 |
 | Global | 翻訳・データ収集 | GTM戦略・市場参入判断 |
 | Marketing | レポート生成・データ集計 | チャネルミックス・予算配分判断 |
 
@@ -640,6 +737,7 @@ model: sonnet  # 実装はSonnet
 - **有効化は最大5〜6個まで**: ツール総数80以下。入れすぎると200k→70kに縮小
 - **CLIで代替できるならMCP不要**: `gh` CLI、`curl` 等で十分なケースはMCPを導入しない
 - **無料運用が前提**: 有料APIを必要とするMCPは導入前にコスト確認必須
+- **Video Use**: TTS機能にElevenLabs APIキー（有料）が必要。TTS不要の編集タスクは無料で利用可能
 - **長セッションでは /compact**: コンテキスト圧縮を手動実行
 - **コードマップ活用**: `/codemap` で `.claude/codemap.md` を生成し、巨大コードベースのナビゲーションコストを削減
 
@@ -679,7 +777,7 @@ model: sonnet  # 実装はSonnet
   - 「新規事業の参入判断をして」→ competitive-analyst→kpi-analytics→strategy-leadがバックグラウンドで連携
   - 「このLPを作って」→ creative-director→ux-designer→frontend-devがバックグラウンドで制作
   - 「海外市場を調査して」→ gtm-consultant→global-journalistがバックグラウンドでリサーチ
-- **安全性**: 反証モード6層品質ガード+評価カード自動記録により、自律実行でも品質を担保
+- **安全性**: 反証モード7層品質ガード+評価カード自動記録により、自律実行でも品質を担保
 - **注意**: Cowork完了後は必ず結果を確認し、評価カードのスコアを検証する
 
 ### Hooks自動化
@@ -687,6 +785,40 @@ model: sonnet  # 実装はSonnet
 - **PreToolUse**: 長時間コマンド（dev server等）実行前にtmux警告
 - **Stop**: console.log残留チェック、ブランドガイドライン準拠確認
 - 詳細は `.claude/skills/claude-code-ops.md` 参照
+
+---
+
+## 🛡️ セキュリティ多層防御（Multi-Layer Defense）
+
+> **「信頼」ではなく「制御」で固める。** モデルの善意に依存しない。Opus 4.7+ 級のモデルは単一層の制約を「ユーザーの意図を汲んで」柔軟解釈するリスクがある。2層で防御する。
+
+### Layer 1: CLAUDE.md（意図レベル — このファイル）
+- `.env`, `credentials`, `secrets`, API キーを含むファイルの **読み取り・出力・コミット禁止**
+- `git push --force`, `git reset --hard` は禁止（既存ルールと統合）
+- 外部 API への POST/PUT/DELETE は **ユーザーの明示的承認なしに実行しない**
+- ユーザーの明示的指示なく **他リポジトリ・他サービスにアクセスしない**
+- MCP サーバー経由の書き込み操作（Figma 編集、GitHub push_files 等）は **タスク単位で承認を得る**
+- `rm -rf`、`chmod 777` 等の破壊的ファイル操作は禁止
+
+### Layer 2: settings.json（技術レベル — permissions.deny）
+- `disabledMcpServers`: 未使用 MCP は無効化（コンテキスト管理ルールと統合）
+- `permissions.deny`: 危険コマンドパターンを明示的に拒否（settings.json に定義済み）
+- ファイルアクセス: `.env*`, `*credentials*`, `*secret*` の cat/read をブロック
+- Bash: `rm -rf /`, `curl -X POST`（無承認外部送信）等をブロック
+- Git: `push --force`, `reset --hard` をブロック
+
+### なぜ 2 層必要か
+
+| 単一層 | リスク |
+|---|---|
+| Layer 1 だけ | モデルが「ユーザーの意図を汲んで」ルールを柔軟解釈し、「この場合は例外」と判断する |
+| Layer 2 だけ | 新しいツール/コマンドが deny リストに入っていない場合にすり抜ける |
+| **両方** | モデルの判断ミス → 技術的にブロック → 安全 |
+
+### 運用ルール
+- **Layer 2 の更新は Layer 1 と同期**: CLAUDE.md にルールを追加したら settings.json の deny にも対応パターンを追加
+- **deny リストは定期レビュー**: `/security-scan` 実行時に deny パターンの網羅性を確認
+- **新 MCP 追加時**: セキュリティ影響を評価し、書き込み系ツールは deny パターンを先に設定
 
 ---
 
