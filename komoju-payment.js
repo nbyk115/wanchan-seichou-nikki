@@ -23,7 +23,8 @@ const KOMOJU_CONFIG = {
       currency: 'JPY',
       interval: 'month',
       features: [
-        'AI健康相談 無制限'
+        'AI健康相談 無制限',
+        '医療カルテ出力（PDF）'
       ]
     },
     yearly: {
@@ -34,6 +35,7 @@ const KOMOJU_CONFIG = {
       interval: 'year',
       features: [
         'AI健康相談 無制限',
+        '医療カルテ出力（PDF）',
         '2ヶ月分おトク！'
       ]
     }
